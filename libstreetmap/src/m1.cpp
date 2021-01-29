@@ -22,6 +22,7 @@
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
 
+std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -45,6 +46,29 @@ bool loadMap(std::string map_streets_database_filename) {
     // Load your map related data structures here.
     //
 
+    //traverse through all intersections
+    for(int intersection = 0; intersection < getNumIntersections(); intersection++){
+        std::vector<StreetSegmentIdx> street_segment_index; //create empty vector
+        
+        //traverse through street segment of each intersection
+        for(int street_segment_num = 0; street_segment_num < getNumIntersectionStreetSegment(intersection);street_segment_num++){
+            street_segment_index.push_back(getIntersectionStreetSegment(intersection,street_segment_num)); //push back street segment id into vector
+        }
+        
+        intersection_street_segments.push_back(street_segment_index);//push back vector into intersection_street_segment
+    }
+    
+    //unordered/ other data structures
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 
     load_successful = true; //Make sure this is updated to reflect whether
