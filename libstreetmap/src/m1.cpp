@@ -78,6 +78,8 @@ bool loadMap(std::string map_streets_database_filename) {
     return load_successful;
 }
 //LatLon         getIntersectionPosition(IntersectionIdx intersectionIdx)
+// Returns the distance between two (lattitude,longitude) coordinates in meters
+// Speed Requirement --> moderate
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
     double x1,y1,x2,y2,lat1,lat2,lat_avg,distance;
     lat1 = points.second.latitude() * kDegreeToRadian;
@@ -94,11 +96,19 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
 
 
 
-
+// Returns the length of the given street segment in meters
+// Speed Requirement --> moderate
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
-    
-    
-    
+    //StreetSegmentInfo getStreetSegmentInfo(StreetSegmentIdx streetSegmentIdx);
+    //LatLon         getIntersectionPosition(IntersectionIdx intersectionIdx);
+    LatLon point1,point2;
+    double length;
+    struct StreetSegmentInfo street_info = getStreetSegmentInfo(street_segment_id);
+    point1 = getIntersectionPosition(street_info.from);
+    point2 = getIntersectionPosition(street_info.to);
+    std::pair<LatLon,LatLon> points (point1,point2);
+    length = findDistanceBetweenTwoPoints(points);
+    return length;
 }
 
 
@@ -114,32 +124,6 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
