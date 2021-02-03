@@ -19,6 +19,7 @@
  * SOFTWARE.
  */
 #include <iostream>
+#include <math.h>
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
 
@@ -76,6 +77,35 @@ bool loadMap(std::string map_streets_database_filename) {
 
     return load_successful;
 }
+//LatLon         getIntersectionPosition(IntersectionIdx intersectionIdx)
+double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
+    double x1,y1,x2,y2,lat1,lat2,lat_avg,distance;
+    lat1 = points.second.latitude() * kDegreeToRadian;
+    lat2 = points.first.latitude() * kDegreeToRadian;
+    lat_avg = (lat1 + lat2)/2.0;
+    
+    x1 = points.first.longitude() * cos(lat_avg) * kDegreeToRadian;
+    y1 = points.first.latitude() * kDegreeToRadian;
+    x2 = points.second.longitude() * cos(lat_avg) * kDegreeToRadian;
+    y2 = points.second.latitude() * kDegreeToRadian;
+    distance = kEarthRadiusInMeters *  sqrt(pow(y2-y1,2)+ pow(x2-x1,2));
+    return distance;
+}
+
+
+
+
+double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
+    
+    
+    
+}
+
+
+
+double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
+    // Note: (time = distance/speed_limit)
+    return 5;
 
 
 
@@ -83,21 +113,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
