@@ -114,16 +114,16 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
 
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
-    // Note: (time = distance/speed_limit)
-    return 5;
-
-
-
-
-
-
-
+    // Note: (time = distance/speed_limit) double / float
+    double distance,time;
+    float speed_limit;
+    struct StreetSegmentInfo street_info = getStreetSegmentInfo(street_segment_id);
+    distance = findStreetSegmentLength(street_segment_id);
+    speed_limit = street_info.speedLimit;
+    time = distance/speed_limit;
+    return time;
 }
+
 
 
 
