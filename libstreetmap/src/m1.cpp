@@ -125,7 +125,9 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
     return time;
 }
 
-
+double findStreetLength(StreetIdx street_id){
+    
+}
 
 
 
