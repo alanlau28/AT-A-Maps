@@ -42,7 +42,8 @@ bool loadMap(std::string map_streets_database_filename) {
                                   //successfully
 
     std::cout << "loadMap: " << map_streets_database_filename << std::endl;
-
+    
+    
     //
     // Load your map related data structures here.
     //
@@ -480,8 +481,8 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
 //end Alex, start Tawseef
 
 /* functions to do: 
- * findStreetSegmentsOfIntersection, 
- * findAdjacentIntersections,
+ * findStreetSegmentsOfIntersection, --done
+ * findAdjacentIntersections,        --done 
  * findIntersectionsOfStreet
  * findIntersectionsOfTwoStreets,
  * findStreetboundingBox
@@ -493,11 +494,14 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
  */
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id) {
     
+    //get number of street segments connected to intersection
     int numIntersections = getNumIntersectionStreetSegment(intersection_id);
     
     std::vector<StreetSegmentIdx> streetSegments;
     
+    //loop through each segment connected to an intersection
     for (int i = 0; i < numIntersections; i++) {
+        //get id of each segment
         StreetSegmentIdx segment = getIntersectionStreetSegment(intersection_id, i);
         streetSegments.push_back(segment);
     }
@@ -507,31 +511,51 @@ std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx i
 
 
 
+/*returns all intersections reachable by traveling down one street segment
+ * from given intersection
+ */
+std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id) {
+    
+    std::vector<IntersectionIdx> adjacentIntersections;
+    
+    //get number of segments connected at intersection
+    int numIntersections = getNumIntersectionStreetSegment(intersection_id);
+    
+    for (int i = 0; i < numIntersections; i++) {
+        //get id of each segment
+        StreetSegmentIdx segment = getIntersectionStreetSegment(intersection_id, i);
+       //get segment info
+        StreetSegmentInfo info = getStreetSegmentInfo(segment);
+       
+        //add intersection ID the segment runs to if it's unique
+        for (int j = 0; j < adjacentIntersections.size(); j++) {
+            if (adjacentIntersections[j] == info.to) {
+                continue;
+            } else {
+                adjacentIntersections.push_back(info.to);
+            }
+        }
 
+    }
+    return adjacentIntersections;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
+    std::vector<std::string> intersectionNames;
+    
+    int numIntersections = getNumIntersectionStreetSegment(intersection_id);
+    
+    //loop through each segment at intersection, find name, add to vector
+    for (int i = 0; i < numIntersections; i++) {
+        StreetSegmentIdx segment = getIntersectionStreetSegment(intersection_id, i);
+        
+        std::string name = getStreetName(getStreetSegmentInfo(segment).streetID);
+        
+        intersectionNames.push_back(name);
+    }
+    
+    return intersectionNames;
+}
 
 
 
