@@ -277,7 +277,7 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
 
 
 
-//end Alan
+//end Alan , start Alex
 
 
 
@@ -477,9 +477,33 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
 
 
 
-//end Alex
+//end Alex, start Tawseef
 
+/* functions to do: 
+ * findStreetSegmentsOfIntersection, 
+ * findAdjacentIntersections,
+ * findIntersectionsOfStreet
+ * findIntersectionsOfTwoStreets,
+ * findStreetboundingBox
+ */
 
+
+/*returns the street segments that connect to given intersection
+ * finds number of segments connected to an intersections, loops through them
+ */
+std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id) {
+    
+    int numIntersections = getNumIntersectionStreetSegment(intersection_id);
+    
+    std::vector<StreetSegmentIdx> streetSegments;
+    
+    for (int i = 0; i < numIntersections; i++) {
+        StreetSegmentIdx segment = getIntersectionStreetSegment(intersection_id, i);
+        streetSegments.push_back(segment);
+    }
+    
+    return streetSegments;
+}
 
 
 
