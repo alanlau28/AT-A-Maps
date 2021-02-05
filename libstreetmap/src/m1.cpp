@@ -43,7 +43,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
     std::cout << "loadMap: " << map_streets_database_filename << std::endl;
     
-    
+    load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
     //
     // Load your map related data structures here.
     //
@@ -727,6 +727,7 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
 
 //end Tawseef
 void closeMap() {
-    //Clean-up your map related data structures here
+    //unloads map / frees memory used by API
+    closeStreetDatabase();
     
 }
