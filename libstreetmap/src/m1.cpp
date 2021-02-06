@@ -82,7 +82,9 @@ bool loadMap(std::string map_streets_database_filename) {
 // Returns the distance between two (lattitude,longitude) coordinates in meters
 // Speed Requirement --> moderate
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
+    
     double x1,y1,x2,y2,lat1,lat2,lat_avg,distance;
+    
     lat1 = points.second.latitude() * kDegreeToRadian;
     lat2 = points.first.latitude() * kDegreeToRadian;
     lat_avg = (lat1 + lat2)/2.0;
@@ -91,6 +93,7 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
     y1 = points.first.latitude() * kDegreeToRadian;
     x2 = points.second.longitude() * cos(lat_avg) * kDegreeToRadian;
     y2 = points.second.latitude() * kDegreeToRadian;
+    
     distance = kEarthRadiusInMeters *  sqrt(pow(y2-y1,2)+ pow(x2-x1,2));
     return distance;
 }
@@ -102,14 +105,35 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
     //StreetSegmentInfo getStreetSegmentInfo(StreetSegmentIdx streetSegmentIdx);
     //LatLon         getIntersectionPosition(IntersectionIdx intersectionIdx);
+    //LatLon getStreetSegmentCurvePoint(StreetSegmentIdx streetSegmentIdx, int pointNum);
     LatLon point1,point2;
-    double length;
-    struct StreetSegmentInfo street_info = getStreetSegmentInfo(street_segment_id);
-    point1 = getIntersectionPosition(street_info.from);
-    point2 = getIntersectionPosition(street_info.to);
     std::pair<LatLon,LatLon> points (point1,point2);
-    length = findDistanceBetweenTwoPoints(points);
-    return length;
+    double length = 0.0;
+    struct StreetSegmentInfo street_info = getStreetSegmentInfo(street_segment_id);
+    int numCurvePoints = street_info.numCurvePoints;
+    
+    if(numCurvePoints == 0){
+        point1 = getIntersectionPosition(street_info.from);
+        point2 = getIntersectionPosition(street_info.to);
+        length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
+        return length;
+    }
+    else{
+        point1 = getIntersectionPosition(street_info.from);
+        point2 = getStreetSegmentCurvePoint(street_segment_id,0);
+        points = std::pair<LatLon,LatLon> (point1,point2);
+        length += findDistanceBetweenTwoPoints(points);
+        
+        for(int i = 0; i < numCurvePoints-1; i++){
+            point1 = getStreetSegmentCurvePoint(street_segment_id,i);
+            point2 = getStreetSegmentCurvePoint(street_segment_id,i+1);
+            length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
+        }
+        point1 = getStreetSegmentCurvePoint(street_segment_id,numCurvePoints-1);
+        point2 = getIntersectionPosition(street_info.to);
+        length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
+        return length;
+    }
 }
 
 
@@ -124,33 +148,6 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
     time = distance/speed_limit;
     return time;
 }
-
-double findStreetLength(StreetIdx street_id){
-    
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
