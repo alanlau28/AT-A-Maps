@@ -154,26 +154,13 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
     return street_segment_travel_times[street_segment_id][0];
 }
 
-double findStreetLength(StreetIdx street_id){
-    return 2.2;
-}
 
-double findFeatureArea(FeatureIdx feature_id){
-    return 2.1;
-}
 
-POIIdx findClosestPOI(LatLon my_position, std::string POIname) {return 2;}
-std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids) {
-    std::vector<int> qq;
-    return qq;
-}
-std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix) {
-    std::vector<int> qq;
-    return qq;
-}
-LatLonBounds findStreetBoundingBox(StreetIdx street_id) {}
-std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){}
-IntersectionIdx findClosestIntersection(LatLon my_position){}
+
+
+
+
+
 
 
 
