@@ -24,6 +24,7 @@
 #include "StreetsDatabaseAPI.h"
 
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
+std::vector<std::vector<double>> street_segment_travel_times; 
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -58,6 +59,16 @@ bool loadMap(std::string map_streets_database_filename) {
         }
         
         intersection_street_segments.push_back(street_segment_index);//push back vector into intersection_street_segment
+    }
+    
+    for(int segment = 0; segment < getNumStreetSegments(); segment++){
+        struct StreetSegmentInfo street_info = getStreetSegmentInfo(segment);
+        double speed_limit = street_info.speedLimit;
+        double distance = findStreetSegmentLength(segment);
+        std::vector<double> segment_travel_time;
+        segment_travel_time.push_back(distance/speed_limit);
+        street_segment_travel_times.push_back(segment_travel_time);
+        
     }
     
     //unordered/ other data structures
@@ -140,27 +151,29 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
     // Note: (time = distance/speed_limit) double / float
-    double distance,time;
-    float speed_limit;
-    struct StreetSegmentInfo street_info = getStreetSegmentInfo(street_segment_id);
-    distance = findStreetSegmentLength(street_segment_id);
-    speed_limit = street_info.speedLimit;
-    time = distance/speed_limit;
-    return time;
+    return street_segment_travel_times[street_segment_id][0];
 }
 
+double findStreetLength(StreetIdx street_id){
+    return 2.2;
+}
 
+double findFeatureArea(FeatureIdx feature_id){
+    return 2.1;
+}
 
-
-
-
-
-
-
-
-
-
-
+POIIdx findClosestPOI(LatLon my_position, std::string POIname) {return 2;}
+std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids) {
+    std::vector<int> qq;
+    return qq;
+}
+std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix) {
+    std::vector<int> qq;
+    return qq;
+}
+LatLonBounds findStreetBoundingBox(StreetIdx street_id) {}
+std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){}
+IntersectionIdx findClosestIntersection(LatLon my_position){}
 
 
 
