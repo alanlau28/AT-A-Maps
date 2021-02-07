@@ -277,16 +277,19 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
 
 
 
+
 //end Alan , start Alex
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
     std::vector<StreetIdx> streetIdx;//create vector for final return
     if (street_prefix.size()==0) return streetIdx;//check for length 0 input
+    
     std::multimap<std::string, StreetIdx> streets;//multimap of all the street names and corresponding idx
-    street_prefix.erase(std::remove_if(street_prefix.begin(), street_prefix.end(), ::isspace), street_prefix.end());;
+    street_prefix.erase(std::remove_if(street_prefix.begin(), street_prefix.end(), ::isspace), street_prefix.end());//formatting: lowercase and remove spaces
+    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
     
     //fill multimap
-    for (int i = 0; i < getNumStreets();i++){
+    for (StreetIdx i = 0; i < getNumStreets();i++){
         std::string streetName = getStreetName(i);
         streetName.erase(std::remove_if(streetName.begin(), streetName.end(), isspace), streetName.end());//remove all spaces
         std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);//transform into lower case only
@@ -323,39 +326,69 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
 
 
 
+    
+                                                     
+POIIdx findClosestPOI(LatLon my_position, std::string POIname){
+    POIIdx target;//define variables needed
+    double distance;
+    std::string name;
+    std::multimap<double, POIIdx> matchingPOI;//define multimap for convenience (already sorted)
+    for (POIIdx POI = 0; POI < getNumPointsOfInterest();POI++){
+        name = getPOIName(POI);
+        //check if name matches
+        if(name.compare(POIname)==0){
+            distance = findDistanceBetweenTwoPoints(std::make_pair(my_position,getPOIPosition(POI)));
+            matchingPOI.insert(std::make_pair(distance,POI));
+        }
+    }
+    target = matchingPOI.begin()->second;
+    return target;
+}
+
+
+IntersectionIdx findClosestIntersection(LatLon my_position){
+    std::multimap<double,IntersectionIdx> intersections;//define multimap for convenience
+    IntersectionIdx target;
+    double distance;
+    //insert into multimap
+    for (IntersectionIdx intersection = 0; intersection < getNumIntersections();intersection++){
+        LatLon query = getIntersectionPosition(intersection);
+        distance = findDistanceBetweenTwoPoints(std::make_pair(query,my_position));
+        intersections.insert(std::make_pair(distance,intersection));
+    }
+    
+    target = intersections.begin()->second;//return smallest value
+    return target;
+}
 
 
 
+//required headers
+LatLonBounds findStreetBoundingBox(StreetIdx street_id){
+    LatLonBounds x;
+    return x;
+}
 
 
+double findFeatureArea(FeatureIdx feature_id){
+    double a;
+    return a;
+}
 
+double findStreetLength(StreetIdx street_id){
+    double a;
+    return a;
+}
 
+std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){
+    std::vector<IntersectionIdx> a;
+    return a;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
+    std::vector<IntersectionIdx> a;
+    return a;
+}
 
 
 
@@ -533,35 +566,6 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
     }
     return adjacentIntersections;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
