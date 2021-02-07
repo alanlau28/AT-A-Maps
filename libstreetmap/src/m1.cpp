@@ -363,36 +363,6 @@ IntersectionIdx findClosestIntersection(LatLon my_position){
 
 
 
-//required headers
-LatLonBounds findStreetBoundingBox(StreetIdx street_id){
-    LatLonBounds x;
-    return x;
-}
-
-
-double findFeatureArea(FeatureIdx feature_id){
-    double a;
-    return a;
-}
-
-double findStreetLength(StreetIdx street_id){
-    double a;
-    return a;
-}
-
-std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){
-    std::vector<IntersectionIdx> a;
-    return a;
-}
-
-std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
-    std::vector<IntersectionIdx> a;
-    return a;
-}
-
-
-
-
 
 
 
