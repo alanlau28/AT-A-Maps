@@ -26,7 +26,8 @@
 #include "StreetsDatabaseAPI.h"
 
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
-std::vector<std::vector<double>> street_segment_travel_times; 
+std::vector<double> street_segment_travel_times; 
+std::vector<std::vector<double>> street_lengths;
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -51,7 +52,9 @@ bool loadMap(std::string map_streets_database_filename) {
     //
     // Load your map related data structures here.
     //
-
+    
+    std::vector<StreetIdx> streets;
+    
     //traverse through all intersections
     for (int intersection = 0; intersection < getNumIntersections(); intersection++) {
         std::vector<StreetSegmentIdx> street_segment_index; //create empty vector
@@ -68,12 +71,20 @@ bool loadMap(std::string map_streets_database_filename) {
         struct StreetSegmentInfo street_info = getStreetSegmentInfo(segment);
         double speed_limit = street_info.speedLimit;
         double distance = findStreetSegmentLength(segment);
-        std::vector<double> segment_travel_time;
-        segment_travel_time.push_back(distance/speed_limit);
-        street_segment_travel_times.push_back(segment_travel_time);
-        
+        int street_id = street_info.streetID;
+        streets.push_back(street_id);
+        street_segment_travel_times.push_back(distance/speed_limit); 
     }
     
+    for(int street = 0; street < getNumStreets(); street++){
+        std::vector<double> segment_length;
+        std::pair<std::vector<int>::iterator,std::vector<int>::iterator> range;
+        range = std::equal_range(streets.begin(),streets.end(),street);
+        while(range.first != range.second){
+            segment_length.push_back(findStreetSegmentLength(*range.first));
+            range.first++; 
+        }
+    }
 
     //unordered/ other data structures
 
@@ -156,10 +167,20 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
     // Note: (time = distance/speed_limit) double / float
-    return street_segment_travel_times[street_segment_id][0];
-
+    return street_segment_travel_times[street_segment_id];
 }
 
+double findStreetLength(StreetIdx street_id){
+    double length = 0.0;
+    for(int i = 0; i < street_lengths[street_id].size();i++){
+        length += street_lengths[street_id][i];
+    }
+    return length;
+}
+
+double findFeatureArea(FeatureIdx feature_id){
+    return 2.1;
+}
 
 
 
