@@ -77,22 +77,27 @@ bool loadMap(std::string map_streets_database_filename) {
         double speed_limit = street_info.speedLimit;
         double distance = findStreetSegmentLength(segment);
         int street_id = street_info.streetID;
+        
+        //pushes back street id, distance, and travel time in each respective vector
         streets.push_back(street_id);
         segment_distances.push_back(distance);
         street_segment_travel_times.push_back(distance/speed_limit); 
     }
     
     for(int i = 0;i < getNumStreetSegments();i++){
+        //inserts a pair of street id and street segment distances for each street segment
         map_streetIds_distances.insert(std::pair<int,double>(streets[i],segment_distances[i]));
     } 
     
     street_lengths.resize(getNumStreets());
-    for(int street = 0; street < getNumStreets(); street++){
-        auto range = map_streetIds_distances.equal_range(street);
+    for(int street_id = 0; street_id < getNumStreets(); street_id++){
+        
+        //finds all occurrences of street_id and returns in a pair
+        auto range = map_streetIds_distances.equal_range(street_id);
         auto it = range.first;
-       
+       //iterate until second iterator
         while(it != range.second){
-            street_lengths[street].push_back((*it).second);
+            street_lengths[street_id].push_back((*it).second);
             it++;
         }
     }
@@ -126,7 +131,7 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
     lat1 = points.second.latitude() * kDegreeToRadian;
     lat2 = points.first.latitude() * kDegreeToRadian;
     lat_avg = (lat1 + lat2) / 2.0;
-
+    
     x1 = points.first.longitude() * cos(lat_avg) * kDegreeToRadian;
     y1 = points.first.latitude() * kDegreeToRadian;
     x2 = points.second.longitude() * cos(lat_avg) * kDegreeToRadian;
@@ -142,9 +147,6 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
 // Speed Requirement --> moderate
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
-    //StreetSegmentInfo getStreetSegmentInfo(StreetSegmentIdx streetSegmentIdx);
-    //LatLon         getIntersectionPosition(IntersectionIdx intersectionIdx);
-    //LatLon getStreetSegmentCurvePoint(StreetSegmentIdx streetSegmentIdx, int pointNum);
     LatLon point1,point2;
     std::pair<LatLon,LatLon> points (point1,point2);
     double length = 0.0;
@@ -161,6 +163,7 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
         point1 = getIntersectionPosition(street_info.from);
         point2 = getStreetSegmentCurvePoint(street_segment_id,0);
         points = std::pair<LatLon,LatLon> (point1,point2);
+        
         length += findDistanceBetweenTwoPoints(points);
         
         for(int i = 0; i < numCurvePoints-1; i++){
@@ -168,8 +171,10 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
             point2 = getStreetSegmentCurvePoint(street_segment_id,i+1);
             length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
         }
+        
         point1 = getStreetSegmentCurvePoint(street_segment_id,numCurvePoints-1);
         point2 = getIntersectionPosition(street_info.to);
+        
         length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
         return length;
     }
@@ -177,12 +182,13 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
 }
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
-    // Note: (time = distance/speed_limit) double / float
+    // returns travel time from vector
     return street_segment_travel_times[street_segment_id];
 }
 
 double findStreetLength(StreetIdx street_id){
     double length = 0.0;
+    //traverses through the vector of street_lengths[street_id] and adds them
     for(int i = 0; i < street_lengths[street_id].size();i++){
         length += street_lengths[street_id][i];
     }
@@ -193,14 +199,6 @@ double findFeatureArea(FeatureIdx feature_id){
     return 2.1;
 }
 
-POIIdx findClosestPOI(LatLon my_position, std::string POIname) {return 2;}
-std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids) {
-    std::vector<int> qq;
-    return qq;
-}
-LatLonBounds findStreetBoundingBox(StreetIdx street_id) {}
-std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){}
-IntersectionIdx findClosestIntersection(LatLon my_position){}
 
 
 
