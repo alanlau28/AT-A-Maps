@@ -101,13 +101,10 @@ bool loadMap(std::string map_streets_database_filename) {
             it++;
         }
     }
-    
+
     //unordered/ other data structures
     
-
-    
-
-
+    findFeatureArea(68692);
 
 
 
@@ -196,7 +193,33 @@ double findStreetLength(StreetIdx street_id){
 }
 
 double findFeatureArea(FeatureIdx feature_id){
-    return 2.1;
+    double x1, y1, x2, y2, lat1, lat2, lat_avg;
+    double area = 0.0;
+    int feature_points = getNumFeaturePoints(feature_id);
+    
+    LatLon point1 = getFeaturePoint(feature_id, 0);
+    LatLon point2 = getFeaturePoint(feature_id, feature_points-1);
+    
+    if(point1 == point2){
+        for(int i = 0; i < feature_points-1; i++){
+            
+            point1 = getFeaturePoint(feature_id, i);
+            point2 = getFeaturePoint(feature_id, i+1);
+            
+            lat1 = point1.latitude() * kDegreeToRadian;
+            lat2 = point2.latitude() * kDegreeToRadian;
+            lat_avg = (lat1 + lat2) / 2.0;
+    
+            x1 = point1.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
+            y1 = point1.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
+            x2 = point2.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
+            y2 = point2.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
+            
+            area += ((x2+x1)/2.0) * (y2-y1);
+        }  
+    }
+    if(area < 0) return area * -1.0;
+    else return area;
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids) {
@@ -205,38 +228,6 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 }
 LatLonBounds findStreetBoundingBox(StreetIdx street_id) {}
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -676,6 +667,8 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 void closeMap() {
     //unloads map / frees memory used by API
     street_lengths.clear();
+    intersection_street_segments.clear();
+    street_segment_travel_times.clear();
     closeStreetDatabase();
 
 }
