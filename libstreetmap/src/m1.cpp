@@ -192,13 +192,19 @@ double findStreetLength(StreetIdx street_id){
     for(int i = 0; i < street_lengths[street_id].size();i++){
         length += street_lengths[street_id][i];
     }
-    return length/3.0;
+    return length;
 }
 
 double findFeatureArea(FeatureIdx feature_id){
     return 2.1;
 }
 
+std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids) {
+    std::vector<int> qq;
+    return qq;
+}
+LatLonBounds findStreetBoundingBox(StreetIdx street_id) {}
+std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){}
 
 
 
@@ -669,6 +675,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 
 void closeMap() {
     //unloads map / frees memory used by API
+    street_lengths.clear();
     closeStreetDatabase();
 
 }
