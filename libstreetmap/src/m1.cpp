@@ -510,7 +510,8 @@ std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx i
  */
 std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id) {
 
-    std::vector<IntersectionIdx> adjacentIntersections;
+    std::vector<IntersectionIdx> intersections;
+
 
     //get number of segments connected at intersection
     int numIntersections = getNumIntersectionStreetSegment(intersection_id);
@@ -520,45 +521,33 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
         StreetSegmentIdx segment = getIntersectionStreetSegment(intersection_id, i);
         //get segment info
         StreetSegmentInfo info = getStreetSegmentInfo(segment);
+        
+       
+        //if oneway, only pass in intersection at position segment.to
+        //else insert both intersections at from and to direction
+        if (info.oneWay) {
+            intersections.push_back(info.to);
+            
+        } else if (!info.oneWay ){
+            intersections.push_back(info.to);
+            intersections.push_back(info.from);
 
-        //add intersection ID the segment runs to if it's unique
-        for (int j = 0; j < adjacentIntersections.size(); j++) {
-            if (adjacentIntersections[j] == info.to) {
-                continue;
-            } else {
-                adjacentIntersections.push_back(info.to);
-            }
         }
-
+        
+       
     }
-    return adjacentIntersections;
+    //sort array in ascending order, delete duplicates
+    std::sort(intersections.begin(), intersections.end());
+    auto last = std::unique(intersections.begin(), intersections.end());
+    intersections.erase(last, intersections.end());
+    //delete intersection_id
+    intersections.erase(std::remove(intersections.begin(), intersections.end(), intersection_id), intersections.end());
+    
+    
+    return intersections;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//Returns all intersections along given street
 
 
 

@@ -64,6 +64,13 @@ int main(int argc, char** argv) {
     std::cout << "Successfully loaded map '" << map_path << "'\n";
 
     //You can now do something with the map data
+    std::vector<int> vec = findAdjacentIntersections(143527);
+    
+    for (int i = 0; i < vec.size(); i++) {
+        std::cout << vec[i] << " " << std::endl;
+
+    }
+    //do something in between
 
 
     //Clean-up the map data and related data structures
