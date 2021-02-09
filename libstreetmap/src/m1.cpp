@@ -28,6 +28,9 @@
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<double> street_segment_travel_times; 
 std::vector<std::vector<double>> street_lengths;
+std::vector<std::vector<StreetSegmentIdx>> streets_streetSegments;
+//holds all street ids of each street segment with street segments as indices
+std::vector<StreetIdx> streets;
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -53,8 +56,6 @@ bool loadMap(std::string map_streets_database_filename) {
     // Load your map related data structures here.
     //
     
-    //holds all street ids of each street segment with street segments as indices
-    std::vector<StreetIdx> streets;
     //holds all distances of each street segment with street segments as indices
     std::vector<double> segment_distances;
     //map of each street id and distance of each street segment
@@ -81,7 +82,9 @@ bool loadMap(std::string map_streets_database_filename) {
         //pushes back street id, distance, and travel time in each respective vector
         streets.push_back(street_id);
         segment_distances.push_back(distance);
-        street_segment_travel_times.push_back(distance/speed_limit); 
+        street_segment_travel_times.push_back(distance/speed_limit);
+        
+        
     }
     
     for(int i = 0;i < getNumStreetSegments();i++){
@@ -99,12 +102,22 @@ bool loadMap(std::string map_streets_database_filename) {
         while(it != range.second){
             street_lengths[street_id].push_back((*it).second);
             it++;
-        }
+        }    
+      
     }
-
+    /* streets: every index is the street segment id, every element holds the street id
+     * streets[streetSegmentID] -> the street id
+     *  resize initializes streets_streetSegments so that you can access specific elements
+     * each index of streets_streetSegments is the streetID
+     * Using streets[streetSegmentID], you can access the street of the respective street segment
+     * push back on that index because the element holds a vector of streetsegmentID
+     */
+    streets_streetSegments.resize(getNumStreets());
+    for(int streetSegmentID = 0; streetSegmentID < getNumStreetSegments();streetSegmentID++){
+        streets_streetSegments[streets[streetSegmentID]].push_back(streetSegmentID);
+    }
     //unordered/ other data structures
     
-    findFeatureArea(68692);
 
 
 
@@ -227,24 +240,6 @@ double findFeatureArea(FeatureIdx feature_id){
     if(area < 0) return area * -1.0;
     else return area;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
