@@ -481,8 +481,8 @@ IntersectionIdx findClosestIntersection(LatLon my_position){
 /* functions to do: 
  * findStreetSegmentsOfIntersection, --done
  * findAdjacentIntersections,        --done 
- * findIntersectionsOfStreet
- * findIntersectionsOfTwoStreets,
+ * findIntersectionsOfStreet         --wip
+ * findIntersectionsOfTwoStreets,    --wip
  * findStreetboundingBox
  */
 
@@ -513,7 +513,6 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 
     std::vector<IntersectionIdx> intersections;
 
-
     //get number of segments connected at intersection
     int numIntersections = getNumIntersectionStreetSegment(intersection_id);
 
@@ -522,8 +521,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
         StreetSegmentIdx segment = getIntersectionStreetSegment(intersection_id, i);
         //get segment info
         StreetSegmentInfo info = getStreetSegmentInfo(segment);
-        
-       
+             
         //if oneway, only pass in intersection at position segment.to
         //else insert both intersections at from and to direction
         if (info.oneWay) {
@@ -532,10 +530,8 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
         } else if (!info.oneWay ){
             intersections.push_back(info.to);
             intersections.push_back(info.from);
-
         }
         
-       
     }
     //sort array in ascending order, delete duplicates
     std::sort(intersections.begin(), intersections.end());
@@ -544,13 +540,85 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
     //delete intersection_id
     intersections.erase(std::remove(intersections.begin(), intersections.end(), intersection_id), intersections.end());
     
-    
     return intersections;
 }
 
 //Returns all intersections along given street
+//currently nonfunctional
+std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
+    
+    std::vector<IntersectionIdx> intersections;
+    
+    //loop through all street segments until street_id is found
+    int numSegments = getNumStreetSegments();
+    
+    for (int i = 0; i < numSegments; i++) {
+        //get info
+        StreetSegmentInfo info = getStreetSegmentInfo(i);     
+        //if street id matches, insert to/from intersections into vector
+        if (info.streetID == street_id) {
+            intersections.push_back(info.to);
+            intersections.push_back(info.from);
+        }
+    }
+    
+    //sort array in ascending order, delete duplicates
+    std::sort(intersections.begin(), intersections.end());
+    auto last = std::unique(intersections.begin(), intersections.end());
+    intersections.erase(last, intersections.end());
+    return intersections;
+}
 
+//returns intersections where two streets intersect
+std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){
+    //make two vectors for the intersections of each street
+    std::vector<IntersectionIdx> intersections1 = findIntersectionsOfStreet(street_ids.first);
+    std::vector<IntersectionIdx> intersections2 = findIntersectionsOfStreet(street_ids.second);
+    
+    std::vector<IntersectionIdx> result;
+    
+    //compare the intersections of each street, if they match, insert
+    for (int i = 0; i < intersections1.size(); i++) {
+        for (int j = 0; j < intersections2.size(); j++) {
+            if (intersections1[i] == intersections2[j]) {
+                result.push_back(intersections1[i]);
+            }
+        }
+    }
+    
+    //sort array in ascending order, delete duplicates
+    std::sort(result.begin(), result.end());
+    auto last = std::unique(result.begin(), result.end());
+    result.erase(last, result.end());
+    
+    return result;
+}
 
+    
+    
+
+//return smallest rectangle that contains all the intersections and
+//curve points of the given street
+LatLonBounds findStreetBoundingBox(StreetIdx street_id){
+    
+    LatLonBounds box;
+   
+    std::vector<IntersectionIdx> intersections = findIntersectionsOfStreet(street_id);
+    
+    box.min = getIntersectionPosition(intersections[0]);
+    box.max = getIntersectionPosition(intersections[0]);
+    
+    for (int i = 0; i < intersections.size(); i++) {
+        LatLon position = getIntersectionPosition(intersections[i]);
+        if (position < box.min) {
+            box.min = position;
+        } else if (box.max < position) {
+            box.max = position;
+        }
+    }
+   
+    return box;
+}
 
 
 
