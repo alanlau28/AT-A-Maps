@@ -101,13 +101,10 @@ bool loadMap(std::string map_streets_database_filename) {
             it++;
         }
     }
-    
+
     //unordered/ other data structures
     
-
-    
-
-
+    findFeatureArea(68692);
 
 
 
@@ -153,17 +150,20 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
     struct StreetSegmentInfo street_info = getStreetSegmentInfo(street_segment_id);
     int numCurvePoints = street_info.numCurvePoints;
     
+    //if the street segment is straight
     if(numCurvePoints == 0){
         point1 = getIntersectionPosition(street_info.from);
         point2 = getIntersectionPosition(street_info.to);
         length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
         return length;
     }
+    //if the street segment has curve points
     else{
         point1 = getIntersectionPosition(street_info.from);
         point2 = getStreetSegmentCurvePoint(street_segment_id,0);
         points = std::pair<LatLon,LatLon> (point1,point2);
         
+        //sum the lengths between each point
         length += findDistanceBetweenTwoPoints(points);
         
         for(int i = 0; i < numCurvePoints-1; i++){
@@ -192,40 +192,41 @@ double findStreetLength(StreetIdx street_id){
     for(int i = 0; i < street_lengths[street_id].size();i++){
         length += street_lengths[street_id][i];
     }
-    return length/3.0;
+    return length;
 }
 
 double findFeatureArea(FeatureIdx feature_id){
-    return 2.1;
+    double x1, y1, x2, y2, lat1, lat2, lat_avg;
+    double area = 0.0;
+    int feature_points = getNumFeaturePoints(feature_id);
+    
+    //Latitude and longitude of the first and last point
+    LatLon point1 = getFeaturePoint(feature_id, 0);
+    LatLon point2 = getFeaturePoint(feature_id, feature_points-1);
+    
+    //if the polygon is closed, compute the area of the closed polygon
+    if(point1 == point2){
+        for(int i = 0; i < feature_points-1; i++){
+            
+            point1 = getFeaturePoint(feature_id, i);
+            point2 = getFeaturePoint(feature_id, i+1);
+            
+            lat1 = point1.latitude() * kDegreeToRadian;
+            lat2 = point2.latitude() * kDegreeToRadian;
+            lat_avg = (lat1 + lat2) / 2.0;
+    
+            x1 = point1.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
+            y1 = point1.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
+            x2 = point2.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
+            y2 = point2.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
+            
+            area += ((x2+x1)/2.0) * (y2-y1);
+        }  
+    }
+    
+    if(area < 0) return area * -1.0;
+    else return area;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -737,6 +738,9 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
 
 void closeMap() {
     //unloads map / frees memory used by API
+    street_lengths.clear();
+    intersection_street_segments.clear();
+    street_segment_travel_times.clear();
     closeStreetDatabase();
 
 }
