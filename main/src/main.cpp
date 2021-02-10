@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
     std::cout << "Successfully loaded map '" << map_path << "'\n";
 
     //You can now do something with the map data
-    std::vector<int> vec = findIntersectionsOfStreet(143527);
+    std::vector<int> vec = findIntersectionsOfTwoStreets(std::make_pair(15277, 15276));
     
     for (int i = 0; i < vec.size(); i++) {
         std::cout << vec[i] << " " << std::endl;
