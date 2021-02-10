@@ -20,6 +20,7 @@
  */
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 #include "m1.h"
 
@@ -64,13 +65,16 @@ int main(int argc, char** argv) {
     std::cout << "Successfully loaded map '" << map_path << "'\n";
 
     //You can now do something with the map data
-    std::vector<int> vec = findIntersectionsOfTwoStreets(std::make_pair(15277, 15276));
+    std::vector<int> vec = findStreetIdsFromPartialStreetName("High");
+    std::sort(vec.begin(),vec.end());
     
     for (int i = 0; i < vec.size(); i++) {
-        std::cout << vec[i] << " " << std::endl;
+        std::cout << vec[i] << ", ";
 
     }
     //do something in between
+   
+    
 
 
     //Clean-up the map data and related data structures
