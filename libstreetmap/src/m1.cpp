@@ -128,16 +128,6 @@ bool loadMap(std::string map_streets_database_filename) {
         streets_streetSegments[streets[streetSegmentID]].push_back(streetSegmentID);
     }    
     
-    /*
-    intersections_of_each_street.resize(getNumStreets());
-    for(int street_id = 0; street_id < getNumStreets();street_id++){
-        for(int street_segment = 0; street_segment < streets_streetSegments[street_id].size();street_segment++){
-            StreetSegmentInfo info = getStreetSegmentInfo(streets_streetSegments[street_id][street_segment]);
-            intersections_of_each_street[street_id].insert(info.to);
-            intersections_of_each_street[street_id].insert(info.from);
-        }
-    }
-     */
    
     for (int street_id = 0; street_id < getNumStreets(); street_id++) {
         
@@ -498,8 +488,8 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
 /* functions to do: 
  * findStreetSegmentsOfIntersection, --done
  * findAdjacentIntersections,        --done 
- * findIntersectionsOfStreet         --wip
- * findIntersectionsOfTwoStreets,    --wip
+ * findIntersectionsOfStreet         --done?
+ * findIntersectionsOfTwoStreets,    --done?
  */
 
 /*returns the street segments that connect to given intersection
@@ -557,21 +547,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
     
     std::vector<IntersectionIdx> intersections = intersections_of_each_street[street_id];
-    
-//    for (int i = 0; i < streets_streetSegments[street_id].size(); i++) {
-//        //get info
-//        StreetSegmentInfo info = getStreetSegmentInfo(streets_streetSegments[street_id][i]);     
-//        //if street id matches, insert to/from intersections into vector
-//        if (info.streetID == street_id) {
-//            intersections.push_back(info.to);
-//            intersections.push_back(info.from);
-//        }
-//    }
-//    
-//    //sort array in ascending order, delete duplicates
-//    std::sort(intersections.begin(), intersections.end());
-//    auto last = std::unique(intersections.begin(), intersections.end());
-//    intersections.erase(last, intersections.end());
+
     return intersections;
 }
 
@@ -592,28 +568,6 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
         }
     }
     
-    
-    //compare the intersections of each street, if they match, insert
-//    for (int i = 0; i < streets_streetSegments[street_ids.first].size(); i++) {
-//        
-//        StreetSegmentInfo street1 = getStreetSegmentInfo(streets_streetSegments[street_ids.first][i]);
-//        
-//        for (int j = 0; j < streets_streetSegments[street_ids.second].size(); j++) {
-//            
-//            StreetSegmentInfo street2 = getStreetSegmentInfo(streets_streetSegments[street_ids.second][j]);
-//            
-//            if (street1.from == street2.from || street1.from == street2.to) {
-//                result.push_back(street1.from);
-//            } else if (street1.to == street2.to || street1.to == street2.from) {
-//                result.push_back(street1.to);
-//            } 
-//        }
-//    }
-//    
-    //sort array in ascending order, delete duplicates
-//    std::sort(result.begin(), result.end());
-//    auto last = std::unique(result.begin(), result.end());
-//    result.erase(last, result.end());
     
     return result;
 }
