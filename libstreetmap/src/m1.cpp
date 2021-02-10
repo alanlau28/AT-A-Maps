@@ -26,6 +26,7 @@
 #include <string>
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
+#include <unordered_set>
 
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<double> street_segment_travel_times; 
@@ -36,7 +37,7 @@ std::vector<StreetIdx> streets;
 
 //holds [streetId][intersections], first index is streetID of street, second index
 //is the array of intersections of streetID
-std::vector<std::vector<StreetSegmentIdx>> intersections_of_each_street;
+std::vector<std::unordered_set<StreetSegmentIdx>> intersections_of_each_street;
 
 
 // loadMap will be called with the name of the file that stores the "layer-2"
@@ -125,7 +126,15 @@ bool loadMap(std::string map_streets_database_filename) {
         streets_streetSegments[streets[streetSegmentID]].push_back(streetSegmentID);
     }
     
-    
+    intersections_of_each_street.resize(getNumStreets());
+    for(int street_id = 0; street_id < getNumStreets();street_id++){
+        for(int street_segment = 0; street_segment < streets_streetSegments[street_id].size();street_segment++){
+            StreetSegmentInfo info = getStreetSegmentInfo(streets_streetSegments[street_id][street_segment]);
+            intersections_of_each_street[street_id].insert(info.to);
+            intersections_of_each_street[street_id].insert(info.from);
+        }
+    }
+   /*
     for (int street_id = 0; street_id < getNumStreets(); street_id++) {
         
         intersections_of_each_street.resize(getNumStreets());
@@ -147,9 +156,9 @@ bool loadMap(std::string map_streets_database_filename) {
         
         
     }
-    
+    */
     //unordered/ other data structures
-    
+
 
 
 
@@ -276,34 +285,6 @@ double findFeatureArea(FeatureIdx feature_id){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //end Alan , start Alex
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
@@ -392,12 +373,12 @@ IntersectionIdx findClosestIntersection(LatLon my_position){
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     
     LatLonBounds box;
-    std::set<double> pointsOfStreet_Lon;
-    std::set<double> pointsOfStreet_Lat;
+    std::set<float> pointsOfStreet_Lon;
+    std::set<float> pointsOfStreet_Lat;
     std::vector<IntersectionIdx> intersections = intersections_of_each_street[street_id];
-    /*
-    //box.min = getIntersectionPosition(intersections[0]);
-    //box.max = getIntersectionPosition(intersections[0]);
+    std::vector<StreetSegmentIdx> segmentsOfThisStreet = streets_streetSegments[street_id];
+    //LatLon bottom_left = segmentsOfThisStreet[0];
+   // LatLon top_right = segmentsOfThisStreet[0];
     
     for (int i = 0; i < intersections.size(); i++) {
         LatLon position = getIntersectionPosition(intersections[i]);
@@ -405,24 +386,21 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
         pointsOfStreet_Lon.insert(position.longitude());
         pointsOfStreet_Lat.insert(position.latitude());
     }
-    std::vector<StreetSegmentIdx> segmentsOfThisStreet = streets_streetSegments[street_id];
-    for(StreetSegmentIdx i = 0; i<segmentsOfThisStreet.size();i++){
-        struct StreetSegmentInfo street_info = getStreetSegmentInfo(i);
+     
+    
+    for(StreetSegmentIdx i = 0; i < segmentsOfThisStreet.size();i++){
+        struct StreetSegmentInfo street_info = getStreetSegmentInfo(segmentsOfThisStreet[i]);
         int numCurvePoints = street_info.numCurvePoints;
-        for (int j = 0; j<numCurvePoints; j++){
+        for (int j = 0; j < numCurvePoints; j++){
             LatLon curvePoint = getStreetSegmentCurvePoint(i,j);
             pointsOfStreet_Lon.insert(curvePoint.longitude());
-            pointsOfStreet_Lat.insert(curvePoint.latitude());
-            
+            pointsOfStreet_Lat.insert(curvePoint.latitude());         
         }
         
-    }*/
-    pointsOfStreet_Lat.insert(1.0);
-    pointsOfStreet_Lon.insert(-1.0);
-    pointsOfStreet_Lat.insert(100.0);
-    pointsOfStreet_Lon.insert(-100.0);
-    LatLon min = LatLon((float)*(pointsOfStreet_Lat.begin()), (float)*(pointsOfStreet_Lon.begin()));
-    LatLon max = LatLon((float)*(pointsOfStreet_Lat.rbegin()), (float)*(pointsOfStreet_Lon.rbegin()));
+    }
+    
+    LatLon min = LatLon(*(pointsOfStreet_Lat.begin()), *(pointsOfStreet_Lon.begin()));
+    LatLon max = LatLon(*(pointsOfStreet_Lat.rbegin()), *(pointsOfStreet_Lon.rbegin()));
     box.min = min;
     box.max = max;
    
