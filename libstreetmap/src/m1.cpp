@@ -37,7 +37,7 @@ std::vector<StreetIdx> streets;
 
 //holds [streetId][intersections], first index is streetID of street, second index
 //is the array of intersections of streetID
-std::vector<std::unordered_set<StreetSegmentIdx>> intersections_of_each_street;
+std::vector<std::vector<StreetSegmentIdx>> intersections_of_each_street;
 
 
 // loadMap will be called with the name of the file that stores the "layer-2"
@@ -124,8 +124,9 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_streetSegments.resize(getNumStreets());
     for(int streetSegmentID = 0; streetSegmentID < getNumStreetSegments();streetSegmentID++){
         streets_streetSegments[streets[streetSegmentID]].push_back(streetSegmentID);
-    }
+    }    
     
+    /*
     intersections_of_each_street.resize(getNumStreets());
     for(int street_id = 0; street_id < getNumStreets();street_id++){
         for(int street_segment = 0; street_segment < streets_streetSegments[street_id].size();street_segment++){
@@ -134,7 +135,8 @@ bool loadMap(std::string map_streets_database_filename) {
             intersections_of_each_street[street_id].insert(info.from);
         }
     }
-   /*
+     */
+   
     for (int street_id = 0; street_id < getNumStreets(); street_id++) {
         
         intersections_of_each_street.resize(getNumStreets());
@@ -156,7 +158,7 @@ bool loadMap(std::string map_streets_database_filename) {
         
         
     }
-    */
+
     //unordered/ other data structures
 
 
@@ -379,7 +381,8 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     std::vector<StreetSegmentIdx> segmentsOfThisStreet = streets_streetSegments[street_id];
     //LatLon bottom_left = segmentsOfThisStreet[0];
    // LatLon top_right = segmentsOfThisStreet[0];
-    
+    std::cout << intersections_of_each_street[street_id].size() << std::endl;
+    std::cout << streets_streetSegments[street_id].size();
     for (int i = 0; i < intersections.size(); i++) {
         LatLon position = getIntersectionPosition(intersections[i]);
  
