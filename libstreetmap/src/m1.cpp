@@ -394,8 +394,8 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     LatLonBounds box;
     std::set<double> pointsOfStreet_Lon;
     std::set<double> pointsOfStreet_Lat;
-    std::vector<IntersectionIdx> intersections = findIntersectionsOfStreet(street_id);
-    
+    std::vector<IntersectionIdx> intersections = intersections_of_each_street[street_id];
+    /*
     //box.min = getIntersectionPosition(intersections[0]);
     //box.max = getIntersectionPosition(intersections[0]);
     
@@ -416,9 +416,13 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
             
         }
         
-    }
-    LatLon min = LatLon(*pointsOfStreet_Lat.begin(), *pointsOfStreet_Lon.begin());
-    LatLon max = LatLon(*pointsOfStreet_Lat.rbegin(), *pointsOfStreet_Lon.rbegin());
+    }*/
+    pointsOfStreet_Lat.insert(1.0);
+    pointsOfStreet_Lon.insert(-1.0);
+    pointsOfStreet_Lat.insert(100.0);
+    pointsOfStreet_Lon.insert(-100.0);
+    LatLon min = LatLon((float)*(pointsOfStreet_Lat.begin()), (float)*(pointsOfStreet_Lon.begin()));
+    LatLon max = LatLon((float)*(pointsOfStreet_Lat.rbegin()), (float)*(pointsOfStreet_Lon.rbegin()));
     box.min = min;
     box.max = max;
    
