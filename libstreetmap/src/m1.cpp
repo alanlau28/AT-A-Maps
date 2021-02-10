@@ -21,7 +21,9 @@
 #include <iostream>
 #include <math.h>
 #include <map>
+#include <set>
 #include <algorithm>
+#include <string>
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
 
@@ -308,7 +310,7 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     std::vector<StreetIdx> streetIdx;//create vector for final return
     if (street_prefix.size()==0) return streetIdx;//check for length 0 input
     
-    std::multimap<std::string, StreetIdx> streets;//multimap of all the street names and corresponding idx
+    std::multimap<std::string, StreetIdx> streets_NamesIdx;//multimap of all the street names and corresponding idx
     street_prefix.erase(std::remove_if(street_prefix.begin(), street_prefix.end(), ::isspace), street_prefix.end());//formatting: lowercase and remove spaces
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
     
@@ -317,11 +319,11 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
         std::string streetName = getStreetName(i);
         streetName.erase(std::remove_if(streetName.begin(), streetName.end(), isspace), streetName.end());//remove all spaces
         std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);//transform into lower case only
-        streets.insert(std::make_pair(streetName,i));
+        streets_NamesIdx.insert(std::make_pair(streetName,i));
     }
     
-    auto firstOccurance = streets.lower_bound(street_prefix);//locate first match, save as iterator
-    if(firstOccurance==streets.end()) return streetIdx;//if no match, return empty vector immediately
+    auto firstOccurance = streets_NamesIdx.lower_bound(street_prefix);//locate first match, save as iterator
+    if(firstOccurance==streets_NamesIdx.end()) return streetIdx;//if no match, return empty vector immediately
     
     //increment iterator until input is not a prefix of Key anymore 
     for (auto it = firstOccurance; it->first.compare(0, street_prefix.size(), street_prefix)==0; ++it){
@@ -385,39 +387,43 @@ IntersectionIdx findClosestIntersection(LatLon my_position){
     return target;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//return smallest rectangle that contains all the intersections and
+//curve points of the given street
+LatLonBounds findStreetBoundingBox(StreetIdx street_id){
+    
+    LatLonBounds box;
+    std::set<double> pointsOfStreet_Lon;
+    std::set<double> pointsOfStreet_Lat;
+    std::vector<IntersectionIdx> intersections = findIntersectionsOfStreet(street_id);
+    
+    //box.min = getIntersectionPosition(intersections[0]);
+    //box.max = getIntersectionPosition(intersections[0]);
+    
+    for (int i = 0; i < intersections.size(); i++) {
+        LatLon position = getIntersectionPosition(intersections[i]);
+ 
+        pointsOfStreet_Lon.insert(position.longitude());
+        pointsOfStreet_Lat.insert(position.latitude());
+    }
+    std::vector<StreetSegmentIdx> segmentsOfThisStreet = streets_streetSegments[street_id];
+    for(StreetSegmentIdx i = 0; i<segmentsOfThisStreet.size();i++){
+        struct StreetSegmentInfo street_info = getStreetSegmentInfo(i);
+        int numCurvePoints = street_info.numCurvePoints;
+        for (int j = 0; j<numCurvePoints; j++){
+            LatLon curvePoint = getStreetSegmentCurvePoint(i,j);
+            pointsOfStreet_Lon.insert(curvePoint.longitude());
+            pointsOfStreet_Lat.insert(curvePoint.latitude());
+            
+        }
+        
+    }
+    LatLon min = LatLon(*pointsOfStreet_Lat.begin(), *pointsOfStreet_Lon.begin());
+    LatLon max = LatLon(*pointsOfStreet_Lat.rbegin(), *pointsOfStreet_Lon.rbegin());
+    box.min = min;
+    box.max = max;
+   
+    return box;
+}
 
 
 
@@ -630,28 +636,7 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
     
     
 
-//return smallest rectangle that contains all the intersections and
-//curve points of the given street
-LatLonBounds findStreetBoundingBox(StreetIdx street_id){
-    
-    LatLonBounds box;
-   
-    std::vector<IntersectionIdx> intersections = findIntersectionsOfStreet(street_id);
-    
-    box.min = getIntersectionPosition(intersections[0]);
-    box.max = getIntersectionPosition(intersections[0]);
-    
-    for (int i = 0; i < intersections.size(); i++) {
-        LatLon position = getIntersectionPosition(intersections[i]);
-        if (position < box.min) {
-            box.min = position;
-        } else if (box.max < position) {
-            box.max = position;
-        }
-    }
-   
-    return box;
-}
+
 
 
 
