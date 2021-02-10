@@ -161,7 +161,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
     //unordered/ other data structures
 
-
+    
 
 
 
@@ -381,24 +381,23 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     std::vector<StreetSegmentIdx> segmentsOfThisStreet = streets_streetSegments[street_id];
     //LatLon bottom_left = segmentsOfThisStreet[0];
    // LatLon top_right = segmentsOfThisStreet[0];
-    std::cout << intersections_of_each_street[street_id].size() << std::endl;
-    std::cout << streets_streetSegments[street_id].size();
+
     for (int i = 0; i < intersections.size(); i++) {
         LatLon position = getIntersectionPosition(intersections[i]);
  
         pointsOfStreet_Lon.insert(position.longitude());
         pointsOfStreet_Lat.insert(position.latitude());
     }
-     
     
-    for(StreetSegmentIdx i = 0; i < segmentsOfThisStreet.size();i++){
-        struct StreetSegmentInfo street_info = getStreetSegmentInfo(segmentsOfThisStreet[i]);
+    
+    for(int segmentNum = 0; segmentNum < segmentsOfThisStreet.size();segmentNum++){
+        struct StreetSegmentInfo street_info = getStreetSegmentInfo(segmentsOfThisStreet[segmentNum]);
         int numCurvePoints = street_info.numCurvePoints;
-        for (int j = 0; j < numCurvePoints; j++){
-            LatLon curvePoint = getStreetSegmentCurvePoint(i,j);
-            pointsOfStreet_Lon.insert(curvePoint.longitude());
-            pointsOfStreet_Lat.insert(curvePoint.latitude());         
-        }
+            for (int j = 0; j < numCurvePoints; j++){
+                LatLon curvePoint = getStreetSegmentCurvePoint(segmentsOfThisStreet[segmentNum],j);
+                pointsOfStreet_Lon.insert(curvePoint.longitude());
+                pointsOfStreet_Lat.insert(curvePoint.latitude());         
+            }
         
     }
     
