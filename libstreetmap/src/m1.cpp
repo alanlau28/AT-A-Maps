@@ -63,7 +63,9 @@ bool loadMap(std::string map_streets_database_filename) {
     //
     // Load your map related data structures here.
     //
-    
+    if(!load_successful){
+        return false;
+    }
     //holds all distances of each street segment with street segments as indices
     std::vector<double> segment_distances;
     //map of each street id and distance of each street segment
@@ -168,10 +170,9 @@ bool loadMap(std::string map_streets_database_filename) {
 
 
 
-    load_successful = true; //Make sure this is updated to reflect whether
-    //loading the map succeeded or failed
 
-    return load_successful;
+    //map loaded successfully
+    return true;
 }
 //LatLon         getIntersectionPosition(IntersectionIdx intersectionIdx)
 // Returns the distance between two (lattitude,longitude) coordinates in meters
@@ -651,6 +652,7 @@ void closeMap() {
     intersection_street_segments.clear();
     street_segment_travel_times.clear();
     intersections_of_each_street.clear();
+    streets.clear();
     closeStreetDatabase();
 
 }
