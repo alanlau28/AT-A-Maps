@@ -26,7 +26,7 @@
 #include <string>
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
-#include <unordered_set>
+#include <unordered_map>
 
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<double> street_segment_travel_times; 
@@ -69,7 +69,7 @@ bool loadMap(std::string map_streets_database_filename) {
     //holds all distances of each street segment with street segments as indices
     std::vector<double> segment_distances;
     //map of each street id and distance of each street segment
-    std::multimap<int,double> map_streetIds_distances;
+    std::unordered_multimap<int,double> map_streetIds_distances;
      
     //traverse through all intersections
     for (int intersection = 0; intersection < getNumIntersections(); intersection++) {
