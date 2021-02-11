@@ -293,6 +293,8 @@ double findFeatureArea(FeatureIdx feature_id){
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
     std::vector<StreetIdx> streetIdx;//create vector for final return
     if (street_prefix.size()==0) return streetIdx;//check for length 0 input
+    std::string streetName;
+    std::cout<<street_prefix<<std::endl;
     
     std::multimap<std::string, StreetIdx> streets_NamesIdx;//multimap of all the street names and corresponding idx
     street_prefix.erase(std::remove_if(street_prefix.begin(), street_prefix.end(), ::isspace), street_prefix.end());//formatting: lowercase and remove spaces
@@ -300,19 +302,21 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     
     //fill multimap
     for (StreetIdx i = 0; i < getNumStreets();i++){
-        std::string streetName = getStreetName(i);
+        streetName = getStreetName(i);
         streetName.erase(std::remove_if(streetName.begin(), streetName.end(), isspace), streetName.end());//remove all spaces
         std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);//transform into lower case only
         streets_NamesIdx.insert(std::make_pair(streetName,i));
+        
     }
     
     auto firstOccurance = streets_NamesIdx.lower_bound(street_prefix);//locate first match, save as iterator
     if(firstOccurance==streets_NamesIdx.end()) return streetIdx;//if no match, return empty vector immediately
     
     //increment iterator until input is not a prefix of Key anymore 
-    for (auto it = firstOccurance; it->first.compare(0, street_prefix.size(), street_prefix)==0; ++it){
-        streetIdx.push_back(it->second);
-    }    
+    for (auto it = firstOccurance; (it!=streets_NamesIdx.end()&& (it->first.compare(0, street_prefix.size(), street_prefix)==0)); ++it){
+        int num = it->second;
+        streetIdx.push_back(num);
+    }
     
     return streetIdx;
 }
