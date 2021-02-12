@@ -39,6 +39,9 @@ std::vector<StreetIdx> streets;
 //is the array of intersections of streetID
 std::vector<std::vector<StreetSegmentIdx>> intersections_of_each_street;
 
+//<StreetName, StreetIdx>
+std::multimap<std::string, StreetIdx> streets_NamesIdx;//multimap of all the street names and corresponding idx
+
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -148,6 +151,15 @@ bool loadMap(std::string map_streets_database_filename) {
         auto last = std::unique(intersections_of_each_street[street_id].begin(), intersections_of_each_street[street_id].end());
         intersections_of_each_street[street_id].erase(last, intersections_of_each_street[street_id].end());
         
+        
+    }
+    
+    //fill multimap of <streetName, streetIdx>
+    for (StreetIdx i = 0; i < getNumStreets();i++){
+        std::string streetName = getStreetName(i);
+        streetName.erase(std::remove_if(streetName.begin(), streetName.end(), isspace), streetName.end());//remove all spaces
+        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);//transform into lower case only
+        streets_NamesIdx.insert(std::make_pair(streetName,i));
         
     }
 
@@ -282,22 +294,10 @@ double findFeatureArea(FeatureIdx feature_id){
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
     std::vector<StreetIdx> streetIdx;//create vector for final return
-    if (street_prefix.size()==0) return streetIdx;//check for length 0 input
-    std::string streetName;
-    std::cout<<street_prefix<<std::endl;
-    
-    std::multimap<std::string, StreetIdx> streets_NamesIdx;//multimap of all the street names and corresponding idx
+    if (street_prefix.size()==0) return streetIdx;//check for length 0 input  
+   
     street_prefix.erase(std::remove_if(street_prefix.begin(), street_prefix.end(), ::isspace), street_prefix.end());//formatting: lowercase and remove spaces
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
-    
-    //fill multimap
-    for (StreetIdx i = 0; i < getNumStreets();i++){
-        streetName = getStreetName(i);
-        streetName.erase(std::remove_if(streetName.begin(), streetName.end(), isspace), streetName.end());//remove all spaces
-        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);//transform into lower case only
-        streets_NamesIdx.insert(std::make_pair(streetName,i));
-        
-    }
     
     auto firstOccurance = streets_NamesIdx.lower_bound(street_prefix);//locate first match, save as iterator
     if(firstOccurance==streets_NamesIdx.end()) return streetIdx;//if no match, return empty vector immediately
@@ -403,20 +403,6 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
    
     return box;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -611,6 +597,7 @@ void closeMap() {
     street_segment_travel_times.clear();
     intersections_of_each_street.clear();
     streets.clear();
+    streets_NamesIdx.clear();
     closeStreetDatabase();
 
 }

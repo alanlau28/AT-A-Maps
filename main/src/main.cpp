@@ -64,12 +64,7 @@ int main(int argc, char** argv) {
     std::cout << "Successfully loaded map '" << map_path << "'\n";
 
     //You can now do something with the map data
-    std::vector<int> vec = findStreetIdsFromPartialStreetName("Drex");
-    
-    for (int i = 0; i < vec.size(); i++) {
-        std::cout << vec[i] << " " << std::endl;
-
-    }
+  
     //do something in between
 
 
