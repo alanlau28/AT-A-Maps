@@ -291,52 +291,55 @@ double findFeatureArea(FeatureIdx feature_id){
 
 
 //end Alan , start Alex
-
+// Returns all street ids corresponding to street names that start with the given prefix 
+//  For example, both "bloor " and "BloOrst" are prefixes to 
+// "Bloor Street East".
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
     std::vector<StreetIdx> streetIdx;//create vector for final return
-    if (street_prefix.size()==0) return streetIdx;//check for length 0 input  
-   
-    street_prefix.erase(std::remove_if(street_prefix.begin(), street_prefix.end(), ::isspace), street_prefix.end());//formatting: lowercase and remove spaces
+    if (street_prefix.size()==0) return streetIdx;//check for length 0 input
+    
+    //formatting: lowercase and remove spaces
+    street_prefix.erase(std::remove_if(street_prefix.begin(), street_prefix.end(), ::isspace), street_prefix.end());
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
     
-    auto firstOccurance = streets_NamesIdx.lower_bound(street_prefix);//locate first match, save as iterator
-    if(firstOccurance==streets_NamesIdx.end()) return streetIdx;//if no match, return empty vector immediately
+    //locate first match(if there is any), save as iterator
+    auto firstOccurance = streets_NamesIdx.lower_bound(street_prefix);
+    //if no match, return empty vector immediately
+    if(firstOccurance==streets_NamesIdx.end()) return streetIdx;
     
     //increment iterator until input is not a prefix of Key anymore 
-    for (auto it = firstOccurance; (it!=streets_NamesIdx.end()&& (it->first.compare(0, street_prefix.size(), street_prefix)==0)); ++it){
-        int num = it->second;
-        streetIdx.push_back(num);
+    for (auto it = firstOccurance; (it!=streets_NamesIdx.end()&& (it->first.compare(0, street_prefix.size(), street_prefix)==0)); ++it){      
+        streetIdx.push_back(it->second);//add streetIdx to vector for return
     }
     
     return streetIdx;
 }
 
+// Returns the street names at the given intersection (includes duplicate street names in the returned vector)
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id) {
     std::vector<std::string> intersectionNames;
-
+    
+    //find number of street segments connected to an intersection
     int numIntersections = getNumIntersectionStreetSegment(intersection_id);
 
     //loop through each segment at intersection, find name, add to vector
     for (int i = 0; i < numIntersections; i++) {
         StreetSegmentIdx segment = getIntersectionStreetSegment(intersection_id, i);
-
         std::string name = getStreetName(getStreetSegmentInfo(segment).streetID);
-
         intersectionNames.push_back(name);
     }
 
     return intersectionNames;
 }
 
-
-
     
-                                                     
+// Returns the nearest point of interest of the given name to the given position                                            
 POIIdx findClosestPOI(LatLon my_position, std::string POIname){
     POIIdx target;//define variables needed
     double distance;
     std::string name;
     std::multimap<double, POIIdx> matchingPOI;//define multimap for convenience (already sorted)
+    
     for (POIIdx POI = 0; POI < getNumPointsOfInterest();POI++){
         name = getPOIName(POI);
         //check if name matches
@@ -345,17 +348,20 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname){
             matchingPOI.insert(std::make_pair(distance,POI));
         }
     }
+    //locate beginning of multimap, aka smallest distance
     target = matchingPOI.begin()->second;
     return target;
 }
 
-
+// Returns the nearest intersection to the given position
 IntersectionIdx findClosestIntersection(LatLon my_position){
     std::multimap<double,IntersectionIdx> intersections;//define multimap for convenience
     IntersectionIdx target;
     double distance;
+    
     //insert into multimap
     for (IntersectionIdx intersection = 0; intersection < getNumIntersections();intersection++){
+        //find distance between my_position and intersections
         LatLon query = getIntersectionPosition(intersection);
         distance = findDistanceBetweenTwoPoints(std::make_pair(query,my_position));
         intersections.insert(std::make_pair(distance,intersection));
@@ -365,18 +371,20 @@ IntersectionIdx findClosestIntersection(LatLon my_position){
     return target;
 }
 
-//return smallest rectangle that contains all the intersections and
-//curve points of the given street
+//return smallest rectangle that contains all the intersections and curve points of the given street
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     
     LatLonBounds box;
-    std::set<float> pointsOfStreet_Lon;
-    std::set<float> pointsOfStreet_Lat;
+    std::set<float> pointsOfStreet_Lon;//set of longitude positions
+    std::set<float> pointsOfStreet_Lat;//set of latitude positions
+    
+    //vector of all intersections of a street
     std::vector<IntersectionIdx> intersections = intersections_of_each_street[street_id];
+    
+    //vector of all street segments of a street
     std::vector<StreetSegmentIdx> segmentsOfThisStreet = streets_streetSegments[street_id];
-    //LatLon bottom_left = segmentsOfThisStreet[0];
-   // LatLon top_right = segmentsOfThisStreet[0];
-
+  
+    //insert all intersection positions into sets (lat and lon)
     for (int i = 0; i < intersections.size(); i++) {
         LatLon position = getIntersectionPosition(intersections[i]);
  
@@ -384,10 +392,13 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
         pointsOfStreet_Lat.insert(position.latitude());
     }
     
-    
+    //insert all curve points into sets (lat and lon)
     for(int segmentNum = 0; segmentNum < segmentsOfThisStreet.size();segmentNum++){
+        //number of curve points in a segment
         struct StreetSegmentInfo street_info = getStreetSegmentInfo(segmentsOfThisStreet[segmentNum]);
         int numCurvePoints = street_info.numCurvePoints;
+        
+            //positions of curve points
             for (int j = 0; j < numCurvePoints; j++){
                 LatLon curvePoint = getStreetSegmentCurvePoint(segmentsOfThisStreet[segmentNum],j);
                 pointsOfStreet_Lon.insert(curvePoint.longitude());
@@ -396,6 +407,7 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
         
     }
     
+    //set is already sorted, create bounding box with smallest & largest LatLon values
     LatLon min = LatLon(*(pointsOfStreet_Lat.begin()), *(pointsOfStreet_Lon.begin()));
     LatLon max = LatLon(*(pointsOfStreet_Lat.rbegin()), *(pointsOfStreet_Lon.rbegin()));
     box.min = min;
