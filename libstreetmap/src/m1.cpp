@@ -175,115 +175,127 @@ bool loadMap(std::string map_streets_database_filename) {
     //map loaded successfully
     return true;
 }
-//LatLon         getIntersectionPosition(IntersectionIdx intersectionIdx)
-// Returns the distance between two (lattitude,longitude) coordinates in meters
-// Speed Requirement --> moderate
 
-
+// Returns the distance between two (latitude,longitude) coordinates in meters
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
-    double x1, y1, x2, y2, lat1, lat2, lat_avg, distance;
-
-    lat1 = points.second.latitude() * kDegreeToRadian;
-    lat2 = points.first.latitude() * kDegreeToRadian;
-    lat_avg = (lat1 + lat2) / 2.0;
     
-    x1 = points.first.longitude() * cos(lat_avg) * kDegreeToRadian;
-    y1 = points.first.latitude() * kDegreeToRadian;
-    x2 = points.second.longitude() * cos(lat_avg) * kDegreeToRadian;
-    y2 = points.second.latitude() * kDegreeToRadian;
+    //converts latitudes of points into radians and finds the average
+    double lat1 = points.second.latitude() * kDegreeToRadian;
+    double lat2 = points.first.latitude() * kDegreeToRadian;
+    double lat_avg = (lat1 + lat2) / 2.0;
     
-    distance = kEarthRadiusInMeters *  sqrt(pow(y2-y1,2)+ pow(x2-x1,2));
-    return distance;
+    //finds the x and y coordinates of each point
+    double x1 = points.first.longitude() * cos(lat_avg) * kDegreeToRadian;
+    double y1 = points.first.latitude() * kDegreeToRadian;
+    double x2 = points.second.longitude() * cos(lat_avg) * kDegreeToRadian;
+    double y2 = points.second.latitude() * kDegreeToRadian;
+    
+    //finds distance between the two points and returns
+    return kEarthRadiusInMeters *  sqrt(pow(y2-y1,2)+ pow(x2-x1,2));
 }
 
 
 
 // Returns the length of the given street segment in meters
-// Speed Requirement --> moderate
-
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
-    LatLon point1,point2;
-    std::pair<LatLon,LatLon> points (point1,point2);
-    double length = 0.0;
-    struct StreetSegmentInfo street_info = getStreetSegmentInfo(street_segment_id);
-    int numCurvePoints = street_info.numCurvePoints;
+    struct StreetSegmentInfo street_seg_info = getStreetSegmentInfo(street_segment_id);
+    int numCurvePoints = street_seg_info.numCurvePoints;
     
     //if the street segment is straight
     if(numCurvePoints == 0){
-        point1 = getIntersectionPosition(street_info.from);
-        point2 = getIntersectionPosition(street_info.to);
-        length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
-        return length;
+        //sum length between to and from
+        LatLon pos_from = getIntersectionPosition(street_seg_info.from);
+        LatLon pos_to = getIntersectionPosition(street_seg_info.to);
+        
+        //return length between the two points
+        return findDistanceBetweenTwoPoints(std::make_pair(pos_from,pos_to));
+        
     }
     //if the street segment has curve points
     else{
-        point1 = getIntersectionPosition(street_info.from);
-        point2 = getStreetSegmentCurvePoint(street_segment_id,0);
-        points = std::pair<LatLon,LatLon> (point1,point2);
+        //first length is between from and first curve point
+        LatLon point1 = getIntersectionPosition(street_seg_info.from);
+        LatLon point2 = getStreetSegmentCurvePoint(street_segment_id,0);
+        double length = findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
         
-        //sum the lengths between each point
-        length += findDistanceBetweenTwoPoints(points);
-        
+        //sum the lengths between each curve point
         for(int i = 0; i < numCurvePoints-1; i++){
             point1 = getStreetSegmentCurvePoint(street_segment_id,i);
             point2 = getStreetSegmentCurvePoint(street_segment_id,i+1);
             length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
         }
         
+        //sum the final length between last curve point and to
         point1 = getStreetSegmentCurvePoint(street_segment_id,numCurvePoints-1);
-        point2 = getIntersectionPosition(street_info.to);
-        
+        point2 = getIntersectionPosition(street_seg_info.to);       
         length += findDistanceBetweenTwoPoints(std::make_pair(point1,point2));
+        
         return length;
     }
 
 }
 
+// Returns the travel time to drive from one end of a street segment 
+// to the other, in seconds, when driving at the speed limit
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
-    // returns travel time from vector
+    // returns travel time from global vector
     return street_segment_travel_times[street_segment_id];
 }
 
+// Returns the length of the given street segment in meters
 double findStreetLength(StreetIdx street_id){
     double length = 0.0;
-    //traverses through the vector of street_lengths[street_id] and adds them
+    
+    //traverses through the street segment lengths of a street and adds them
     for(int i = 0; i < street_lengths[street_id].size();i++){
         length += street_lengths[street_id][i];
     }
+    
     return length;
 }
 
+// Returns the area of the given closed feature in square meters
+// Assume a non self-intersecting polygon (i.e. no holes)
+// Return 0 if this feature is not a closed polygon.
 double findFeatureArea(FeatureIdx feature_id){
-    double x1, y1, x2, y2, lat1, lat2, lat_avg;
     double area = 0.0;
     int feature_points = getNumFeaturePoints(feature_id);
     
-    //Latitude and longitude of the first and last point
+    //Latitude and longitude of the first and last point of feature
     LatLon point1 = getFeaturePoint(feature_id, 0);
     LatLon point2 = getFeaturePoint(feature_id, feature_points-1);
     
     //if the polygon is closed, compute the area of the closed polygon
     if(point1 == point2){
+        //traverse through each feature point
         for(int i = 0; i < feature_points-1; i++){
             
             point1 = getFeaturePoint(feature_id, i);
             point2 = getFeaturePoint(feature_id, i+1);
             
-            lat1 = point1.latitude() * kDegreeToRadian;
-            lat2 = point2.latitude() * kDegreeToRadian;
-            lat_avg = (lat1 + lat2) / 2.0;
-    
-            x1 = point1.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
-            y1 = point1.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
-            x2 = point2.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
-            y2 = point2.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
+            //convert latitudes to radians and find the average
+            double lat1 = point1.latitude() * kDegreeToRadian;
+            double lat2 = point2.latitude() * kDegreeToRadian;
+            double lat_avg = (lat1 + lat2) / 2.0;
             
+            //find the x,y coordinates of point 1 and point 2
+            double x1 = point1.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
+            double y1 = point1.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
+            double x2 = point2.longitude() * cos(lat_avg) * kDegreeToRadian * kEarthRadiusInMeters;
+            double y2 = point2.latitude() * kDegreeToRadian * kEarthRadiusInMeters;
+            
+            //calculate the area between the two points and add to the total area sum
             area += ((x2+x1)/2.0) * (y2-y1);
         }  
     }
-    
-    if(area < 0) return area * -1.0;
-    else return area;
+    //if feature points are traversed counterclockwise, area is negative 
+    if(area < 0) {
+        return area * -1.0;
+    }
+    //if feature points are traversed clockwise, area is positive
+    else {
+        return area;
+    }
 }
 
 
