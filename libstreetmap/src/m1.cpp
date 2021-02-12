@@ -475,13 +475,6 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
 
 //end Alex, start Tawseef
 
-/* functions to do: 
- * findStreetSegmentsOfIntersection, --done
- * findAdjacentIntersections,        --done 
- * findIntersectionsOfStreet         --done?
- * findIntersectionsOfTwoStreets,    --done?
- */
-
 /*returns the street segments that connect to given intersection
  * finds number of segments connected to an intersections, loops through them
  */
@@ -547,9 +540,19 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
     
     std::vector<IntersectionIdx> result;
     
+    //make two vectors with the intersections of each street
     std::vector<IntersectionIdx> street1 = intersections_of_each_street[street_ids.first];
     std::vector<IntersectionIdx> street2 = intersections_of_each_street[street_ids.second];
     
+    //corner case when streetIds are same
+    //return all the intersections along street
+    if (street_ids.first == street_ids.second) {
+        for (int i = 0; i < intersections_of_each_street[street_ids.first].size(); i++) {
+            result.push_back(street1[i]);
+        }
+    }
+    
+    //else check which intersections along each street match, insert into vector
     for (int i = 0; i < intersections_of_each_street[street_ids.first].size(); i++) {
         for (int j = 0; j < intersections_of_each_street[street_ids.second].size(); j++) {
             if (street1[i] == street2[j]) {
