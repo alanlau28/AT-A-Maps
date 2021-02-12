@@ -27,14 +27,18 @@
 #include "StreetsDatabaseAPI.h"
 #include <unordered_map>
 
+struct SegmentData{
+    double travel_time;
+    StreetIdx streetID;
+};
+
+//holds all street ids and travel times of each street segment
+//street segments ids are indices
+std::vector<SegmentData> street_segment_data;
 
 //holds all street segment ids of each intersection
 //intersection ids are indices
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
-
-//holds all street segment travel time
-//street segment ids are indices
-std::vector<double> street_segment_travel_times; 
 
 //holds distances of all street segments on each street
 //street ids are indices
@@ -43,10 +47,6 @@ std::vector<std::vector<double>> street_lengths;
 //hold all street segment ids of each street
 //street ids are indices
 std::vector<std::vector<StreetSegmentIdx>> streets_streetSegments;
-
-//holds all street ids of each street segment
-//street segments ids are indices
-std::vector<StreetIdx> streets;
 
 //holds [streetId][intersections], first index is streetID of street, second index
 //is the array of intersections of streetID
@@ -110,20 +110,22 @@ bool loadMap(std::string map_streets_database_filename) {
     for(int segment = 0; segment < getNumStreetSegments(); segment++){
         //street info
         struct StreetSegmentInfo street_info = getStreetSegmentInfo(segment);
+        struct SegmentData street_data;
         double speed_limit = street_info.speedLimit;
         double distance = findStreetSegmentLength(segment);
         int street_id = street_info.streetID;
         
+        street_data.travel_time = distance/speed_limit;
+        street_data.streetID = street_id;
+        
         //pushes back street id, distance, and travel time in each respective vector
-        streets.push_back(street_id);
         segment_distances.push_back(distance);
-        street_segment_travel_times.push_back(distance/speed_limit);
-               
+        street_segment_data.push_back(street_data);
     }
     
     for(int i = 0;i < getNumStreetSegments();i++){
         //inserts a pair of street id and street segment distances for each street segment
-        map_streetIds_distances.insert(std::pair<int,double>(streets[i],segment_distances[i]));
+        map_streetIds_distances.insert(std::pair<int,double>(street_segment_data[i].streetID,segment_distances[i]));
     }     
     
     
@@ -151,7 +153,7 @@ bool loadMap(std::string map_streets_database_filename) {
      */
     streets_streetSegments.resize(getNumStreets());
     for(int streetSegmentID = 0; streetSegmentID < getNumStreetSegments();streetSegmentID++){
-        streets_streetSegments[streets[streetSegmentID]].push_back(streetSegmentID);
+        streets_streetSegments[street_segment_data[streetSegmentID].streetID].push_back(streetSegmentID);
     }    
     
    
@@ -256,7 +258,7 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
 // Returns the travel time to drive from one end of a street segment 
 // to the other, in seconds, when driving at the speed limit
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {    
-    return street_segment_travel_times[street_segment_id];
+    return street_segment_data[street_segment_id].travel_time;
 }
 
 // Returns the length of the given street segment in meters
@@ -523,10 +525,8 @@ void closeMap() {
     //unloads map / frees memory used by API
     street_lengths.clear();
     intersection_street_segments.clear();
-    street_segment_travel_times.clear();
     intersections_of_each_street.clear();
-    streets.clear();
     streets_NamesIdx.clear();
     closeStreetDatabase();
-
+    street_segment_data.clear();
 }
