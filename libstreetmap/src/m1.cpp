@@ -166,7 +166,6 @@ bool loadMap(std::string map_streets_database_filename) {
     //unordered/ other data structures
 
     
-    
 
 
 
