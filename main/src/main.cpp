@@ -22,6 +22,7 @@
 #include <string>
 
 #include "m1.h"
+#include "m2.h"
 
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everything went OK
@@ -67,7 +68,7 @@ int main(int argc, char** argv) {
   
     //do something in between
 
-
+    drawMap();
     //Clean-up the map data and related data structures
     std::cout << "Closing map\n";
     closeMap(); 
