@@ -6,7 +6,6 @@
 #include <iostream>
 #include <vector>
 #include <utility>
-#include <point.hpp>
 
 constexpr double kEarthRadiusInMeters = 6372797.560856;
 constexpr double kDegreeToRadian = 0.017453292519943295769236907684886;
@@ -17,15 +16,24 @@ struct boundingbox{
     double min_x;
     double min_y;
     double lat_avg;
+    double area;
 };
 
 struct street_segment_data{
     std::vector<ezgl::point2d> coordinates;
     std::string name;
     float speed_limit;
+    StreetIdx street_id; 
+};
+
+struct street_data{
+    std::vector<ezgl::point2d> coordinates;
+    std::string name;
 };
 
 std::vector<street_segment_data> street_segments;
+
+std::vector<street_data> streets;
 
 struct boundingbox bounds;
 
@@ -42,12 +50,13 @@ ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_a
 
 
 void load_map(){
+    street_segments.resize(getNumStreetSegments());
+    streets.resize(getNumStreets());
     
     double max_lon = getIntersectionPosition(0).longitude();
     double min_lon = max_lon;
     double max_lat = getIntersectionPosition(0).latitude();
     double min_lat = max_lat;
-    street_segments.resize(getNumStreetSegments());
     
     for(int i = 0; i < getNumIntersections(); i++){
         max_lon = std::max(max_lon, getIntersectionPosition(i).longitude());
@@ -66,6 +75,8 @@ void load_map(){
     for(int street_segment_id = 0;street_segment_id < getNumStreetSegments();street_segment_id++){
         struct StreetSegmentInfo street_seg_info = getStreetSegmentInfo(street_segment_id);
         int numCurvePoints = street_seg_info.numCurvePoints;
+        street_segments[street_segment_id].speed_limit = street_seg_info.speedLimit;
+        street_segments[street_segment_id].street_id = street_seg_info.streetID;
 
         //if the street segment is straight
         if(numCurvePoints == 0){
@@ -78,8 +89,7 @@ void load_map(){
             
             coordinate = convertCoordinates(pos_to.longitude(),pos_to.latitude(),bounds.lat_avg);
             street_segments[street_segment_id].coordinates.push_back(coordinate);
-            
-            street_segments[street_segment_id].speed_limit = street_seg_info.speedLimit;
+           
         }
         
         //if the street segment has curve points
@@ -97,22 +107,19 @@ void load_map(){
             point = getIntersectionPosition(street_seg_info.to);
             coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
             street_segments[street_segment_id].coordinates.push_back(coordinate);
-            
-            street_segments[street_segment_id].speed_limit = street_seg_info.speedLimit;
         }
-         
-        
     }
  
 }
 
-void draw_main_canvas (ezgl::renderer *g){
+void draw_all_streets(ezgl::renderer *g){
+    
     for(int i = 0;i < street_segments.size(); i++){
-        if(street_segments[i].speed_limit >= 80){
+        if(street_segments[i].speed_limit >= 22.2){
             g ->set_color(ezgl::ORANGE);
-            g->set_line_width(8); 
+            g->set_line_width(16); 
         }
-        else if(street_segments[i].speed_limit >= 50){
+        else if(street_segments[i].speed_limit >= 16.66){
             g ->set_color(ezgl::GREY_75);
             g->set_line_width(4); 
         }
@@ -120,12 +127,46 @@ void draw_main_canvas (ezgl::renderer *g){
             g ->set_color(ezgl::GREY_75);
             g->set_line_width(2); 
         }
-        
         for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
             g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
         }
     }
+    
 }
+void draw_some_streets(ezgl::renderer *g){
+    for(int i = 0;i < street_segments.size(); i++){
+        if(street_segments[i].speed_limit >= 22.2){
+            g ->set_color(ezgl::ORANGE);
+            g->set_line_width(16); 
+        }
+        else if(street_segments[i].speed_limit >= 16.66){
+            g ->set_color(ezgl::GREY_75);
+            g->set_line_width(4); 
+        }
+        for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
+            if(street_segments[i].speed_limit >= 16.66){
+                g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
+            }
+        }
+    }
+}
+
+void draw_main_canvas (ezgl::renderer *g){
+    ezgl::rectangle world = g->get_visible_world();
+    double area = world.area();
+    if(bounds.area/area > 459){
+        draw_all_streets(g);
+    }
+    else{
+        draw_some_streets(g);
+    }
+    std::cout << bounds.area/area << std::endl;
+}
+void initial_setup(ezgl::application *application, bool){
+    ezgl::rectangle world = application-> get_renderer()->get_visible_world();
+    bounds.area = world.area();
+}
+
 void drawMap(){
     load_map();
     ezgl::application::settings settings;
@@ -139,7 +180,7 @@ void drawMap(){
     ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
     application.add_canvas("MainCanvas",draw_main_canvas,initial_background);
     
-    
-    application.run(nullptr,nullptr,nullptr,nullptr);
+
+    application.run(initial_setup,nullptr,nullptr,nullptr);
     
 }
