@@ -33,7 +33,6 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="has_focus">True</property>
-            <property name="halign">start</property>
             <property name="hexpand">False</property>
             <property name="vexpand">False</property>
             <property name="search_mode_enabled">True</property>
@@ -209,6 +208,21 @@
           </packing>
         </child>
       </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="PopOver">
+    <property name="name">SearchResults</property>
+    <property name="can_focus">False</property>
+    <property name="events">GDK_ENTER_NOTIFY_MASK | GDK_PROXIMITY_IN_MASK</property>
+    <property name="tooltip_text" translatable="yes">asdf</property>
+    <property name="halign">start</property>
+    <property name="valign">start</property>
+    <property name="hexpand">True</property>
+    <property name="vexpand">True</property>
+    <property name="relative_to">SearchBar</property>
+    <property name="position">bottom</property>
+    <child>
+      <placeholder/>
     </child>
   </object>
 </interface>
