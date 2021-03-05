@@ -160,12 +160,12 @@ void draw_some_streets(ezgl::renderer *g){
         draw = false;
         if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
             g ->set_color(ezgl::ORANGE);
-            g->set_line_width(12); 
+            g->set_line_width(8); 
             draw = true;
         }
         else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "primary_link" || street_segments[i].segment_type == "secondary" || street_segments[i].segment_type == "secondary_link" ||street_segments[i].segment_type == "trunk" || street_segments[i].segment_type == "trunk_link"){
             g ->set_color(ezgl::GREY_75);
-            g->set_line_width(4);
+            g->set_line_width(3);
             draw = true;
         }
         for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
@@ -175,28 +175,51 @@ void draw_some_streets(ezgl::renderer *g){
         }
     }
 }
+
+void draw_more_streets(ezgl::renderer *g){
+    bool draw = false;
+    for(int i = 0;i < street_segments.size(); i++){
+        draw = false;
+        if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
+            g ->set_color(ezgl::ORANGE);
+            g->set_line_width(8); 
+            draw = true;
+        }
+        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "primary_link" || street_segments[i].segment_type == "secondary" || street_segments[i].segment_type == "secondary_link" ||street_segments[i].segment_type == "trunk" || street_segments[i].segment_type == "trunk_link"){
+            g ->set_color(ezgl::GREY_75);
+            g->set_line_width(3);
+            draw = true;
+        }
+        else if(street_segments[i].segment_type == "tertiary" ||street_segments[i].segment_type == "tertiary_link" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
+            g ->set_color(ezgl::GREY_75);
+            g->set_line_width(1);
+            draw = true;
+        }
+        for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
+            if(draw){
+                g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
+            }
+        }
+    }
+}
+
 void draw_most_streets(ezgl::renderer *g){
     bool draw = false;
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
         if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
             g ->set_color(ezgl::ORANGE);
-            g->set_line_width(12); 
+            g->set_line_width(8); 
             draw = true;
         }
-        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "primary_link" || street_segments[i].segment_type == "secondary" || street_segments[i].segment_type == "secondary_link" ||street_segments[i].segment_type == "trunk" || street_segments[i].segment_type == "trunk_link"){
             g ->set_color(ezgl::GREY_75);
-            g->set_line_width(4);
+            g->set_line_width(3);
             draw = true;
         }
-        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+        else if(street_segments[i].segment_type == "tertiary" ||street_segments[i].segment_type == "tertiary_link" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street" || street_segments[i].segment_type == "residential"){
             g ->set_color(ezgl::GREY_75);
-            g->set_line_width(4);
-            draw = true;
-        }
-        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
-            g ->set_color(ezgl::GREY_75);
-            g->set_line_width(4);
+            g->set_line_width(1);
             draw = true;
         }
         for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
@@ -210,8 +233,16 @@ void draw_most_streets(ezgl::renderer *g){
 void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
-    if(bounds.area/area > 459){
+    double zoom = bounds.area/area;
+   // std::cout << bounds.area/area << std::endl;
+    if(zoom > 165){
         draw_all_streets(g);
+    }
+    else if(zoom > 21){
+        draw_most_streets(g);
+    }
+    else if(zoom > 2){
+        draw_more_streets(g);
     }
     else{
         draw_some_streets(g);
