@@ -2,10 +2,13 @@
 #include "m2.h"
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
+#include "OSMDatabaseAPI.h"
 #include <math.h>
 #include <iostream>
 #include <vector>
 #include <utility>
+#include <algorithm>
+#include <unordered_map>
 
 constexpr double kEarthRadiusInMeters = 6372797.560856;
 constexpr double kDegreeToRadian = 0.017453292519943295769236907684886;
@@ -23,21 +26,21 @@ struct street_segment_data{
     std::vector<ezgl::point2d> coordinates;
     std::string name;
     float speed_limit;
-    StreetIdx street_id; 
-};
-
-struct street_data{
-    std::vector<ezgl::point2d> coordinates;
-    std::string name;
+    StreetIdx street_id;
+    std::string segment_type;
 };
 
 std::vector<street_segment_data> street_segments;
 
-std::vector<street_data> streets;
+std::unordered_map <OSMID,std::string> street_types;
 
 struct boundingbox bounds;
 
 //(x, y) = (R·lon·cos(latavg), R·lat)
+
+bool operator< (const street_segment_data &a, const street_segment_data &b){
+    return a.speed_limit < b.speed_limit;
+}
 
 ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_avg){
     
@@ -50,8 +53,10 @@ ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_a
 
 
 void load_map(){
+    
+    loadOSMDatabaseBIN("/cad2/ece297s/public/maps/toronto_canada.osm.bin");
+    
     street_segments.resize(getNumStreetSegments());
-    streets.resize(getNumStreets());
     
     double max_lon = getIntersectionPosition(0).longitude();
     double min_lon = max_lon;
@@ -72,12 +77,27 @@ void load_map(){
     bounds.min_x = kEarthRadiusInMeters * min_lon * cos(bounds.lat_avg) * kDegreeToRadian;
     bounds.min_y = kEarthRadiusInMeters * min_lat * kDegreeToRadian;
     
+    
+    for(int i =0;i < getNumberOfWays();i++){
+        const OSMWay *curr = getWayByIndex(i);
+        for (int j = 0; j < getTagCount(curr); j++) {
+            std::pair<std::string, std::string> tagPair = getTagPair(curr, j);
+            if(tagPair.first == "highway"){
+                std::pair<OSMID,std::string> street_type = std::make_pair(curr->id(),tagPair.second);
+                street_types.insert(street_type);
+                break;
+            }
+        }
+    }
+    
+    
     for(int street_segment_id = 0;street_segment_id < getNumStreetSegments();street_segment_id++){
         struct StreetSegmentInfo street_seg_info = getStreetSegmentInfo(street_segment_id);
         int numCurvePoints = street_seg_info.numCurvePoints;
         street_segments[street_segment_id].speed_limit = street_seg_info.speedLimit;
         street_segments[street_segment_id].street_id = street_seg_info.streetID;
-
+        auto it = street_types.find(street_seg_info.wayOSMID);
+        street_segments[street_segment_id].segment_type = it -> second;
         //if the street segment is straight
         if(numCurvePoints == 0){
             
@@ -109,6 +129,7 @@ void load_map(){
             street_segments[street_segment_id].coordinates.push_back(coordinate);
         }
     }
+    std::sort(street_segments.begin(),street_segments.end());
  
 }
 
@@ -134,17 +155,52 @@ void draw_all_streets(ezgl::renderer *g){
     
 }
 void draw_some_streets(ezgl::renderer *g){
+    bool draw = false;
     for(int i = 0;i < street_segments.size(); i++){
-        if(street_segments[i].speed_limit >= 22.2){
+        draw = false;
+        if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
             g ->set_color(ezgl::ORANGE);
-            g->set_line_width(16); 
+            g->set_line_width(12); 
+            draw = true;
         }
-        else if(street_segments[i].speed_limit >= 16.66){
+        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "primary_link" || street_segments[i].segment_type == "secondary" || street_segments[i].segment_type == "secondary_link" ||street_segments[i].segment_type == "trunk" || street_segments[i].segment_type == "trunk_link"){
             g ->set_color(ezgl::GREY_75);
-            g->set_line_width(4); 
+            g->set_line_width(4);
+            draw = true;
         }
         for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
-            if(street_segments[i].speed_limit >= 16.66){
+            if(draw){
+                g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
+            }
+        }
+    }
+}
+void draw_most_streets(ezgl::renderer *g){
+    bool draw = false;
+    for(int i = 0;i < street_segments.size(); i++){
+        draw = false;
+        if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
+            g ->set_color(ezgl::ORANGE);
+            g->set_line_width(12); 
+            draw = true;
+        }
+        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+            g ->set_color(ezgl::GREY_75);
+            g->set_line_width(4);
+            draw = true;
+        }
+        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+            g ->set_color(ezgl::GREY_75);
+            g->set_line_width(4);
+            draw = true;
+        }
+        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+            g ->set_color(ezgl::GREY_75);
+            g->set_line_width(4);
+            draw = true;
+        }
+        for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
+            if(draw){
                 g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
             }
         }
@@ -160,7 +216,6 @@ void draw_main_canvas (ezgl::renderer *g){
     else{
         draw_some_streets(g);
     }
-    std::cout << bounds.area/area << std::endl;
 }
 void initial_setup(ezgl::application *application, bool){
     ezgl::rectangle world = application-> get_renderer()->get_visible_world();
@@ -182,5 +237,7 @@ void drawMap(){
     
 
     application.run(initial_setup,nullptr,nullptr,nullptr);
+    
+    closeOSMDatabase();
     
 }
