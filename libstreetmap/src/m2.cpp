@@ -1,5 +1,6 @@
 #include "StreetsDatabaseAPI.h"
 #include "m2.h"
+#include "m1.h"
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
 #include "OSMDatabaseAPI.h"
@@ -9,9 +10,6 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-
-constexpr double kEarthRadiusInMeters = 6372797.560856;
-constexpr double kDegreeToRadian = 0.017453292519943295769236907684886;
 
 struct boundingbox{
     double max_x;
@@ -35,6 +33,8 @@ std::vector<street_segment_data> street_segments;
 
 std::unordered_map <OSMID,std::string> street_types;
 
+std::unordered_map<std::string,std::string> map_paths;
+
 struct boundingbox bounds;
 
 //(x, y) = (R·lon·cos(latavg), R·lat)
@@ -52,8 +52,30 @@ ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_a
     return point;
 }
 
+void load_bin(){
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/beijing_china.streets.bin","/cad2/ece297s/public/maps/beijing_china.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/cairo_egypt.streets.bin","/cad2/ece297s/public/maps/cairo_egypt.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/cape-town_south-africa.streets.bin","/cad2/ece297s/public/maps/cape-town_south-africa.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/golden-horseshoe_canada.streets.bin","/cad2/ece297s/public/maps/golden-horseshoe_canada.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/hamilton_canada.streets.bin","/cad2/ece297s/public/maps/hamilton_canada.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/hong-kong_china.streets.bin","/cad2/ece297s/public/maps/hong-kong_china.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/iceland.streets.bin","/cad2/ece297s/public/maps/iceland.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/interlaken_switzerland.streets.bin","/cad2/ece297s/public/maps/interlaken_switzerland.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/london_england.streets.bin","/cad2/ece297s/public/maps/london_england.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/moscow_russia.streets.bin","/cad2/ece297s/public/maps/moscow_russia.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/new-delhi_india.streets.bin","/cad2/ece297s/public/maps/new-delhi_india.osm.bin"));
+    map_paths.insert(std::make_pair("//cad2/ece297s/public/maps/new-york_usa.streets.bin","/cad2/ece297s/public/maps/new-york_usa.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/rio-de-janeiro_brazil.streets.bin","/cad2/ece297s/public/maps/rio-de-janeiro_brazil.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/saint-helena.streets.bin","/cad2/ece297s/public/maps/saint-helena.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/singapore.streets.bin","/cad2/ece297s/public/maps/singapore.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/sydney_australia.streets.bin","/cad2/ece297s/public/maps/sydney_australia.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/tehran_iran.streets.bin","/cad2/ece297s/public/maps/tehran_iran.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/tokyo_japan.streets.bin","/cad2/ece297s/public/maps/tokyo_japan.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/toronto_canada.streets.bin","/cad2/ece297s/public/maps/toronto_canada.osm.bin"));    
+}
 
 void load_map(){
+
     
     loadOSMDatabaseBIN("/cad2/ece297s/public/maps/toronto_canada.osm.bin");
     
@@ -137,6 +159,7 @@ void load_map(){
 }
 
 
+//choose when to draw highway ramps, what colour and what line width too
 void drawAllStreets(ezgl::renderer *g){
     ezgl::color colour;
     
