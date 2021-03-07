@@ -166,8 +166,7 @@ void load_map(){
             street_segments[street_segment_id].coordinates.push_back(coordinate);
         }
     }
-<<<<<<< HEAD
-    std::sort(street_segments.begin(),street_segments.end());
+
    
     
     
@@ -186,8 +185,6 @@ void load_map(){
             //std::cout<<" wwww\n"<<features[featureidx].feature_type;
         }
     }
-=======
->>>>>>> 06336e2a61964498f34fbf9af3b207b280c6010e
  
 }
 
@@ -346,12 +343,8 @@ void draw_main_canvas (ezgl::renderer *g){
     double zoom = bounds.area/area;
    // std::cout << bounds.area/area << std::endl;
     if(zoom > 165){
-<<<<<<< HEAD
-        draw_all_streets(g);
-        
-=======
         drawAllStreets(g);
->>>>>>> 06336e2a61964498f34fbf9af3b207b280c6010e
+        
     }
     else if(zoom > 21){
         drawMostStreets(g);
