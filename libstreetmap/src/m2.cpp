@@ -29,7 +29,16 @@ struct street_segment_data{
     bool one_way;
 };
 
+struct feature_data{
+    std::vector<ezgl::point2d> coordinates;
+    std::string name;
+    std::string feature_type;
+    int numFeaturePoints;
+    
+};
+
 std::vector<street_segment_data> street_segments;
+std::vector<feature_data> features;
 
 std::unordered_map <OSMID,std::string> street_types;
 
@@ -157,6 +166,28 @@ void load_map(){
             street_segments[street_segment_id].coordinates.push_back(coordinate);
         }
     }
+<<<<<<< HEAD
+    std::sort(street_segments.begin(),street_segments.end());
+   
+    
+    
+    //-------------------------------------------------
+    
+    features.resize(getNumFeatures());
+    
+    for(FeatureIdx featureidx = 0; featureidx<getNumFeatures(); featureidx++){
+        features[featureidx].name = getFeatureName(featureidx);
+        features[featureidx].feature_type = asString(getFeatureType(featureidx));
+        features[featureidx].numFeaturePoints = getNumFeaturePoints(featureidx);
+        for(int i = 0; i < features[featureidx].numFeaturePoints; i++){
+            LatLon point = getFeaturePoint(featureidx,i);
+            ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+            features[featureidx].coordinates.push_back(coordinate);
+            //std::cout<<" wwww\n"<<features[featureidx].feature_type;
+        }
+    }
+=======
+>>>>>>> 06336e2a61964498f34fbf9af3b207b280c6010e
  
 }
 
@@ -276,13 +307,51 @@ void drawMostStreets(ezgl::renderer *g){
     }
 }
 
+
+void draw_features(ezgl::renderer *g){
+    for (int i = 0; i<features.size();i++){
+        if (features[i].feature_type == "park"&&features[i].numFeaturePoints>1){
+            g ->set_color(195, 236, 178,255);
+            
+            g->fill_poly(features[i].coordinates);
+        }
+        else if(features[i].feature_type == "lake"&&features[i].numFeaturePoints>1){
+            g ->set_color(170, 218, 255,255);
+            
+            g->fill_poly(features[i].coordinates);
+        }
+        else if(features[i].feature_type == "beach"&&features[i].numFeaturePoints>1){
+            g ->set_color(255, 242, 175,255);
+            
+            g->fill_poly(features[i].coordinates);
+        }else if(features[i].feature_type == "island"&&features[i].numFeaturePoints>1){
+            g ->set_color(232, 232, 232,255);
+          
+            g->fill_poly(features[i].coordinates);
+        }else if(features[i].feature_type == "building"&&features[i].numFeaturePoints>1){
+            g ->set_color(213, 216, 219,255);
+          
+            g->fill_poly(features[i].coordinates);
+        }else if(features[i].feature_type == "greenspace"&&features[i].numFeaturePoints>1){
+            g ->set_color(0,0,0,80);
+           
+            g->fill_poly(features[i].coordinates);
+        }
+    }
+}
+
 void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
     double zoom = bounds.area/area;
    // std::cout << bounds.area/area << std::endl;
     if(zoom > 165){
+<<<<<<< HEAD
+        draw_all_streets(g);
+        
+=======
         drawAllStreets(g);
+>>>>>>> 06336e2a61964498f34fbf9af3b207b280c6010e
     }
     else if(zoom > 21){
         drawMostStreets(g);
@@ -293,6 +362,7 @@ void draw_main_canvas (ezgl::renderer *g){
     else{
         drawSomeStreets(g);
     }
+    draw_features(g);
 }
 
 
