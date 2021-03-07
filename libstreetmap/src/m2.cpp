@@ -1,5 +1,6 @@
 #include "StreetsDatabaseAPI.h"
 #include "m2.h"
+#include "m1.h"
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
 #include "OSMDatabaseAPI.h"
@@ -9,9 +10,6 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-
-constexpr double kEarthRadiusInMeters = 6372797.560856;
-constexpr double kDegreeToRadian = 0.017453292519943295769236907684886;
 
 struct boundingbox{
     double max_x;
@@ -28,6 +26,7 @@ struct street_segment_data{
     float speed_limit;
     StreetIdx street_id;
     std::string segment_type;
+    bool one_way;
 };
 
 struct feature_data{
@@ -42,6 +41,8 @@ std::vector<street_segment_data> street_segments;
 std::vector<feature_data> features;
 
 std::unordered_map <OSMID,std::string> street_types;
+
+std::unordered_map<std::string,std::string> map_paths;
 
 struct boundingbox bounds;
 
@@ -60,8 +61,30 @@ ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_a
     return point;
 }
 
+void load_bin(){
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/beijing_china.streets.bin","/cad2/ece297s/public/maps/beijing_china.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/cairo_egypt.streets.bin","/cad2/ece297s/public/maps/cairo_egypt.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/cape-town_south-africa.streets.bin","/cad2/ece297s/public/maps/cape-town_south-africa.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/golden-horseshoe_canada.streets.bin","/cad2/ece297s/public/maps/golden-horseshoe_canada.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/hamilton_canada.streets.bin","/cad2/ece297s/public/maps/hamilton_canada.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/hong-kong_china.streets.bin","/cad2/ece297s/public/maps/hong-kong_china.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/iceland.streets.bin","/cad2/ece297s/public/maps/iceland.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/interlaken_switzerland.streets.bin","/cad2/ece297s/public/maps/interlaken_switzerland.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/london_england.streets.bin","/cad2/ece297s/public/maps/london_england.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/moscow_russia.streets.bin","/cad2/ece297s/public/maps/moscow_russia.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/new-delhi_india.streets.bin","/cad2/ece297s/public/maps/new-delhi_india.osm.bin"));
+    map_paths.insert(std::make_pair("//cad2/ece297s/public/maps/new-york_usa.streets.bin","/cad2/ece297s/public/maps/new-york_usa.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/rio-de-janeiro_brazil.streets.bin","/cad2/ece297s/public/maps/rio-de-janeiro_brazil.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/saint-helena.streets.bin","/cad2/ece297s/public/maps/saint-helena.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/singapore.streets.bin","/cad2/ece297s/public/maps/singapore.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/sydney_australia.streets.bin","/cad2/ece297s/public/maps/sydney_australia.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/tehran_iran.streets.bin","/cad2/ece297s/public/maps/tehran_iran.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/tokyo_japan.streets.bin","/cad2/ece297s/public/maps/tokyo_japan.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/toronto_canada.streets.bin","/cad2/ece297s/public/maps/toronto_canada.osm.bin"));    
+}
 
 void load_map(){
+
     
     loadOSMDatabaseBIN("/cad2/ece297s/public/maps/toronto_canada.osm.bin");
     
@@ -103,8 +126,11 @@ void load_map(){
     for(int street_segment_id = 0;street_segment_id < getNumStreetSegments();street_segment_id++){
         struct StreetSegmentInfo street_seg_info = getStreetSegmentInfo(street_segment_id);
         int numCurvePoints = street_seg_info.numCurvePoints;
+        
         street_segments[street_segment_id].speed_limit = street_seg_info.speedLimit;
         street_segments[street_segment_id].street_id = street_seg_info.streetID;
+        street_segments[street_segment_id].one_way = street_seg_info.oneWay;
+        
         auto it = street_types.find(street_seg_info.wayOSMID);
         street_segments[street_segment_id].segment_type = it -> second;
         //if the street segment is straight
@@ -138,6 +164,7 @@ void load_map(){
             street_segments[street_segment_id].coordinates.push_back(coordinate);
         }
     }
+<<<<<<< HEAD
     std::sort(street_segments.begin(),street_segments.end());
    
     
@@ -157,40 +184,61 @@ void load_map(){
             //std::cout<<" wwww\n"<<features[featureidx].feature_type;
         }
     }
+=======
+>>>>>>> 06336e2a61964498f34fbf9af3b207b280c6010e
  
 }
 
-void draw_all_streets(ezgl::renderer *g){
+
+//choose when to draw highway ramps, what colour and what line width too
+void drawAllStreets(ezgl::renderer *g){
+    ezgl::color colour;
     
     for(int i = 0;i < street_segments.size(); i++){
-        if(street_segments[i].speed_limit >= 22.2){
-            g ->set_color(ezgl::ORANGE);
-            g->set_line_width(16); 
+        if(street_segments[i].segment_type == "motorway"){
+            colour = ezgl::ORANGE;
+            g ->set_color(colour);
+            g->set_line_width(8); 
+
         }
-        else if(street_segments[i].speed_limit >= 16.66){
-            g ->set_color(ezgl::GREY_75);
-            g->set_line_width(4); 
+        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+            colour = ezgl::GREY_75;
+            g ->set_color(colour);
+            g->set_line_width(3);
+
+        }
+        else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
+            colour = ezgl::GREY_75;
+            g ->set_color(colour);
+            g->set_line_width(2);
+
         }
         else{
-            g ->set_color(ezgl::GREY_75);
-            g->set_line_width(2); 
+            colour = ezgl::GREY_75;
+            g ->set_color(colour);
+            g->set_line_width(1); 
         }
         for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
             g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
+            if(street_segments[i].one_way){
+                g ->set_color(ezgl::BLACK);
+                //drawArrow(g,street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
+                g ->set_color(colour);
+            }
         }
     }
     
 }
-void draw_some_streets(ezgl::renderer *g){
+void drawSomeStreets(ezgl::renderer *g){
     bool draw = false;
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
-        if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
+        if(street_segments[i].segment_type == "motorway"){
             g ->set_color(ezgl::ORANGE);
             g->set_line_width(8); 
             draw = true;
         }
-        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "primary_link" || street_segments[i].segment_type == "secondary" || street_segments[i].segment_type == "secondary_link" ||street_segments[i].segment_type == "trunk" || street_segments[i].segment_type == "trunk_link"){
+        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
             g ->set_color(ezgl::GREY_75);
             g->set_line_width(3);
             draw = true;
@@ -203,21 +251,21 @@ void draw_some_streets(ezgl::renderer *g){
     }
 }
 
-void draw_more_streets(ezgl::renderer *g){
+void drawMoreStreets(ezgl::renderer *g){
     bool draw = false;
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
-        if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
+        if(street_segments[i].segment_type == "motorway"){
             g ->set_color(ezgl::ORANGE);
             g->set_line_width(8); 
             draw = true;
         }
-        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "primary_link" || street_segments[i].segment_type == "secondary" || street_segments[i].segment_type == "secondary_link" ||street_segments[i].segment_type == "trunk" || street_segments[i].segment_type == "trunk_link"){
+        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
             g ->set_color(ezgl::GREY_75);
             g->set_line_width(3);
             draw = true;
         }
-        else if(street_segments[i].segment_type == "tertiary" ||street_segments[i].segment_type == "tertiary_link" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
+        else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
             g ->set_color(ezgl::GREY_75);
             g->set_line_width(1);
             draw = true;
@@ -230,21 +278,21 @@ void draw_more_streets(ezgl::renderer *g){
     }
 }
 
-void draw_most_streets(ezgl::renderer *g){
+void drawMostStreets(ezgl::renderer *g){
     bool draw = false;
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
-        if(street_segments[i].segment_type == "motorway" || street_segments[i].segment_type == "motorway_link"){
+        if(street_segments[i].segment_type == "motorway"){
             g ->set_color(ezgl::ORANGE);
             g->set_line_width(8); 
             draw = true;
         }
-        else if(street_segments[i].segment_type == "primary" ||street_segments[i].segment_type == "primary_link" || street_segments[i].segment_type == "secondary" || street_segments[i].segment_type == "secondary_link" ||street_segments[i].segment_type == "trunk" || street_segments[i].segment_type == "trunk_link"){
+        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
             g ->set_color(ezgl::GREY_75);
             g->set_line_width(3);
             draw = true;
         }
-        else if(street_segments[i].segment_type == "tertiary" ||street_segments[i].segment_type == "tertiary_link" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street" || street_segments[i].segment_type == "residential"){
+        else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street" || street_segments[i].segment_type == "residential"){
             g ->set_color(ezgl::GREY_75);
             g->set_line_width(1);
             draw = true;
@@ -296,17 +344,21 @@ void draw_main_canvas (ezgl::renderer *g){
     double zoom = bounds.area/area;
    // std::cout << bounds.area/area << std::endl;
     if(zoom > 165){
+<<<<<<< HEAD
         draw_all_streets(g);
         
+=======
+        drawAllStreets(g);
+>>>>>>> 06336e2a61964498f34fbf9af3b207b280c6010e
     }
     else if(zoom > 21){
-        draw_most_streets(g);
+        drawMostStreets(g);
     }
     else if(zoom > 2){
-        draw_more_streets(g);
+        drawMoreStreets(g);
     }
     else{
-        draw_some_streets(g);
+        drawSomeStreets(g);
     }
     draw_features(g);
 }
