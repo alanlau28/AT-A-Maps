@@ -39,6 +39,8 @@ struct boundingbox bounds;
 
 //(x, y) = (R·lon·cos(latavg), R·lat)
 
+
+
 bool operator< (const street_segment_data &a, const street_segment_data &b){
     return a.speed_limit < b.speed_limit;
 }
@@ -292,10 +294,24 @@ void draw_main_canvas (ezgl::renderer *g){
         drawSomeStreets(g);
     }
 }
+
+
+//UI function declarations for convenience
+void test_entry(GtkEntry *entry);
+void connect_signals(ezgl::application *app);
+
+
 void initial_setup(ezgl::application *application, bool){
     ezgl::rectangle world = application-> get_renderer()->get_visible_world();
     bounds.area = world.area();
+    
+    //UI stuff
+    //connect search bar entry as signal
+    GtkEntry *entry = (GtkEntry*) application->get_object("SearchEntry");
+    g_signal_connect(entry, "activate", G_CALLBACK(test_entry), entry);
 }
+
+
 
 void drawMap(){
     load_map();
@@ -313,6 +329,28 @@ void drawMap(){
 
     application.run(initial_setup,nullptr,nullptr,nullptr);
     
+    //connect search bar
+    
+    
     closeOSMDatabase();
     
 }
+
+
+//UI stuff from here
+
+
+//searchEntry
+void test_entry(GtkEntry *entry) {
+    
+    // Get the text written in the widget
+    const char* text = gtk_entry_get_text(entry);
+    
+    std::cout << text << std::endl;
+    
+    //after that clear the entry
+    
+    gtk_entry_set_text (entry, "");
+    
+}
+
