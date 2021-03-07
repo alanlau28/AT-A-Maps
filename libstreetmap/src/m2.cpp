@@ -34,7 +34,7 @@ struct feature_data{
     std::string name;
     std::string feature_type;
     int numFeaturePoints;
-    
+    double area;
 };
 
 std::vector<street_segment_data> street_segments;
@@ -177,6 +177,7 @@ void load_map(){
     for(FeatureIdx featureidx = 0; featureidx<getNumFeatures(); featureidx++){
         features[featureidx].name = getFeatureName(featureidx);
         features[featureidx].feature_type = asString(getFeatureType(featureidx));
+        features[featureidx].area = findFeatureArea(featureidx);
         features[featureidx].numFeaturePoints = getNumFeaturePoints(featureidx);
         for(int i = 0; i < features[featureidx].numFeaturePoints; i++){
             LatLon point = getFeaturePoint(featureidx,i);
@@ -305,17 +306,43 @@ void drawMostStreets(ezgl::renderer *g){
 }
 
 
-void draw_features(ezgl::renderer *g){
+void draw_features(ezgl::renderer *g, double zoom){
     for (int i = 0; i<features.size();i++){
         if (features[i].feature_type == "park"&&features[i].numFeaturePoints>1){
             g ->set_color(195, 236, 178,255);
+            if(features[i].area>200000){
+                //std::cout<<features[i].area;
+            g->fill_poly(features[i].coordinates);
+            } else if (features[i].area>10000&&zoom>5){
+                g->fill_poly(features[i].coordinates);
+            }else if (features[i].area<=10000&&zoom>100){
+                g->fill_poly(features[i].coordinates);
+            }
+        } else if (features[i].feature_type == "golfcourse"&&features[i].numFeaturePoints>1){
+            g ->set_color(178, 217, 163,255);
             
             g->fill_poly(features[i].coordinates);
+        }else if (features[i].feature_type == "greenspace"&&features[i].numFeaturePoints>1){
+            g ->set_color(181, 219, 167,255);
+            if(features[i].area>200000){
+            g->fill_poly(features[i].coordinates);
+            }
+            else if (features[i].area>10000&&zoom>5){
+                g->fill_poly(features[i].coordinates);
+            }else if (features[i].area<=10000&&zoom>100){
+                g->fill_poly(features[i].coordinates);
+            }
         }
-        else if(features[i].feature_type == "lake"&&features[i].numFeaturePoints>1){
+        else if(features[i].feature_type == "lake" &&features[i].numFeaturePoints>1){
             g ->set_color(170, 218, 255,255);
-            
+            if(features[i].area>200000){
             g->fill_poly(features[i].coordinates);
+            }
+            else if (features[i].area>10000&&zoom>5){
+                g->fill_poly(features[i].coordinates);
+            }else if (features[i].area<=10000&&zoom>100){
+                g->fill_poly(features[i].coordinates);
+            }
         }
         else if(features[i].feature_type == "beach"&&features[i].numFeaturePoints>1){
             g ->set_color(255, 242, 175,255);
@@ -325,14 +352,18 @@ void draw_features(ezgl::renderer *g){
             g ->set_color(232, 232, 232,255);
           
             g->fill_poly(features[i].coordinates);
-        }else if(features[i].feature_type == "building"&&features[i].numFeaturePoints>1){
+        }else if(features[i].feature_type == "building"&&features[i].numFeaturePoints>1&&zoom>1500){
             g ->set_color(213, 216, 219,255);
           
             g->fill_poly(features[i].coordinates);
-        }else if(features[i].feature_type == "greenspace"&&features[i].numFeaturePoints>1){
-            g ->set_color(0,0,0,80);
-           
-            g->fill_poly(features[i].coordinates);
+        }else if((features[i].feature_type == "stream"||features[i].feature_type == "river")&&features[i].numFeaturePoints>1){
+            g ->set_color(170, 218, 255,255);
+            g->set_line_width(0);
+            if(features[i].feature_type == "river") g->set_line_width(3);
+            for (int j = 0;(j<features[i].coordinates.size()-1)&&zoom>100;j++){
+                g->draw_line(features[i].coordinates[j], features[i].coordinates[j+1]);
+            }
+       
         }
     }
 }
@@ -342,6 +373,7 @@ void draw_main_canvas (ezgl::renderer *g){
     double area = world.area();
     double zoom = bounds.area/area;
    // std::cout << bounds.area/area << std::endl;
+    draw_features(g,zoom);
     if(zoom > 165){
         drawAllStreets(g);
         
@@ -355,7 +387,7 @@ void draw_main_canvas (ezgl::renderer *g){
     else{
         drawSomeStreets(g);
     }
-    draw_features(g);
+    
 }
 
 
