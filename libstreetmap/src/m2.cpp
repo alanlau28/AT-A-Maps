@@ -6,6 +6,7 @@
 #include "OSMDatabaseAPI.h"
 #include <math.h>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -29,6 +30,7 @@ struct street_segment_data{
     bool one_way;
 };
 
+
 struct feature_data{
     std::vector<ezgl::point2d> coordinates;
     std::string name;
@@ -39,6 +41,8 @@ struct feature_data{
 
 std::vector<street_segment_data> street_segments;
 std::vector<feature_data> features;
+
+std::vector<ezgl::point2d> intersections_coordinates;
 
 std::unordered_map <OSMID,std::string> street_types;
 
@@ -186,6 +190,17 @@ void load_map(){
             //std::cout<<" wwww\n"<<features[featureidx].feature_type;
         }
     }
+    
+    
+    //Gets coordinate of each intersection
+    //-------------------------------------------------
+    //intersections_coordinates.resize(getNumIntersections());
+    
+//    for (int i = 0; i < getNumIntersections(); i++) {
+//        LatLon point = getIntersectionPosition(i);
+//        ezgl::point2d coordinate = convertCoordinates(point.longitude(), point.latitude(), bounds.lat_avg);
+//        intersection_locations.push_back(coordinate);
+//    }
  
 }
 
@@ -392,8 +407,9 @@ void draw_main_canvas (ezgl::renderer *g){
 
 
 //UI function declarations for convenience
-void test_entry(GtkEntry *entry);
+void search_entry(GtkEntry *entry);
 void connect_signals(ezgl::application *app);
+void find_button(ezgl::renderer *g);
 
 
 void initial_setup(ezgl::application *application, bool){
@@ -403,7 +419,11 @@ void initial_setup(ezgl::application *application, bool){
     //UI stuff
     //connect search bar entry as signal
     GtkEntry *entry = (GtkEntry*) application->get_object("SearchEntry");
-    g_signal_connect(entry, "activate", G_CALLBACK(test_entry), entry);
+    g_signal_connect(entry, "activate", G_CALLBACK(search_entry), entry);
+    
+    //connect "Find" button as signal
+    GtkWidget* findButton = (GtkWidget*) application->get_object("SearchFindButton");
+    g_signal_connect(findButton, "clicked", G_CALLBACK(find_button), application->get_renderer());
 }
 
 
@@ -436,7 +456,7 @@ void drawMap(){
 
 
 //searchEntry
-void test_entry(GtkEntry *entry) {
+void search_entry(GtkEntry *entry) {
     
     // Get the text written in the widget
     const char* text = gtk_entry_get_text(entry);
@@ -447,5 +467,44 @@ void test_entry(GtkEntry *entry) {
     
     gtk_entry_set_text (entry, "");
     
+}
+
+//Find Button - right now works through command line
+void find_button(ezgl::renderer *g) {
+    
+    std::cout<< "Button Pressed!" << std::endl;
+    
+    std::string street1, street2;
+    
+    //get street names
+    std::getline(std::cin, street1);
+    std::getline(std::cin, street2);
+    
+    //find street ids
+    std::vector<StreetIdx> streetOne = findStreetIdsFromPartialStreetName(street1);
+    std::vector<StreetIdx> streetTwo = findStreetIdsFromPartialStreetName(street2);
+    
+    std::pair<StreetIdx, StreetIdx> streets (streetOne[0], streetTwo[0]);
+    
+    //find intersections between first elements
+    std::vector<IntersectionIdx> intersections = findIntersectionsOfTwoStreets(streets);
+    
+//    for (int i = 0; i < intersections.size(); i++) {
+//        float width = 25;
+//        float height = 25;
+//        int id = intersections[i];
+//        g->draw_rectangle(intersection_locations[id], height, width);
+//    }
+    
+
+    
+    //for checking that results are good
+    for (int i = 0; i < intersections.size(); i++) {
+        std::cout << intersections[i] << " " ;
+    }
+    std::cout << std::endl;
+
+    std::cout << street1 << " " << street2 << std::endl;
+ 
 }
 
