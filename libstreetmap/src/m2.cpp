@@ -599,7 +599,7 @@ void draw_main_canvas (ezgl::renderer *g){
 
 //UI function declarations for convenience
 void search_entry(GtkEntry *entry);
-void find_button(ezgl::renderer *g);
+void find_button(GtkWidget * /*widget*/ , ezgl::application *app);
 
 
 void initial_setup(ezgl::application *application, bool){
@@ -613,7 +613,7 @@ void initial_setup(ezgl::application *application, bool){
     
     //connect "Find" button as signal
     GtkWidget* findButton = (GtkWidget*) application->get_object("SearchFindButton");
-    g_signal_connect(findButton, "clicked", G_CALLBACK(find_button), application->get_renderer());
+    g_signal_connect(findButton, "clicked", G_CALLBACK(find_button), application);
 }
 
 
@@ -660,7 +660,7 @@ void search_entry(GtkEntry *entry) {
 }
 
 //Find Button - right now works through command line
-void find_button(ezgl::renderer *g) {
+void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
     std::cout<< "Insert your streets" << std::endl;
     
@@ -675,29 +675,34 @@ void find_button(ezgl::renderer *g) {
     std::vector<StreetIdx> streetTwo = findStreetIdsFromPartialStreetName(street2);
     
     //for holding intersections
-    std::vector<IntersectionIdx> intersections;
+    std::vector<IntersectionIdx> intersectionResults;
     
     if (streetOne.size() > 0 && streetTwo.size() > 0) {
         //first matches are used as arguments
         std::pair<StreetIdx, StreetIdx> streets (streetOne[0], streetTwo[0]);
         
-        intersections = findIntersectionsOfTwoStreets(streets);
+        intersectionResults = findIntersectionsOfTwoStreets(streets);
         
        
     } else {
         std::cout << "No suitable streets found" << std::endl;
         return;
     }
+    
+    //draw stuff from here
+    app->refresh_drawing();
+    ezgl::renderer *g = app->get_renderer();
+    g->set_color(ezgl::BLUE);
         
-    if (intersections.size() > 0) {
-//    for (int i = 0; i < intersection_coordinates.size(); i++) {
-//            float width = 25;
-//            float height = 25;
-//            g->set_color(200, 50, 10);
-//            ezgl::point2d coordinate(intersection_coordinates[i].x - width/2, intersection_coordinates[i].y - height/2);
-//            g->fill_rectangle(coordinate, height, width);
-//           
-//        }
+    if (intersectionResults.size() > 0) {
+    for (int i = 0; i < intersectionResults.size(); i++) {
+            float width = 25;
+            float height = 25;
+            
+            ezgl::point2d coordinate(intersection_coordinates[i].x - width/2, intersection_coordinates[i].y - height/2);
+            g->fill_rectangle(coordinate, height, width);
+           
+        }
     } else {
         std::cout << "No intersections found" << std::endl;
     }
@@ -706,16 +711,16 @@ void find_button(ezgl::renderer *g) {
 
     
     //for checking that results are good
-    for (int i = 0; i < intersections.size(); i++) {
-        std::cout << intersection_coordinates[intersections[i]].x << " " 
-                  << intersection_coordinates[intersections[i]].y << " " << std::endl;
+    for (int i = 0; i < intersectionResults.size(); i++) {
+        std::cout << intersection_coordinates[intersectionResults[i]].x << " " 
+                  << intersection_coordinates[intersectionResults[i]].y << " " << std::endl;
         
-        std::cout << intersections[i] << " " ;
+        std::cout << intersectionResults[i] << " " ;
     }
     std::cout << std::endl;
     
     //at the end delete vectors
-    intersections.clear();
+    intersectionResults.clear();
  
 }
 
