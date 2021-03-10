@@ -91,6 +91,7 @@ struct boundingbox bounds;
 
 //(x, y) = (R·lon·cos(latavg), R·lat)
 
+void drawOneWays(ezgl::renderer *g, ezgl::point2d start, ezgl::point2d finish, double angle);
 
 ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_avg){
     
@@ -310,11 +311,6 @@ void load_map(){
 }
 
     
-   
-
-
-
-//choose when to draw highway ramps, what colour and what line width too
 
 void drawAllStreets(ezgl::renderer *g, double zoom){
 
@@ -466,8 +462,24 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
                 g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
             }
         }
+        if(zoom > 3249 && street_segments[i].one_way){
+            drawOneWays(g,street_segments[i].coordinates[0],street_segments[i].coordinates[street_segments[i].coordinates.size()-1],street_segments[i].angle);
+        }
     }
     
+}
+
+void drawOneWays(ezgl::renderer *g, ezgl::point2d start, ezgl::point2d finish, double angle){
+    g ->set_color(ezgl::BLACK);
+    g ->set_text_rotation(angle);
+    if(start.x - finish.x > 0 || start.y - finish.y > 0){
+        g -> draw_text(start,"←",50,50);
+        g -> draw_text(finish,"←",50,50);
+    }
+    else{
+        g -> draw_text(start,"→",50,50);
+        g -> draw_text(finish,"→",50,50);
+    }
 }
 
 void draw_features(ezgl::renderer *g, double zoom){
