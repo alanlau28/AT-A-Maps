@@ -213,7 +213,6 @@ void load_map(){
  
 }
 
-
 //choose when to draw highway ramps, what colour and what line width too
 void drawAllStreets(ezgl::renderer *g){
     ezgl::color colour;
