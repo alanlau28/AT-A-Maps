@@ -51,6 +51,12 @@ struct POI_data{
     std::string type;
 };
 
+struct intersection_data{
+    ezgl::point2d coordinate {0,0};
+    LatLon position;
+    bool highlight;
+};
+
 std::vector<street_segment_data> street_segments;
 std::vector<feature_data> features;
 std::vector<POI_data> pointOfInterests;
@@ -69,7 +75,7 @@ std::vector<ezgl::point2d>  post_office;
 std::vector<ezgl::point2d>  dentist;
 
 
-std::vector<ezgl::point2d> intersection_coordinates;
+std::vector<intersection_data> intersections;
 
 std::unordered_map <OSMID,std::string> street_types;
 
@@ -228,11 +234,12 @@ void load_map(){
     //Gets coordinate of each intersection
     //-------------------------------------------------
     //intersection_coordinates.resize(getNumIntersections());
+    intersections.resize(getNumIntersections());
     
     for (int i = 0; i < getNumIntersections(); i++) {
         LatLon point = getIntersectionPosition(i);
         ezgl::point2d coordinate = convertCoordinates(point.longitude(), point.latitude(), bounds.lat_avg);
-        intersection_coordinates.push_back(coordinate);
+        intersections[i].coordinate = coordinate;
     }
  
 
@@ -711,9 +718,9 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
 
     
     //for checking that results are good
-    for (int i = 0; i < intersectionResults.size(); i++) {
-        std::cout << intersection_coordinates[intersectionResults[i]].x << " " 
-                  << intersection_coordinates[intersectionResults[i]].y << " " << std::endl;
+    for (int i = 0; i < intersections.size(); i++) {
+        std::cout << intersections[intersections[i]].coordinate.x << " " 
+                  << intersections[intersections[i]].coordinate.y << " " << std::endl;
         
         std::cout << intersectionResults[i] << " " ;
     }
