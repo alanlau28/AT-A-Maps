@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include "load_database.h"
+
 #include <point.hpp>
 #include <unordered_set>
 
@@ -53,6 +54,20 @@ struct POI_data{
 std::vector<street_segment_data> street_segments;
 std::vector<feature_data> features;
 std::vector<POI_data> pointOfInterests;
+std::vector<ezgl::point2d>  fuel;
+std::vector<ezgl::point2d>  school;
+std::vector<ezgl::point2d>  restaurant;
+std::vector<ezgl::point2d>  parking;
+std::vector<ezgl::point2d>  theatre;
+std::vector<ezgl::point2d>  bank;
+std::vector<ezgl::point2d>  bar;
+std::vector<ezgl::point2d>  cafe;
+std::vector<ezgl::point2d>  fast_food;
+std::vector<ezgl::point2d>   pharmacy; 
+std::vector<ezgl::point2d>  hospital;
+std::vector<ezgl::point2d>  post_office;
+std::vector<ezgl::point2d>  dentist;
+
 
 std::vector<ezgl::point2d> intersection_coordinates;
 
@@ -208,6 +223,7 @@ void load_map(){
         }
     }
     
+
     
     //Gets coordinate of each intersection
     //-------------------------------------------------
@@ -225,30 +241,53 @@ void load_map(){
    std::vector <std::string> types;
     
     for (POIIdx poiidx = 0; poiidx < getNumPointsOfInterest(); poiidx++){
+        std::string poitype = getPOIType(poiidx);
         pointOfInterests[poiidx].name = getPOIName(poiidx);
-        pointOfInterests[poiidx].type = getPOIType(poiidx);
+        pointOfInterests[poiidx].type = poitype;
         LatLon point = getPOIPosition(poiidx);
-       //ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
-        pointOfInterests[poiidx].coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+       ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+        pointOfInterests[poiidx].coordinate = coordinate;
         //types.push_back(getPOIType(poiidx));
-  
         
-  }/*
-   for (auto it = types.begin(); it !=types.end(); it++){
-       std::cout<<*it<<std::endl;
-   }
-   std::unordered_map<unsigned, size_t> counts;
-    for (auto v : types){
-         ++counts[v];
+        if(poitype=="fuel"){
+            fuel.push_back(coordinate);
+        }else if (poitype=="theatre"||poitype=="cinema"){
+            theatre.push_back(coordinate);
+        }else if (poitype=="school"||poitype=="kindergarten"||poitype=="preschool"||poitype=="college"||poitype=="university"){
+            school.push_back(coordinate);
+        }else if (poitype=="bank"){
+            bank.push_back(coordinate);
+        }else if (poitype=="pharmacy"){
+            pharmacy.push_back(coordinate);
+        }else if (poitype=="pub"||poitype=="bar"){
+            bar.push_back(coordinate);
+        }else if (poitype=="restaurant"){
+            restaurant.push_back(coordinate);
+        }else if (poitype=="dentist"||poitype=="orthodonists"||poitype=="orthodonist"){
+            dentist.push_back(coordinate);
+        }else if (poitype=="hospital"){
+            hospital.push_back(coordinate);
+        }else if (poitype=="fast_food"){
+            fast_food.push_back(coordinate);
+        }else if (poitype=="post_office"){
+            post_office.push_back(coordinate);
+        }
     }
-   for (auto const &p : counts){
-    std::cout << "The value: " << p.first << " occurred " << p.second << "times\n";
-   }*/
+
+  
    
 }
 
+    
+   
+
+
+
 //choose when to draw highway ramps, what colour and what line width too
+
 void drawAllStreets(ezgl::renderer *g, double zoom){
+
+
     bool draw = false;
     g -> set_line_cap(ezgl::line_cap::round);
     for(int i = 0;i < street_segments.size(); i++){
@@ -462,6 +501,7 @@ void draw_features(ezgl::renderer *g, double zoom){
     }
 }
 
+
 void draw_street_names (ezgl::renderer *g) {
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
@@ -495,7 +535,7 @@ void draw_POI (ezgl::renderer *g, double zoom){
              ezgl::renderer::free_surface(png_surface);
         }
         else if (pointOfInterests[i].type == "restaurant"){
-            if(zoom <1000 && (i%5 == 0)){
+            if((i%5 == 0)){
             png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
             ezgl::point2d point = pointOfInterests[i].coordinate;
             g->draw_surface(png_surface, point);
@@ -533,21 +573,26 @@ void draw_POI (ezgl::renderer *g, double zoom){
              ezgl::renderer::free_surface(png_surface);
         }
     }
+
 }
 
 void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
     double zoom = bounds.area/area;
+
     std::cout << bounds.area/area << std::endl;
     
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
-    
+    if(zoom>800){
+        draw_POI(g,zoom);
+    }
     
     //draw street names
      draw_street_names(g);
-//  
+     
+
 
 }
 
