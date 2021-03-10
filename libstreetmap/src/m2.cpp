@@ -11,12 +11,10 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-<<<<<<< HEAD
 #include "load_database.h"
-=======
 #include <point.hpp>
 #include <unordered_set>
->>>>>>> added some png, some draw poi
+
 
 struct boundingbox{
     double max_x;
@@ -208,7 +206,6 @@ void load_map(){
         }
     }
     
-<<<<<<< HEAD
     
     //Gets coordinate of each intersection
     //-------------------------------------------------
@@ -220,7 +217,7 @@ void load_map(){
         intersection_coordinates.push_back(coordinate);
     }
  
-=======
+
     //-------------------------------
    pointOfInterests.resize(getNumPointsOfInterest());
    std::vector <std::string> types;
@@ -245,53 +242,11 @@ void load_map(){
    for (auto const &p : counts){
     std::cout << "The value: " << p.first << " occurred " << p.second << "times\n";
    }*/
->>>>>>> added some png, some draw poi
+   
 }
 
 //choose when to draw highway ramps, what colour and what line width too
-<<<<<<< HEAD
 void drawAllStreets(ezgl::renderer *g, double zoom){
-=======
-void drawAllStreets(ezgl::renderer *g){
-    ezgl::color colour;
-    
-    for(int i = 0;i < street_segments.size(); i++){
-        if(street_segments[i].segment_type == "motorway"){
-            colour = ezgl::ORANGE;
-            g ->set_color(colour);
-            g->set_line_width(24); 
-
-        }
-        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
-            colour = ezgl::GREY_75;
-            g ->set_color(colour);
-            g->set_line_width(12);
-
-        }
-        else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
-            colour = ezgl::GREY_75;
-            g ->set_color(colour);
-            g->set_line_width(10);
-
-        }
-        else{
-            colour = ezgl::GREY_75;
-            g ->set_color(colour);
-            g->set_line_width(8); 
-        }
-        for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
-            g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
-            if(street_segments[i].one_way){
-                g ->set_color(ezgl::BLACK);
-                //drawArrow(g,street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
-                g ->set_color(colour);
-            }
-        }
-    }
-    
-}
-void drawSomeStreets(ezgl::renderer *g){
->>>>>>> added some png, some draw poi
     bool draw = false;
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
@@ -504,7 +459,6 @@ void draw_features(ezgl::renderer *g, double zoom){
     }
 }
 
-<<<<<<< HEAD
 void draw_street_names (ezgl::renderer *g) {
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
@@ -519,7 +473,8 @@ void draw_street_names (ezgl::renderer *g) {
         }
         
     }
-=======
+}
+
 void draw_POI (ezgl::renderer *g, double zoom){
      ezgl::surface *png_surface; 
     for (int i = 0; i< getNumPointsOfInterest(); i++){
@@ -575,16 +530,12 @@ void draw_POI (ezgl::renderer *g, double zoom){
              ezgl::renderer::free_surface(png_surface);
         }
     }
-  
-
->>>>>>> added some png, some draw poi
 }
 
 void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
     double zoom = bounds.area/area;
-<<<<<<< HEAD
     std::cout << bounds.area/area << std::endl;
     
     draw_features(g,zoom);
@@ -594,27 +545,7 @@ void draw_main_canvas (ezgl::renderer *g){
     //draw street names
      draw_street_names(g);
 //  
-    
-=======
-    //std::cout << bounds.area/area << std::endl;
-    draw_features(g,zoom);
-    if(zoom > 165){
-        drawAllStreets(g);
-        
-    }
-    else if(zoom > 21){
-        drawMostStreets(g);
-    }
-    else if(zoom > 2){
-        drawMoreStreets(g);
-    }
-    else{
-        drawSomeStreets(g);
-    }
-    if(zoom>800){
-      draw_POI(g,zoom);
-    }
->>>>>>> added some png, some draw poi
+
 }
 
 
