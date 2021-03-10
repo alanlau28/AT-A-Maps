@@ -438,12 +438,11 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
     double zoom = bounds.area/area;
-
     std::cout << bounds.area/area << std::endl;
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
-
-       
+    
+    
     //draw street names
      draw_street_names(g);
 //  
