@@ -54,11 +54,6 @@ struct boundingbox bounds;
 //(x, y) = (R·lon·cos(latavg), R·lat)
 
 
-
-bool operator< (const street_segment_data &a, const street_segment_data &b){
-    return a.speed_limit < b.speed_limit;
-}
-
 ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_avg){
     
     double x = kEarthRadiusInMeters * longitude * cos(lat_avg) * kDegreeToRadian;
