@@ -73,7 +73,11 @@ std::vector<ezgl::point2d>   pharmacy;
 std::vector<ezgl::point2d>  hospital;
 std::vector<ezgl::point2d>  post_office;
 std::vector<ezgl::point2d>  dentist;
-//std::vector<ezgl::
+std::vector<ezgl::point2d>  gym;
+std::vector<ezgl::point2d>  art;
+std::vector<ezgl::point2d>  library;
+std::vector<ezgl::point2d>  place_of_worship;
+
 
 
 std::vector<intersection_data> intersections;
@@ -281,6 +285,18 @@ void load_map(){
             fast_food.push_back(coordinate);
         }else if (poitype=="post_office"){
             post_office.push_back(coordinate);
+        }else if (poitype=="gym"||poitype=="gymnasium"||poitype=="swimming_pool"||poitype=="pool; fitness centre; ice rinks"){
+            gym.push_back(coordinate);
+        }else if (poitype=="place_of_worship"){
+            place_of_worship.push_back(coordinate);
+        }else if (poitype=="libraray"){
+            library.push_back(coordinate);
+        }else if (poitype=="artwork"||poitype=="art_centre"){
+            art.push_back(coordinate);
+        }else if (poitype=="cafe"){
+            cafe.push_back(coordinate);
+        }else if (poitype=="parking"){
+            parking.push_back(coordinate);
         }
     }
 
