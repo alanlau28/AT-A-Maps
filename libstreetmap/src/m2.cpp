@@ -239,6 +239,8 @@ void load_map(){
     for (int i = 0; i < getNumIntersections(); i++) {
         LatLon point = getIntersectionPosition(i);
         ezgl::point2d coordinate = convertCoordinates(point.longitude(), point.latitude(), bounds.lat_avg);
+        intersections[i].highlight = false;
+        intersections[i].position = point;
         intersections[i].coordinate = coordinate;
     }
  
@@ -706,7 +708,7 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
             float width = 25;
             float height = 25;
             
-            ezgl::point2d coordinate(intersection_coordinates[i].x - width/2, intersection_coordinates[i].y - height/2);
+            ezgl::point2d coordinate(intersections[i].coordinate.x - width/2, intersections[i].coordinate.y - height/2);
             g->fill_rectangle(coordinate, height, width);
            
         }
@@ -715,15 +717,6 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     }
     
     
-
-    
-    //for checking that results are good
-    for (int i = 0; i < intersections.size(); i++) {
-        std::cout << intersections[intersections[i]].coordinate.x << " " 
-                  << intersections[intersections[i]].coordinate.y << " " << std::endl;
-        
-        std::cout << intersectionResults[i] << " " ;
-    }
     std::cout << std::endl;
     
     //at the end delete vectors
