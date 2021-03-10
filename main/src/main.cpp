@@ -22,6 +22,7 @@
 #include <string>
 #include "m1.h"
 #include "m2.h"
+#include "load_database.h"
 
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everything went OK
@@ -30,7 +31,7 @@ constexpr int BAD_ARGUMENTS_EXIT_CODE = 2;  //Invalid command-line usage
 
 //The default map to load if none is specified
 std::string default_map_path = "/cad2/ece297s/public/maps/toronto_canada.streets.bin";
-
+std::string map_load_path;
 
 // The start routine of your program (main) when you are running your standalone
 // mapper program. This main routine is *never called* when you are running 
@@ -66,6 +67,8 @@ int main(int argc, char** argv) {
     //You can now do something with the map data
   
     //do something in between
+    
+    map_load_path = map_path;
     drawMap();
 
 

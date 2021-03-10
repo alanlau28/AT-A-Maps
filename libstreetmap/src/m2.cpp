@@ -11,6 +11,7 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
+#include "load_database.h"
 
 struct boundingbox{
     double max_x;
@@ -87,8 +88,8 @@ void load_bin(){
 
 void load_map(){
 
-    
-    loadOSMDatabaseBIN("/cad2/ece297s/public/maps/toronto_canada.osm.bin");
+    load_bin();
+    loadOSMDatabaseBIN(map_paths.find(map_load_path) -> second);
     
     street_segments.resize(getNumStreetSegments());
     
@@ -215,7 +216,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         draw = false;
         if(street_segments[i].segment_type == "motorway" ||street_segments[i].segment_type == "motorway_link"){
             draw = true;
-            g ->set_color(ezgl::ORANGE);
+            g ->set_color(246,207,101,255);
             if(street_segments[i].segment_type == "motorway_link" && zoom < 7){
                 draw = false;
             }
@@ -237,7 +238,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
             draw = true;
-            g ->set_color(ezgl::GREY_75);
+            g ->set_color(213,216,219,255);
             if(zoom > 25107){
                 g->set_line_width(26);
             }
@@ -272,7 +273,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
             if(zoom > 7){
-                g ->set_color(ezgl::GREY_75);
+                g ->set_color(213,216,219,255);
                 draw = true;
             }
             if(zoom > 25107){
@@ -302,7 +303,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else if (street_segments[i].segment_type == "residential"){
             if(zoom > 54){
-                g ->set_color(ezgl::GREY_75);
+                g ->set_color(213,216,219,255);
                 draw = true;
             }
             if(zoom > 25107){
@@ -329,7 +330,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else{
             if(zoom > 151){
-            g ->set_color(ezgl::GREY_75);
+            g ->set_color(213,216,219,255);
             draw = true;
             }
             if(zoom > 27351){
@@ -443,6 +444,7 @@ void draw_main_canvas (ezgl::renderer *g){
     double area = world.area();
     double zoom = bounds.area/area;
     std::cout << bounds.area/area << std::endl;
+    
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
     
