@@ -24,6 +24,7 @@ struct boundingbox{
 struct street_segment_data{
     std::vector<ezgl::point2d> coordinates;
     std::string name;
+    double angle;
     float speed_limit;
     StreetIdx street_id;
     std::string segment_type;
@@ -136,6 +137,7 @@ void load_map(){
         street_segments[street_segment_id].speed_limit = street_seg_info.speedLimit;
         street_segments[street_segment_id].street_id = street_seg_info.streetID;
         street_segments[street_segment_id].one_way = street_seg_info.oneWay;
+        street_segments[street_segment_id].name = getStreetName(street_seg_info.streetID);
         
         auto it = street_types.find(street_seg_info.wayOSMID);
         street_segments[street_segment_id].segment_type = it -> second;
@@ -147,6 +149,7 @@ void load_map(){
             
             ezgl::point2d coordinate = convertCoordinates(pos_from.longitude(),pos_from.latitude(),bounds.lat_avg);
             street_segments[street_segment_id].coordinates.push_back(coordinate);
+            
             
             coordinate = convertCoordinates(pos_to.longitude(),pos_to.latitude(),bounds.lat_avg);
             street_segments[street_segment_id].coordinates.push_back(coordinate);
@@ -169,8 +172,14 @@ void load_map(){
             coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
             street_segments[street_segment_id].coordinates.push_back(coordinate);
         }
+        
+        
+        //get angle of street
+        double delta_x = street_segments[street_segment_id].coordinates[0].x - street_segments[street_segment_id].coordinates[1].x;
+        double delta_y = street_segments[street_segment_id].coordinates[0].y - street_segments[street_segment_id].coordinates[1].y;
+        street_segments[street_segment_id].angle = atan2(delta_y, delta_x)* (180/3.141592653);
     }
-
+    
    
     
     
@@ -383,12 +392,31 @@ void draw_features(ezgl::renderer *g, double zoom){
     }
 }
 
+void draw_street_names (ezgl::renderer *g) {
+    for (int i = 0; i < getNumStreetSegments(); i++) {
+        
+        double x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
+        double y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
+        
+        g->set_color(0,0,0);
+        g->set_font_size(15);
+        if (street_segments[i].name != "<unknown>") {
+            g->set_text_rotation(street_segments[i].angle);
+            g->draw_text({x, y}, street_segments[i].name, 100.0, 100.0);
+        }
+        
+    }
+}
+
 void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
     double zoom = bounds.area/area;
    // std::cout << bounds.area/area << std::endl;
+    
     draw_features(g,zoom);
+   
+    
     if(zoom > 165){
         drawAllStreets(g);
         
@@ -403,6 +431,9 @@ void draw_main_canvas (ezgl::renderer *g){
         drawSomeStreets(g);
     }
     
+    
+    //draw street names
+     draw_street_names(g);
 //  
     
 }
@@ -410,7 +441,6 @@ void draw_main_canvas (ezgl::renderer *g){
 
 //UI function declarations for convenience
 void search_entry(GtkEntry *entry);
-void connect_signals(ezgl::application *app);
 void find_button(ezgl::renderer *g);
 
 
