@@ -216,16 +216,16 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         if(street_segments[i].segment_type == "motorway" ||street_segments[i].segment_type == "motorway_link"){
             draw = true;
             g ->set_color(ezgl::ORANGE);
-            if(street_segments[i].segment_type == "motorway_link" && zoom < 2){
+            if(street_segments[i].segment_type == "motorway_link" && zoom < 7){
                 draw = false;
             }
-            if(zoom > 27351){
-                g->set_line_width(24);
+            if(zoom > 25107){
+                g->set_line_width(26);
             }
-            else if(zoom > 3544){
+            else if(zoom > 1171){
                 g->set_line_width(20);
             }
-            else if(zoom > 59){
+            else if(zoom > 54){
                 g ->set_line_width(8);
             }
             else if (zoom > 7){
@@ -238,26 +238,29 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
             draw = true;
             g ->set_color(ezgl::GREY_75);
-            if(zoom > 27351){
-                g->set_line_width(24);
+            if(zoom > 25107){
+                g->set_line_width(26);
             }
-            else if(zoom > 9846){
-                g->set_line_width(20);
+            else if(zoom > 9038){
+                g->set_line_width(22);
             }
-            else if(zoom > 3544){
-                g->set_line_width(14);
+            else if(zoom > 3253){
+                g->set_line_width(18);
             }
-            else if(zoom > 1276){
+            else if(zoom > 1171){
+                g->set_line_width(16);
+            }
+            else if(zoom > 421){
                 g->set_line_width(11);
             }
-            else if(zoom > 459){
-                g->set_line_width(9);
+            else if(zoom > 151){
+                g->set_line_width(6);
             }
-            else if(zoom > 165){
+            else if (zoom > 54){
                 g->set_line_width(5);
             }
-            else if (zoom > 59){
-                g->set_line_width(3);
+            else if (zoom > 19){
+                g->set_line_width(4);
             }
             else if(zoom > 7){
                 g->set_line_width(2);
@@ -272,73 +275,79 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
                 g ->set_color(ezgl::GREY_75);
                 draw = true;
             }
-            if(zoom > 27351){
+            if(zoom > 25107){
               g -> set_line_width(16);  
             }
-            else if(zoom >9846){
-              g -> set_line_width(10);  
+            else if(zoom >9038){
+              g -> set_line_width(12);  
             }
-            else if(zoom > 3544){
-                g->set_line_width(7);
+            else if(zoom > 3253){
+                g->set_line_width(9);
             }
-            else if(zoom > 1276){
-                g->set_line_width(5);
+            else if(zoom > 1171){
+                g->set_line_width(6);
             }
-            else if(zoom > 459){
+            else if(zoom > 421){
+                g ->set_line_width(4);
+            }
+            else if(zoom > 151){
                 g ->set_line_width(3);
             }
-            else if(zoom > 165){
-                g ->set_line_width(2);
+            else if (zoom > 19){
+                g->set_line_width(2);
             }
             else if(zoom > 7){
                 g -> set_line_width(1);
             }
         }
         else if (street_segments[i].segment_type == "residential"){
-            if(zoom > 59){
+            if(zoom > 54){
                 g ->set_color(ezgl::GREY_75);
                 draw = true;
             }
-            if(zoom > 27351){
-              g -> set_line_width(16);  
+            if(zoom > 25107){
+              g -> set_line_width(18);  
             }
-            else if(zoom >9846){
-              g -> set_line_width(10);  
+            else if(zoom > 9038){
+              g -> set_line_width(11);  
             }
-            else if(zoom > 3544){
-                g->set_line_width(7);
+            else if(zoom > 3253){
+                g->set_line_width(9);
             }
-            else if(zoom > 1276){
-                g->set_line_width(5);
+            else if(zoom > 1171){
+                g->set_line_width(6);
             }
-            else if(zoom > 459){
+            else if(zoom > 421){
                 g ->set_line_width(3);
             }
-            else if(zoom > 165){
+            else if(zoom > 151){
                 g ->set_line_width(2);
             }
-            else if(zoom > 59){
+            else if(zoom > 19){
                 g -> set_line_width(1);
             }
         }
         else{
-            if(zoom > 165){
+            if(zoom > 151){
             g ->set_color(ezgl::GREY_75);
             draw = true;
             }
             if(zoom > 27351){
                 g -> set_line_width(16);  
             }
-            else if(zoom > 9846){
+            else if(zoom > 9038){
                 g -> set_line_width(10);
             }
-            else if(zoom > 3544){
+            else if(zoom > 3253){
                 g->set_line_width(6); 
             } 
-            else if(zoom > 459){
+            else if(zoom > 1171){
+                g->set_line_width(3);
+            }
+            else if(zoom > 421){
                 g->set_line_width(2);
             }
-            else if(zoom > 165){
+            else if(zoom > 151){
                 g->set_line_width(1);
             }
         }
