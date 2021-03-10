@@ -546,6 +546,9 @@ void draw_street_names (ezgl::renderer *g) {
 
 void draw_POI (ezgl::renderer *g, double zoom){
      ezgl::surface *png_surface; 
+     int count = 0;
+     
+     //if(zoom>)
     for (int i = 0; i< getNumPointsOfInterest(); i++){
         if (pointOfInterests[i].type == "fuel"){
             png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
@@ -566,6 +569,8 @@ void draw_POI (ezgl::renderer *g, double zoom){
             ezgl::point2d point = pointOfInterests[i].coordinate;
             g->draw_surface(png_surface, point);
              ezgl::renderer::free_surface(png_surface);
+             std::cout<<count<<std::endl;
+             count++;
             }
         }else if (pointOfInterests[i].type == "parking"){
             png_surface = ezgl::renderer::load_png("libstreetmap/resources/parking.png");
@@ -607,7 +612,7 @@ void draw_main_canvas (ezgl::renderer *g){
     double area = world.area();
     double zoom = bounds.area/area;
 
-    std::cout << bounds.area/area << std::endl;
+    //std::cout << bounds.area/area << std::endl;
     
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
