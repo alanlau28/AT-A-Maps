@@ -250,6 +250,7 @@ void load_map(){
 //choose when to draw highway ramps, what colour and what line width too
 void drawAllStreets(ezgl::renderer *g, double zoom){
     bool draw = false;
+    g -> set_line_cap(ezgl::line_cap::round);
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
         if(street_segments[i].segment_type == "motorway" ||street_segments[i].segment_type == "motorway_link"){
