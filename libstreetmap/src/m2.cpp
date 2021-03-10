@@ -698,19 +698,22 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         return;
     }
     
+    std::cout << "these are the intersections found" << std::endl;
+    for (int i = 0; i < intersectionResults.size(); i++) {
+        std::cout << intersectionResults[i] << " ";
+    }
+    
     //draw stuff from here
     app->refresh_drawing();
-    ezgl::renderer *g = app->get_renderer();
-    g->set_color(ezgl::BLUE);
+
         
     if (intersectionResults.size() > 0) {
     for (int i = 0; i < intersectionResults.size(); i++) {
-            float width = 25;
-            float height = 25;
             
-            ezgl::point2d coordinate(intersections[i].coordinate.x - width/2, intersections[i].coordinate.y - height/2);
-            g->fill_rectangle(coordinate, height, width);
-           
+        std::cout << intersections[intersectionResults[i]].coordinate.x << " "
+                  << intersections[intersectionResults[i]].coordinate.y << std::endl;
+        
+        intersections[intersectionResults[i]].highlight = true;
         }
     } else {
         std::cout << "No intersections found" << std::endl;
