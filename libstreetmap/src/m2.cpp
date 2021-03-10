@@ -73,6 +73,7 @@ std::vector<ezgl::point2d>   pharmacy;
 std::vector<ezgl::point2d>  hospital;
 std::vector<ezgl::point2d>  post_office;
 std::vector<ezgl::point2d>  dentist;
+//std::vector<ezgl::
 
 
 std::vector<intersection_data> intersections;
