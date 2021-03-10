@@ -660,10 +660,16 @@ void search_entry(GtkEntry *entry) {
     // Get the text written in the widget
     const char* text = gtk_entry_get_text(entry);
     
-    std::cout << text << std::endl;
+  
+    std::vector<StreetIdx> street = findStreetIdsFromPartialStreetName(text);
     
-    //after that clear the entry
+    for (int i = 0; i < street.size(); i++) {
+        std::cout << getStreetName(street[i]) << std::endl;
+    }
     
+    
+    //after that clear the entry and vector
+    street.clear();
     gtk_entry_set_text (entry, "");
     
 }
@@ -698,10 +704,7 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         return;
     }
     
-    std::cout << "these are the intersections found" << std::endl;
-    for (int i = 0; i < intersectionResults.size(); i++) {
-        std::cout << intersectionResults[i] << " ";
-    }
+   
     
     //draw stuff from here
     app->refresh_drawing();
@@ -720,8 +723,13 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     }
     
     
-    std::cout << std::endl;
-    
+     std::cout << "these are the intersections found" << std::endl;
+    for (int i = 0; i < intersectionResults.size(); i++) {
+        std::cout << intersectionResults[i] << " " 
+                  << intersections[intersectionResults[i]].highlight << " "
+                  << getIntersectionName(intersectionResults[i]) <<std::endl;
+    }
+        
     //at the end delete vectors
     intersectionResults.clear();
  
