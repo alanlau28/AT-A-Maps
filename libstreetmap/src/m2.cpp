@@ -80,6 +80,7 @@ std::vector<ezgl::point2d>  place_of_worship;
 
 
 
+
 std::vector<intersection_data> intersections;
 
 std::unordered_map <OSMID,std::string> street_types;
@@ -253,6 +254,7 @@ void load_map(){
     //-------------------------------
    pointOfInterests.resize(getNumPointsOfInterest());
    std::vector <std::string> types;
+   // int count = 0;
     
     for (POIIdx poiidx = 0; poiidx < getNumPointsOfInterest(); poiidx++){
         std::string poitype = getPOIType(poiidx);
@@ -277,6 +279,9 @@ void load_map(){
             bar.push_back(coordinate);
         }else if (poitype=="restaurant"){
             restaurant.push_back(coordinate);
+            //if(count==8){
+                
+            //}
         }else if (poitype=="dentist"||poitype=="orthodonists"||poitype=="orthodonist"){
             dentist.push_back(coordinate);
         }else if (poitype=="hospital"){
@@ -544,12 +549,45 @@ void draw_street_names (ezgl::renderer *g) {
     }
 }
 
-void draw_POI (ezgl::renderer *g, double zoom){
+void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2d large){
      ezgl::surface *png_surface; 
-     int count = 0;
+    //png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
+     ezgl::point2d point {.0,.0};
+     for(int i = 0; i<restaurant.size();i++){
+         png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
+         if((restaurant[i]<large)&&(small<restaurant[i])){             
+             if(i%50==0){
+                 point=restaurant[i];
+                 g->draw_surface(png_surface, point);
+             
+             }else if (zoom>10000&&i%5==0){
+                 point=restaurant[i];
+                 g->draw_surface(png_surface, point);
+             //g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+             }
+             else if(zoom>90000){
+             point=restaurant[i];
+             g->draw_surface(png_surface, point);
+            // g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+             }
+         }
+         
+         ezgl::renderer::free_surface(png_surface);
+     }
+     for (int i = 0; i < fuel.size(); i++){
+         png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
+         if(fuel[i]<large&&(small<fuel[i])){
+             point=fuel[i];
+                 g->draw_surface(png_surface, point);
+         }
+         ezgl::renderer::free_surface(png_surface);
+     }
+     //for (int i = 0; i <)
+   
      
-     //if(zoom>)
-    for (int i = 0; i< getNumPointsOfInterest(); i++){
+    /*for (int i = 0; i< getNumPointsOfInterest(); i++){
         if (pointOfInterests[i].type == "fuel"){
             png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
             ezgl::point2d point = pointOfInterests[i].coordinate;
@@ -569,8 +607,7 @@ void draw_POI (ezgl::renderer *g, double zoom){
             ezgl::point2d point = pointOfInterests[i].coordinate;
             g->draw_surface(png_surface, point);
              ezgl::renderer::free_surface(png_surface);
-             std::cout<<count<<std::endl;
-             count++;
+             
             }
         }else if (pointOfInterests[i].type == "parking"){
             png_surface = ezgl::renderer::load_png("libstreetmap/resources/parking.png");
@@ -603,7 +640,7 @@ void draw_POI (ezgl::renderer *g, double zoom){
             g->draw_surface(png_surface, point);
              ezgl::renderer::free_surface(png_surface);
         }
-    }
+    }*/
 
 }
 
@@ -611,17 +648,19 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
     double zoom = bounds.area/area;
+    ezgl::point2d small = world.bottom_left();
+    ezgl::point2d large = world.top_right();
 
     //std::cout << bounds.area/area << std::endl;
-    
+    std::cout<<small.x<<" "<<small.y<<"   "<<large.x<<" "<<large.y<<std::endl;
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
-    if(zoom>800){
-        draw_POI(g,zoom);
+    if(zoom>1500){
+        //draw_POI(g,zoom,small, large);
     }
     
     //draw street names
-     draw_street_names(g);
+     //draw_street_names(g);
      
 
 

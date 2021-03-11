@@ -50,6 +50,10 @@ public:
   {
     return (lhs.x == rhs.x) && (lhs.y == rhs.y);
   }
+  
+  friend bool operator<(point2d const &lhs, point2d const &rhs){
+      return (lhs.x < rhs.x) && (lhs.y< rhs.y);
+  }
 
   /**
    * Test for inequality.
