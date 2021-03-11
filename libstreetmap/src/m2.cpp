@@ -741,11 +741,7 @@ void draw_street_names (ezgl::renderer *g) {
        
         
     }
-    
-<<<<<<< HEAD
-    //std::cout << count << " street names written" << std::endl;
-=======
->>>>>>> added icon to UI, map loader can display map paths now
+   
 }
 
 void draw_main_canvas (ezgl::renderer *g){
@@ -802,11 +798,11 @@ void initial_setup(ezgl::application *application, bool){
 }
 
 
+
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* /*event*/,double x, double y){
     clearHighlights();
-
+    
     LatLon position = latLonFromWorld(x,y);
-    std::cout<<"Mouse clicked at ("<<position.latitude() <<","<<position.longitude() <<")\n";
     int id = findClosestIntersection(position);
     intersections[id].highlight = true;
     app -> refresh_drawing();
