@@ -539,6 +539,7 @@ void drawOneWays(ezgl::renderer *g, double zoom){
     
 }
 
+<<<<<<< HEAD
 void drawHighlights(ezgl::renderer *g){
     ezgl::surface *png_surface;
     png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin(1).png");
@@ -554,6 +555,10 @@ void clearHighlights(){
     for(int i = 0;i < intersections.size();i++){
         intersections[i].highlight = false;
     }
+=======
+void drawHighlights(){
+    
+>>>>>>> parent of 37ad360... Finished and tested clicking intersections at certain points
 }
 
 void draw_features(ezgl::renderer *g, double zoom){
