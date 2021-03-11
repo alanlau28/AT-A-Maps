@@ -561,6 +561,7 @@
                       <object class="GtkImage" id="MapLoaderIcon">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="xpad">5</property>
                         <property name="ypad">5</property>
                         <property name="pixbuf">globe.png</property>
                       </object>
@@ -574,7 +575,7 @@
                       <object class="GtkLabel" id="MapLoaderLabel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xpad">10</property>
+                        <property name="xpad">5</property>
                         <property name="label" translatable="yes">Choose Map</property>
                         <attributes>
                           <attribute name="font-desc" value="Sans Bold 13"/>
