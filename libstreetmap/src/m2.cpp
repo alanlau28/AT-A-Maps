@@ -623,96 +623,46 @@ void draw_features(ezgl::renderer *g, double zoom){
 
 void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2d large){
      ezgl::surface *png_surface; 
-    //png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
+    
      ezgl::point2d point {.0,.0};
-     for(int i = 0; i<restaurant.size();i++){
-         png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
-         if((restaurant[i]<large)&&(small<restaurant[i])){             
-             if(i%50==0){
-                 point=restaurant[i];
-                 g->draw_surface(png_surface, point);
-             
-             }else if (zoom>10000&&i%5==0){
-                 point=restaurant[i];
-                 g->draw_surface(png_surface, point);
-             //g->draw_surface(png_surface, point);
-             //ezgl::renderer::free_surface(png_surface);
-             }
-             else if(zoom>90000){
-             point=restaurant[i];
-             g->draw_surface(png_surface, point);
-            // g->draw_surface(png_surface, point);
-             //ezgl::renderer::free_surface(png_surface);
-             }
+     for(int i = 0; i<restaurant.size() ;i++){
+         if ((restaurant[i]<large)&&(small<restaurant[i])){
+         png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");                 
+         point=restaurant[i];
+         g->draw_surface(png_surface, point);                  
+         //ezgl::renderer::free_surface(png_surface);
          }
-         
-         ezgl::renderer::free_surface(png_surface);
      }
-     for (int i = 0; i < fuel.size(); i++){
-         png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
+     for (int i = 0; i < fuel.size() ; i++){
          if(fuel[i]<large&&(small<fuel[i])){
+         png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
              point=fuel[i];
-                 g->draw_surface(png_surface, point);
+             g->draw_surface(png_surface, point);
+         
+         //ezgl::renderer::free_surface(png_surface);
          }
-         ezgl::renderer::free_surface(png_surface);
      }
-     //for (int i = 0; i <)
-   
-     
-    /*for (int i = 0; i< getNumPointsOfInterest(); i++){
-        if (pointOfInterests[i].type == "fuel"){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-             
+     for (int i = 0; i < bar.size(); i++){
+         if(bar[i]<large&&(small<bar[i])){
+         png_surface = ezgl::renderer::load_png("libstreetmap/resources/bar.png");
+         
+             point=bar[i];
+                 g->draw_surface(png_surface, point);
+         
+         //ezgl::renderer::free_surface(png_surface);
          }
-        else if ((pointOfInterests[i].type == "school"||pointOfInterests[i].type == "university"||pointOfInterests[i].type == "college"||pointOfInterests[i].type == "kindergarten"||pointOfInterests[i].type == "preschool")){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/university.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-        }
-        else if (pointOfInterests[i].type == "restaurant"){
-            if((i%5 == 0)){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-             
-            }
-        }else if (pointOfInterests[i].type == "parking"){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/parking.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-        }else if (pointOfInterests[i].type == "theatre"||pointOfInterests[i].type == "cinema"){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/theater.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-        }else if (pointOfInterests[i].type == "bank"){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-        }else if (pointOfInterests[i].type == "pharmacy"){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/drugstore.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-        }else if (pointOfInterests[i].type == "bar"||pointOfInterests[i].type == "pub"){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/bar.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-        }else if (pointOfInterests[i].type == "cafe;bakery"){
-            png_surface = ezgl::renderer::load_png("libstreetmap/resources/coffee.png");
-            ezgl::point2d point = pointOfInterests[i].coordinate;
-            g->draw_surface(png_surface, point);
-             ezgl::renderer::free_surface(png_surface);
-        }
-    }*/
+     }
+     for(int i = 0; i<restaurant.size() ;i++){
+         if ((restaurant[i]<large)&&(small<restaurant[i])){
+         png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");                 
+         point=restaurant[i];
+         g->draw_surface(png_surface, point);                  
+         //ezgl::renderer::free_surface(png_surface);
+         }
+     }
+   ezgl::renderer::free_surface(png_surface);
+     
+    
 
 }
 
@@ -751,11 +701,16 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
 
+<<<<<<< HEAD
     //std::cout << bounds.area/area << std::endl;
+=======
+    std::cout << bounds.area/area << std::endl;
+    
+>>>>>>> commit to pull
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
     if(zoom>1500){
-        //draw_POI(g,zoom,small, large);
+        draw_POI(g,zoom,small, large);
     }
     if(zoom > 3249){
         drawOneWays(g,zoom);
