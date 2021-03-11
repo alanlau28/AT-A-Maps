@@ -24,7 +24,6 @@ struct boundingbox{
     double min_y;
     double lat_avg;
     double area;
-    ezgl::rectangle world;
 };
 
 struct street_segment_data{
@@ -762,7 +761,7 @@ void draw_main_canvas (ezgl::renderer *g){
     
     //draw street names
     draw_street_names(g);
-    drawHighlights(g);
+     
 
 
 }
@@ -777,7 +776,6 @@ void map_list(GtkListBox  *box);
 
 void initial_setup(ezgl::application *application, bool){
     ezgl::rectangle world = application-> get_renderer()->get_visible_world();
-    bounds.world = world;
     bounds.area = world.area();
     
     //UI stuff
@@ -796,12 +794,12 @@ void initial_setup(ezgl::application *application, bool){
 }
 
 void act_on_mouse_click(ezgl::application* app,GdkEventButton* event,double x, double y){
-    clearHighlights();
     LatLon position = latLonFromWorld(x,y);
+    std::cout<<"Mouse clicked at ("<<position.latitude() <<","<<position.longitude() <<")\n";
     int id = findClosestIntersection(position);
     intersections[id].highlight = true;
     app -> refresh_drawing();
-    app ->update_message("Point clicked at "+intersections[id].name);
+    app ->update_message(intersections[id].name);
 }
 
 void drawMap(){
