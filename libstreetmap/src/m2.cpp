@@ -539,7 +539,7 @@ void drawOneWays(ezgl::renderer *g, double zoom){
     
 }
 
-<<<<<<< HEAD
+
 void drawHighlights(ezgl::renderer *g){
     ezgl::surface *png_surface;
     png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin(1).png");
@@ -555,11 +555,8 @@ void clearHighlights(){
     for(int i = 0;i < intersections.size();i++){
         intersections[i].highlight = false;
     }
-=======
-void drawHighlights(){
-    
->>>>>>> parent of 37ad360... Finished and tested clicking intersections at certain points
 }
+
 
 void draw_features(ezgl::renderer *g, double zoom){
     for (int i = 0; i<features.size();i++){
@@ -766,7 +763,9 @@ void draw_main_canvas (ezgl::renderer *g){
     
     //draw street names
     draw_street_names(g);
-     
+
+    drawHighlights(g);
+
 
 
 }
@@ -798,13 +797,18 @@ void initial_setup(ezgl::application *application, bool){
     g_signal_connect(mapList, "row-activated", G_CALLBACK(map_list), mapList);
 }
 
-void act_on_mouse_click(ezgl::application* app,GdkEventButton* event,double x, double y){
+
+void act_on_mouse_click(ezgl::application* app, GdkEventButton* /*event*/,double x, double y){
+    clearHighlights();
+
     LatLon position = latLonFromWorld(x,y);
     std::cout<<"Mouse clicked at ("<<position.latitude() <<","<<position.longitude() <<")\n";
     int id = findClosestIntersection(position);
     intersections[id].highlight = true;
     app -> refresh_drawing();
-    app ->update_message(intersections[id].name);
+
+    app -> update_message("Point clicked at " + intersections[id].name);
+
 }
 
 void drawMap(){
@@ -819,7 +823,7 @@ void drawMap(){
    
     ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
     application.add_canvas("MainCanvas",draw_main_canvas,initial_background);
-    application.run(initial_setup,act_on_mouse_click,nullptr,nullptr);
+    application.run(initial_setup, act_on_mouse_click, nullptr,nullptr);
     
     //connect search bar
     
