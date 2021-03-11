@@ -55,6 +55,7 @@ struct intersection_data{
     ezgl::point2d coordinate {0,0};
     LatLon position;
     bool highlight;
+    std::string name;
 };
 
 std::vector<street_segment_data> street_segments;
@@ -252,6 +253,7 @@ void load_map(){
         intersections[i].highlight = false;
         intersections[i].position = point;
         intersections[i].coordinate = coordinate;
+        intersections[i].name = getIntersectionName(i);
     }
  
 
@@ -529,6 +531,10 @@ void drawOneWays(ezgl::renderer *g, double zoom){
     
 }
 
+void drawHighlights(){
+    
+}
+
 void draw_features(ezgl::renderer *g, double zoom){
     for (int i = 0; i<features.size();i++){
         if (features[i].feature_type == "park"&&features[i].numFeaturePoints>1){
@@ -772,8 +778,8 @@ void act_on_mouse_click(ezgl::application* app,GdkEventButton* event,double x, d
     std::cout<<"Mouse clicked at ("<<position.latitude() <<","<<position.longitude() <<")\n";
     int id = findClosestIntersection(position);
     intersections[id].highlight = true;
-    std::cout << id << std::endl;
     app -> refresh_drawing();
+    app ->update_message(intersections[id].name);
 }
 
 void drawMap(){
