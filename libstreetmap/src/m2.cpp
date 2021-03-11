@@ -72,11 +72,10 @@ std::vector<ezgl::point2d>  theatre;
 std::vector<ezgl::point2d>  bank;
 std::vector<ezgl::point2d>  bar;
 std::vector<ezgl::point2d>  cafe;
-std::vector<ezgl::point2d>  fast_food;
-std::vector<ezgl::point2d>   pharmacy; 
+std::vector<ezgl::point2d>  fastfood;
+std::vector<ezgl::point2d>  pharmacy; 
 std::vector<ezgl::point2d>  hospital;
 std::vector<ezgl::point2d>  post_office;
-std::vector<ezgl::point2d>  dentist;
 std::vector<ezgl::point2d>  gym;
 std::vector<ezgl::point2d>  art;
 std::vector<ezgl::point2d>  library;
@@ -272,6 +271,9 @@ void load_map(){
     
     for (POIIdx poiidx = 0; poiidx < getNumPointsOfInterest(); poiidx++){
         std::string poitype = getPOIType(poiidx);
+        if(poitype=="doctors"){
+            //std::cout<<"wefewf\n";
+        }
         pointOfInterests[poiidx].name = getPOIName(poiidx);
         pointOfInterests[poiidx].type = poitype;
         LatLon point = getPOIPosition(poiidx);
@@ -279,43 +281,48 @@ void load_map(){
         pointOfInterests[poiidx].coordinate = coordinate;
         //types.push_back(getPOIType(poiidx));
         
-        if(poitype=="fuel"){
-            fuel.push_back(coordinate);
-        }else if (poitype=="theatre"||poitype=="cinema"){
-            theatre.push_back(coordinate);
+        if(poitype.compare("fuel")==0||poitype.compare("parking")==0){
+            if(poitype=="parking"){
+                parking.push_back(coordinate);
+            }
+            else {fuel.push_back(coordinate);}
+        }else if (poitype.compare("theatre")==0||poitype.compare("cinema")==0||poitype.compare("post_office")==0){
+            if (poitype.compare("post_office")==0) post_office.push_back(coordinate);
+            else theatre.push_back(coordinate);
         }else if (poitype=="school"||poitype=="kindergarten"||poitype=="preschool"||poitype=="college"||poitype=="university"){
             school.push_back(coordinate);
-        }else if (poitype=="bank"){
+        }else if (poitype=="bank"||poitype=="artwork"||poitype=="arts_centre"){
+            if(poitype=="artwork"||poitype=="arts_centre"){
+                art.push_back(coordinate);
+            }else{
             bank.push_back(coordinate);
-        }else if (poitype=="pharmacy"){
-            pharmacy.push_back(coordinate);
-        }else if (poitype=="pub"||poitype=="bar"){
-            bar.push_back(coordinate);
-        }else if (poitype=="restaurant"){
-            restaurant.push_back(coordinate);
-            //if(count==8){
+            }
+        }else if (poitype=="pharmacy"||poitype=="restaurant"){
+            if(poitype=="restaurant") restaurant.push_back(coordinate);
+            else pharmacy.push_back(coordinate);
+        }else if (poitype=="pub"||poitype=="bar"||poitype=="gym"||poitype=="gymnasium"||poitype=="swimming_pool"||poitype=="pool; fitness centre; ice rinks"){
+            if (poitype=="gym"||poitype=="gymnasium"||poitype=="swimming_pool"||poitype=="pool; fitness centre; ice rinks"){
+                gym.push_back(coordinate);
                 
-            //}
-        }else if (poitype=="dentist"||poitype=="orthodonists"||poitype=="orthodonist"){
-            dentist.push_back(coordinate);
-        }else if (poitype=="hospital"){
-            hospital.push_back(coordinate);
-        }else if (poitype=="fast_food"){
-            fast_food.push_back(coordinate);
-        }else if (poitype=="post_office"){
-            post_office.push_back(coordinate);
-        }else if (poitype=="gym"||poitype=="gymnasium"||poitype=="swimming_pool"||poitype=="pool; fitness centre; ice rinks"){
-            gym.push_back(coordinate);
-        }else if (poitype=="place_of_worship"){
-            place_of_worship.push_back(coordinate);
-        }else if (poitype=="libraray"){
-            library.push_back(coordinate);
-        }else if (poitype=="artwork"||poitype=="art_centre"){
-            art.push_back(coordinate);
-        }else if (poitype=="cafe"){
-            cafe.push_back(coordinate);
-        }else if (poitype=="parking"){
-            parking.push_back(coordinate);
+            }
+            else {
+                bar.push_back(coordinate);
+            }
+        }else if (poitype=="fast_food"||poitype.compare("cafe")==0){
+            if(poitype.compare("cafe")==0){
+                cafe.push_back(coordinate);
+            }
+            else fastfood.push_back(coordinate);            
+        }
+        else if (poitype=="hospital"||poitype=="doctors"||poitype.compare("library")==0){       
+            if (poitype.compare("library")==0){
+                library.push_back(coordinate);
+                //std::cout<<getPOIName(poiidx)<<std::endl;
+            }
+            else{
+                hospital.push_back(coordinate);
+            }
+            
         }
     }
 
@@ -605,7 +612,7 @@ void draw_features(ezgl::renderer *g, double zoom){
             
             g->fill_poly(features[i].coordinates);
         }else if(features[i].feature_type == "building"&&features[i].numFeaturePoints>1&&zoom>1500){
-            g ->set_color(213, 216, 219,255);
+            g ->set_color(200, 200, 200,255);
           
             g->fill_poly(features[i].coordinates);
         }else if((features[i].feature_type == "stream"||features[i].feature_type == "river")&&features[i].numFeaturePoints>1){
@@ -623,44 +630,146 @@ void draw_features(ezgl::renderer *g, double zoom){
 
 void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2d large){
      ezgl::surface *png_surface; 
-    
+    //png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
      ezgl::point2d point {.0,.0};
-     for(int i = 0; i<restaurant.size() ;i++){
-         if ((restaurant[i]<large)&&(small<restaurant[i])){
-         png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");                 
-         point=restaurant[i];
-         g->draw_surface(png_surface, point);                  
-         //ezgl::renderer::free_surface(png_surface);
-         }
+     int count = 0;
+     for(int i = 0; i<restaurant.size();i++){
+         
+         if((restaurant[i]<large)&&(small<restaurant[i])&&count<15){  
+             count++;
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png"); //zoom
+             point=restaurant[i];
+             g->draw_surface(png_surface, point);
+            // g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);             
+         }         
+         
      }
-     for (int i = 0; i < fuel.size() ; i++){
+     count = 0;
+     for (int i = 0; i < fuel.size(); i++){         
          if(fuel[i]<large&&(small<fuel[i])){
-         png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
              point=fuel[i];
              g->draw_surface(png_surface, point);
-         
-         //ezgl::renderer::free_surface(png_surface);
-         }
+             //ezgl::renderer::free_surface(png_surface);
+         }       
      }
-     for (int i = 0; i < bar.size(); i++){
-         if(bar[i]<large&&(small<bar[i])){
-         png_surface = ezgl::renderer::load_png("libstreetmap/resources/bar.png");
-         
+     for (int i = 0; i < bar.size(); i++){         
+         if(bar[i]<large&&(small<bar[i])&&count<15){
+             count++;
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/bar.png");//zoom
              point=bar[i];
-                 g->draw_surface(png_surface, point);
-         
-         //ezgl::renderer::free_surface(png_surface);
-         }
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
      }
-     for(int i = 0; i<restaurant.size() ;i++){
-         if ((restaurant[i]<large)&&(small<restaurant[i])){
-         png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");                 
-         point=restaurant[i];
-         g->draw_surface(png_surface, point);                  
-         //ezgl::renderer::free_surface(png_surface);
-         }
+     count = 0;
+     for (int i = 0; i < school.size(); i++){         
+         if(school[i]<large&&(small<school[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/university.png");
+             point=school[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
      }
-   ezgl::renderer::free_surface(png_surface);
+     for (int i = 0; i < pharmacy.size(); i++){         
+         if(pharmacy[i]<large&&(small<pharmacy[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/drugstore.png");
+             point=pharmacy[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     for (int i = 0; i < theatre.size(); i++){         
+         if(theatre[i]<large&&(small<theatre[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/theater.png");
+             point=theatre[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     for (int i = 0; i < bank.size(); i++){         
+         if(bank[i]<large&&(small<bank[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
+             point=bank[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     count =0;
+     for (int i = 0; i < cafe.size(); i++){         
+         if(cafe[i]<large&&(small<cafe[i])&&count<15){
+             count++;
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/coffee.png");//zoom
+             point=cafe[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     count = 0;
+     for (int i = 0; i < parking.size(); i++){         
+         if(parking[i]<large&&(small<parking[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/parking.png");
+             point=parking[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     for (int i = 0; i < post_office.size(); i++){         
+         if(post_office[i]<large&&(small<post_office[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/postal.png");
+             point=post_office[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+    for (int i = 0; i < hospital.size(); i++){         
+         if(hospital[i]<large&&(small<hospital[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
+             point=hospital[i];
+             g->draw_surface(png_surface, point);
+            
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     for (int i = 0; i < fastfood.size(); i++){         
+         if(fastfood[i]<large&&(small<fastfood[i])&&count<15){
+             count++;
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/fastfood.png");//zoom
+             point=fastfood[i];
+             g->draw_surface(png_surface, point);
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     count = 0;
+     for (int i = 0; i < art.size(); i++){         
+         if(art[i]<large&&(small<art[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/art.png");//zoom
+             point=art[i];
+             g->draw_surface(png_surface, point);             
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     for (int i = 0; i < gym.size(); i++){         
+         if(gym[i]<large&&(small<gym[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/gym.png");//zoom
+             point=gym[i];
+             g->draw_surface(png_surface, point);
+             
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     for (int i = 0; i < library.size(); i++){         
+         if(library[i]<large&&(small<library[i])){
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/library.png");//zoom
+             point=library[i];
+             g->draw_surface(png_surface, point);
+             
+             //ezgl::renderer::free_surface(png_surface);
+         }       
+     }
+     
+     ezgl::renderer::free_surface(png_surface);   
      
     
 
@@ -691,7 +800,7 @@ void draw_street_names (ezgl::renderer *g) {
        
         
     }
-   
+
 }
 
 void draw_main_canvas (ezgl::renderer *g){
@@ -701,17 +810,10 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
 
-<<<<<<< HEAD
     //std::cout << bounds.area/area << std::endl;
-=======
-    std::cout << bounds.area/area << std::endl;
-    
->>>>>>> commit to pull
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
-    if(zoom>1500){
-        draw_POI(g,zoom,small, large);
-    }
+    
     if(zoom > 3249){
         drawOneWays(g,zoom);
     }
@@ -719,7 +821,13 @@ void draw_main_canvas (ezgl::renderer *g){
     //draw street names
     draw_street_names(g);
 
+
     drawHighlights(g);
+
+
+     if(zoom>1500){
+        draw_POI(g,zoom,small, large);
+    }
 
 
 
