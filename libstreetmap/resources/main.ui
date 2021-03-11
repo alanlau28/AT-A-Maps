@@ -641,6 +641,15 @@
             <child>
               <placeholder/>
             </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
           </object>
           <packing>
             <property name="left_attach">2</property>
@@ -675,6 +684,7 @@
                     <property name="primary_icon_name">edit-find-symbolic</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="primary_icon_sensitive">False</property>
+                    <property name="placeholder_text" translatable="yes">Search some place here!</property>
                   </object>
                 </child>
               </object>
@@ -710,22 +720,8 @@
           </packing>
         </child>
         <child>
-          <object class="GtkAlignment" id="SpaceBottomBar">
-            <property name="width_request">20</property>
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
-            <property name="width">3</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkStatusbar" id="StatusBar">
+            <property name="height_request">10</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
@@ -734,7 +730,7 @@
           <packing>
             <property name="left_attach">0</property>
             <property name="top_attach">2</property>
-            <property name="width">2</property>
+            <property name="width">3</property>
           </packing>
         </child>
       </object>
