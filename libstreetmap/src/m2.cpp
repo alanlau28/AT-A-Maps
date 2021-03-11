@@ -90,7 +90,12 @@ std::unordered_map<std::string,std::string> map_paths;
 struct boundingbox bounds;
 
 //(x, y) = (R·lon·cos(latavg), R·lat)
-
+LatLon latLonFromWorld(double x, double y){
+    float lon = x / kEarthRadiusInMeters / cos(bounds.lat_avg) / kDegreeToRadian;
+    float lat = y / kEarthRadiusInMeters / kDegreeToRadian;
+    LatLon position(lat,lon);
+    return position;
+}
 ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_avg){
     
     double x = kEarthRadiusInMeters * longitude * cos(lat_avg) * kDegreeToRadian;
@@ -710,7 +715,7 @@ void draw_street_names (ezgl::renderer *g) {
         
     }
     
-    std::cout << count << " street names written" << std::endl;
+    //std::cout << count << " street names written" << std::endl;
 }
 
 void draw_main_canvas (ezgl::renderer *g){
@@ -761,7 +766,14 @@ void initial_setup(ezgl::application *application, bool){
     g_signal_connect(mapList, "row-activated", G_CALLBACK(map_list), mapList);
 }
 
-
+void act_on_mouse_click(ezgl::application* app,GdkEventButton* event,double x, double y){
+    LatLon position = latLonFromWorld(x,y);
+    std::cout<<"Mouse clicked at ("<<position.latitude() <<","<<position.longitude() <<")\n";
+    int id = findClosestIntersection(position);
+    intersections[id].highlight = true;
+    std::cout << id << std::endl;
+    app -> refresh_drawing();
+}
 
 void drawMap(){
     load_map();
@@ -775,9 +787,7 @@ void drawMap(){
    
     ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
     application.add_canvas("MainCanvas",draw_main_canvas,initial_background);
-    
-
-    application.run(initial_setup,nullptr,nullptr,nullptr);
+    application.run(initial_setup,act_on_mouse_click,nullptr,nullptr);
     
     //connect search bar
     
