@@ -728,7 +728,7 @@ void renderer::draw_surface(surface *p_surface, point2d top_left)
     top_left = m_transform(top_left);
 
   // Create a source for painting from the surface
-  cairo_set_source_surface(m_cairo, p_surface, top_left.x, top_left.y);
+  cairo_set_source_surface(m_cairo, p_surface, top_left.x-16, top_left.y-63);
 
   // Actual drawing
   cairo_paint(m_cairo);

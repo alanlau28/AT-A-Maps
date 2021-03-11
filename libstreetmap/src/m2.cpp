@@ -24,6 +24,7 @@ struct boundingbox{
     double min_y;
     double lat_avg;
     double area;
+    ezgl::rectangle world;
 };
 
 struct street_segment_data{
@@ -531,8 +532,21 @@ void drawOneWays(ezgl::renderer *g, double zoom){
     
 }
 
-void drawHighlights(){
-    
+void drawHighlights(ezgl::renderer *g){
+    ezgl::surface *png_surface;
+    png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
+    for(int i = 0;i < intersections.size();i++){
+        if(intersections[i].highlight){
+            g -> draw_surface(png_surface,intersections[i].coordinate);
+        }
+    }
+    ezgl::renderer::free_surface(png_surface);
+}
+
+void clearHighlights(){
+    for(int i = 0;i < intersections.size();i++){
+        intersections[i].highlight = false;
+    }
 }
 
 void draw_features(ezgl::renderer *g, double zoom){
@@ -740,7 +754,7 @@ void draw_main_canvas (ezgl::renderer *g){
     
     //draw street names
     draw_street_names(g);
-     
+    drawHighlights(g);
 
 
 }
@@ -754,6 +768,7 @@ void map_list(GtkListBox  *box);
 
 void initial_setup(ezgl::application *application, bool){
     ezgl::rectangle world = application-> get_renderer()->get_visible_world();
+    bounds.world = world;
     bounds.area = world.area();
     
     //UI stuff
@@ -770,12 +785,12 @@ void initial_setup(ezgl::application *application, bool){
 }
 
 void act_on_mouse_click(ezgl::application* app,GdkEventButton* event,double x, double y){
+    clearHighlights();
     LatLon position = latLonFromWorld(x,y);
-    std::cout<<"Mouse clicked at ("<<position.latitude() <<","<<position.longitude() <<")\n";
     int id = findClosestIntersection(position);
     intersections[id].highlight = true;
     app -> refresh_drawing();
-    app ->update_message(intersections[id].name);
+    app ->update_message("Point clicked at "+intersections[id].name);
 }
 
 void drawMap(){
