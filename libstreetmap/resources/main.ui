@@ -11,6 +11,7 @@
         <property name="can_focus">False</property>
         <child>
           <object class="GtkListBoxRow" id="MapListToronto">
+            <property name="name">/cad2/ece297s/public/maps/toronto_canada.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -19,6 +20,7 @@
               <object class="GtkLabel" id="Toronto">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="opacity">0.80000000000000004</property>
                 <property name="label" translatable="yes">Toronto, Canada</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
@@ -29,12 +31,14 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListTokyo">
+            <property name="name">/cad2/ece297s/public/maps/tokyo_japan.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="Tokyo">
+                <property name="name">Tokyo</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Tokyo, Japan</property>
@@ -47,12 +51,14 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListNewYork">
+            <property name="name">/cad2/ece297s/public/maps/new-york_usa.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="NewYork">
+                <property name="name">NewYork</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">New York City, USA</property>
@@ -65,6 +71,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListBeijing">
+            <property name="name">/cad2/ece297s/public/maps/beijing_china.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -83,12 +90,14 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListCairo">
+            <property name="name">/cad2/ece297s/public/maps/cairo_egypt.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="Cairo">
+                <property name="name">Cairo</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Cairo, Egypt</property>
@@ -101,6 +110,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListTehran">
+            <property name="name">/cad2/ece297s/public/maps/tehran_iran.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -119,6 +129,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListIceland">
+            <property name="name">/cad2/ece297s/public/maps/iceland.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -137,6 +148,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListSingapore">
+            <property name="name">/cad2/ece297s/public/maps/singapore.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -155,6 +167,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListSydney">
+            <property name="name">/cad2/ece297s/public/maps/sydney_australia.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -173,6 +186,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListStHelena">
+            <property name="name">/cad2/ece297s/public/maps/saint-helena.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -191,6 +205,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListRioDeJaneiro">
+            <property name="name">/cad2/ece297s/public/maps/rio-de-janeiro_brazil.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -209,6 +224,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListNewDelhi">
+            <property name="name">/cad2/ece297s/public/maps/new-delhi_india.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -227,6 +243,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListMoscow">
+            <property name="name">/cad2/ece297s/public/maps/moscow_russia.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -245,6 +262,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListLondon">
+            <property name="name">/cad2/ece297s/public/maps/london_england.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -263,6 +281,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListInterlaken">
+            <property name="name">/cad2/ece297s/public/maps/interlaken_switzerland.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -281,6 +300,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListHongKong">
+            <property name="name">cad2/ece297s/public/maps/hong-kong_china.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -299,6 +319,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListCapeTown">
+            <property name="name">/cad2/ece297s/public/maps/cape-town_south-africa.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -317,6 +338,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListHamilton">
+            <property name="name">/cad2/ece297s/public/maps/hamilton_canada.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -335,6 +357,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListGoldenHorseshoe">
+            <property name="name">/cad2/ece297s/public/maps/golden-horseshoe_canada.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -528,18 +551,42 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="direction">left</property>
                 <property name="popover">MapLoaderMenu</property>
                 <child>
-                  <object class="GtkLabel" id="MapLoaderLabel">
-                    <property name="height_request">45</property>
+                  <object class="GtkBox" id="MapLoaderBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">Choose Map</property>
-                    <attributes>
-                      <attribute name="font-desc" value="Sans Bold 12"/>
-                      <attribute name="foreground" value="#000000000000"/>
-                    </attributes>
+                    <child>
+                      <object class="GtkImage" id="MapLoaderIcon">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="xpad">5</property>
+                        <property name="ypad">5</property>
+                        <property name="pixbuf">globe.png</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="MapLoaderLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="xpad">5</property>
+                        <property name="label" translatable="yes">Choose Map</property>
+                        <attributes>
+                          <attribute name="font-desc" value="Sans Bold 13"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -566,7 +613,7 @@
             </child>
             <child>
               <object class="GtkAlignment" id="SpaceTop">
-                <property name="height_request">50</property>
+                <property name="height_request">25</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>

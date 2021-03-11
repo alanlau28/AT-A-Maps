@@ -117,7 +117,7 @@ void load_bin(){
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/london_england.streets.bin","/cad2/ece297s/public/maps/london_england.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/moscow_russia.streets.bin","/cad2/ece297s/public/maps/moscow_russia.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/new-delhi_india.streets.bin","/cad2/ece297s/public/maps/new-delhi_india.osm.bin"));
-    map_paths.insert(std::make_pair("//cad2/ece297s/public/maps/new-york_usa.streets.bin","/cad2/ece297s/public/maps/new-york_usa.osm.bin"));
+    map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/new-york_usa.streets.bin","/cad2/ece297s/public/maps/new-york_usa.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/rio-de-janeiro_brazil.streets.bin","/cad2/ece297s/public/maps/rio-de-janeiro_brazil.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/saint-helena.streets.bin","/cad2/ece297s/public/maps/saint-helena.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/singapore.streets.bin","/cad2/ece297s/public/maps/singapore.osm.bin"));
@@ -691,7 +691,6 @@ void draw_street_names (ezgl::renderer *g) {
     
     ezgl::rectangle world = g->get_visible_world();
     
-    int count = 0;
     
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
@@ -707,7 +706,6 @@ void draw_street_names (ezgl::renderer *g) {
                 
                 g->set_text_rotation(street_segments[i].angle);
                 g->draw_text({x, y}, street_segments[i].name, 100.0, 100.0);
-                count++;
             }
             
         }
@@ -715,7 +713,10 @@ void draw_street_names (ezgl::renderer *g) {
         
     }
     
+<<<<<<< HEAD
     //std::cout << count << " street names written" << std::endl;
+=======
+>>>>>>> added icon to UI, map loader can display map paths now
 }
 
 void draw_main_canvas (ezgl::renderer *g){
