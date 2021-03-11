@@ -91,8 +91,6 @@ struct boundingbox bounds;
 
 //(x, y) = (R·lon·cos(latavg), R·lat)
 
-void drawOneWays(ezgl::renderer *g, ezgl::point2d start, ezgl::point2d finish, double angle);
-
 ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_avg){
     
     double x = kEarthRadiusInMeters * longitude * cos(lat_avg) * kDegreeToRadian;
@@ -313,8 +311,6 @@ void load_map(){
     
 
 void drawAllStreets(ezgl::renderer *g, double zoom){
-
-
     bool draw = false;
     g -> set_line_cap(ezgl::line_cap::round);
     for(int i = 0;i < street_segments.size(); i++){
@@ -462,24 +458,53 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
                 g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
             }
         }
-        if(zoom > 3249 && street_segments[i].one_way){
-            drawOneWays(g,street_segments[i].coordinates[0],street_segments[i].coordinates[street_segments[i].coordinates.size()-1],street_segments[i].angle);
-        }
     }
     
 }
 
-void drawOneWays(ezgl::renderer *g, ezgl::point2d start, ezgl::point2d finish, double angle){
+void drawOneWays(ezgl::renderer *g){
     g ->set_color(ezgl::BLACK);
-    g ->set_text_rotation(angle);
-    if(start.x - finish.x > 0 || start.y - finish.y > 0){
-        g -> draw_text(start,"←",50,50);
-        g -> draw_text(finish,"←",50,50);
+    bool draw;
+    for(int i = 0;i < street_segments.size(); i++){
+        draw = false;
+        if(street_segments[i].segment_type == "motorway_link"){
+                draw = true;
+        }
+        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+            draw = true;
+        }
+        else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){     
+            draw = true;
+        }
+        else if (street_segments[i].segment_type == "residential"){
+            draw = true;
+        }
+        if(draw && street_segments[i].one_way){
+            double angle = street_segments[i].angle;
+            if(angle < 0) angle += 180;
+            g ->set_text_rotation(angle);
+            ezgl::point2d start = street_segments[i].coordinates[0];
+            ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
+            
+            if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
+                g -> draw_text(start,"←",50,50);
+                //g -> draw_text(finish,"←",50,50);
+            }
+            else if(start.x - finish.x <= 0 && start.y - finish.y <= 0){
+                g -> draw_text(start,"→",50,50);
+                //g -> draw_text(finish,"→",50,50);
+            }
+            else if(start.x - finish.x >= 0 && start.y - finish.y >= 0){
+                g -> draw_text(start,"←",50,50);
+                //g -> draw_text(finish,"←",50,50);
+            }
+            else{
+                g -> draw_text(start,"→",50,50);
+               // g -> draw_text(finish,"→",50,50);
+            }
+        }
     }
-    else{
-        g -> draw_text(start,"→",50,50);
-        g -> draw_text(finish,"→",50,50);
-    }
+    
 }
 
 void draw_features(ezgl::renderer *g, double zoom){
@@ -683,6 +708,9 @@ void draw_main_canvas (ezgl::renderer *g){
     drawAllStreets(g,zoom);       
     if(zoom>1500){
         //draw_POI(g,zoom,small, large);
+    }
+    if(zoom > 3249){
+        drawOneWays(g);
     }
     
     //draw street names
