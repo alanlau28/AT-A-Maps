@@ -696,15 +696,15 @@ void draw_street_names (ezgl::renderer *g) {
         g->set_color(0,0,0);
         g->set_font_size(15);
         
-        
-        
         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
             
             if (street_segments[i].name != "<unknown>") {
+                
                 g->set_text_rotation(street_segments[i].angle);
                 g->draw_text({x, y}, street_segments[i].name, 100.0, 100.0);
                 count++;
             }
+            
         }
        
         
@@ -741,6 +741,7 @@ void draw_main_canvas (ezgl::renderer *g){
 //UI function declarations for convenience
 void search_entry(GtkEntry *entry);
 void find_button(GtkWidget * /*widget*/ , ezgl::application *app);
+void map_list(GtkListBox  *box);
 
 
 void initial_setup(ezgl::application *application, bool){
@@ -755,6 +756,9 @@ void initial_setup(ezgl::application *application, bool){
     //connect "Find" button as signal
     GtkWidget* findButton = (GtkWidget*) application->get_object("SearchFindButton");
     g_signal_connect(findButton, "clicked", G_CALLBACK(find_button), application);
+    
+    GtkListBox* mapList = (GtkListBox*) application->get_object("MapList");
+    g_signal_connect(mapList, "row-activated", G_CALLBACK(map_list), mapList);
 }
 
 
@@ -784,7 +788,13 @@ void drawMap(){
 
 
 //UI stuff from here
-
+void map_list(GtkListBox  *box) {
+    GtkListBoxRow* selected = gtk_list_box_get_selected_row(box);
+    
+    std::string selectedText = gtk_widget_get_name((GtkWidget *)selected);
+    
+    std::cout << selectedText << std::endl;
+}
 
 //searchEntry
 void search_entry(GtkEntry *entry) {

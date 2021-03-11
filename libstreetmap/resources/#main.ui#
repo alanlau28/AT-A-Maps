@@ -11,12 +11,14 @@
         <property name="can_focus">False</property>
         <child>
           <object class="GtkListBoxRow" id="MapListToronto">
+            <property name="name">Toronto</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="Toronto">
+                <property name="name">Toronto</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="opacity">0.80000000000000004</property>
@@ -30,12 +32,14 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListTokyo">
+            <property name="name">Tokyo</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="Tokyo">
+                <property name="name">Tokyo</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Tokyo, Japan</property>
@@ -48,12 +52,14 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListNewYork">
+            <property name="name">NewYork</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="NewYork">
+                <property name="name">NewYork</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">New York City, USA</property>
@@ -66,12 +72,14 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListBeijing">
+            <property name="name">Beijing</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="Beijing">
+                <property name="name">Beijing</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Beijing, China</property>
@@ -84,12 +92,14 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListCairo">
+            <property name="name">Cairo</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
               <object class="GtkLabel" id="Cairo">
+                <property name="name">Cairo</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Cairo, Egypt</property>
@@ -102,6 +112,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListTehran">
+            <property name="name">Tehran</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -120,6 +131,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListIceland">
+            <property name="name">Iceland</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -138,6 +150,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListSingapore">
+            <property name="name">Singapore</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -156,6 +169,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListSydney">
+            <property name="name">Sydney</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -174,6 +188,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListStHelena">
+            <property name="name">StHelena</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
