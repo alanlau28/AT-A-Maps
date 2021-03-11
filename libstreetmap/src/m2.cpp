@@ -542,7 +542,7 @@ void drawOneWays(ezgl::renderer *g, double zoom){
 
 void drawHighlights(ezgl::renderer *g){
     ezgl::surface *png_surface;
-    png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
+    png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin(1).png");
     for(int i = 0;i < intersections.size();i++){
         if(intersections[i].highlight){
             g -> draw_surface(png_surface,intersections[i].coordinate);
