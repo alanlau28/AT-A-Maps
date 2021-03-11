@@ -533,22 +533,6 @@ void draw_features(ezgl::renderer *g, double zoom){
 }
 
 
-void draw_street_names (ezgl::renderer *g) {
-    for (int i = 0; i < getNumStreetSegments(); i++) {
-        
-        double x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
-        double y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
-        
-        g->set_color(0,0,0);
-        g->set_font_size(15);
-        if (street_segments[i].name != "<unknown>") {
-            g->set_text_rotation(street_segments[i].angle);
-            g->draw_text({x, y}, street_segments[i].name, 100.0, 100.0);
-        }
-        
-    }
-}
-
 void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2d large){
      ezgl::surface *png_surface; 
     //png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
@@ -644,6 +628,37 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
 
 }
 
+void draw_street_names (ezgl::renderer *g) {
+    
+    ezgl::rectangle world = g->get_visible_world();
+    
+    int count = 0;
+    
+    for (int i = 0; i < getNumStreetSegments(); i++) {
+        
+        double x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
+        double y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
+        
+        g->set_color(0,0,0);
+        g->set_font_size(15);
+        
+        
+        
+        if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
+            
+            if (street_segments[i].name != "<unknown>") {
+                g->set_text_rotation(street_segments[i].angle);
+                g->draw_text({x, y}, street_segments[i].name, 100.0, 100.0);
+                count++;
+            }
+        }
+       
+        
+    }
+    
+    std::cout << count << " street names written" << std::endl;
+}
+
 void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
@@ -652,7 +667,6 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d large = world.top_right();
 
     //std::cout << bounds.area/area << std::endl;
-    std::cout<<small.x<<" "<<small.y<<"   "<<large.x<<" "<<large.y<<std::endl;
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
     if(zoom>1500){
@@ -660,7 +674,7 @@ void draw_main_canvas (ezgl::renderer *g){
     }
     
     //draw street names
-     //draw_street_names(g);
+    draw_street_names(g);
      
 
 
