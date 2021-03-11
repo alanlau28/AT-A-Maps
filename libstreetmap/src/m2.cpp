@@ -434,7 +434,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
             g ->set_color(213,216,219,255);
             draw = true;
             }
-            if(zoom > 27351){
+            if(zoom > 25071){
                 g -> set_line_width(16);  
             }
             else if(zoom > 9038){
@@ -462,7 +462,8 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
     
 }
 
-void drawOneWays(ezgl::renderer *g){
+void drawOneWays(ezgl::renderer *g, double zoom){
+    std::cout << zoom << std::endl;
     g ->set_color(ezgl::BLACK);
     bool draw;
     for(int i = 0;i < street_segments.size(); i++){
@@ -487,20 +488,36 @@ void drawOneWays(ezgl::renderer *g){
             ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
             
             if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
-                g -> draw_text(start,"←",50,50);
-                //g -> draw_text(finish,"←",50,50);
+                if(zoom > 25107){
+                    g -> draw_text(start,"←",100,100);
+                }
+                else{
+                    g -> draw_text(start,"←",50,50);
+                }
             }
             else if(start.x - finish.x <= 0 && start.y - finish.y <= 0){
-                g -> draw_text(start,"→",50,50);
-                //g -> draw_text(finish,"→",50,50);
+                if(zoom > 25107){
+                    g -> draw_text(start,"→",100,100);
+                }
+                else{
+                    g -> draw_text(start,"→",50,50);
+                }
             }
             else if(start.x - finish.x >= 0 && start.y - finish.y >= 0){
-                g -> draw_text(start,"←",50,50);
-                //g -> draw_text(finish,"←",50,50);
+                if(zoom > 25107){
+                    g -> draw_text(start,"←",100,100);
+                }
+                else{
+                    g -> draw_text(start,"←",50,50);
+                }
             }
             else{
-                g -> draw_text(start,"→",50,50);
-               // g -> draw_text(finish,"→",50,50);
+                if(zoom > 25107){
+                    g -> draw_text(start,"→",100,100);
+                }
+                else{
+                    g -> draw_text(start,"→",50,50);
+                }
             }
         }
     }
@@ -710,7 +727,7 @@ void draw_main_canvas (ezgl::renderer *g){
         //draw_POI(g,zoom,small, large);
     }
     if(zoom > 3249){
-        drawOneWays(g);
+        drawOneWays(g,zoom);
     }
     
     //draw street names
