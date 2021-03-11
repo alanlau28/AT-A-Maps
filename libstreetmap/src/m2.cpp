@@ -547,24 +547,6 @@ void drawOneWays(ezgl::renderer *g, double zoom){
 }
 
 
-void drawHighlights(ezgl::renderer *g){
-    ezgl::surface *png_surface;
-    png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
-    for(int i = 0;i < intersections.size();i++){
-        if(intersections[i].highlight){
-            g -> draw_surface(png_surface,intersections[i].coordinate);
-        }
-    }
-    ezgl::renderer::free_surface(png_surface);
-}
-
-void clearHighlights(){
-    for(int i = 0;i < intersections.size();i++){
-        intersections[i].highlight = false;
-    }
-}
-
-
 void draw_features(ezgl::renderer *g, double zoom){
     for (int i = 0; i<features.size();i++){
         if (features[i].feature_type == "park"&&features[i].numFeaturePoints>1){
@@ -803,6 +785,47 @@ void draw_street_names (ezgl::renderer *g) {
 
 }
 
+
+void drawHighlights(ezgl::renderer *g){
+    ezgl::surface *png_surface;
+    
+    png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
+    
+    ezgl::rectangle world = g->get_visible_world();
+    
+    for(int i = 0;i < intersections.size();i++){
+        
+        double x = intersections[i].coordinate.x;
+        double y = intersections[i].coordinate.y;
+        
+        //check that intersections are within world bounds
+        if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
+            if(intersections[i].highlight){
+                g -> draw_surface(png_surface,intersections[i].coordinate);
+                std::cout << "drawn at " << x << " " << y << std::endl;
+            }
+        }
+        
+    }
+    
+//    for (int i = 0; i < street_segments.size(); i++) {
+//        double x = street_segments[i].coordinates.x;
+//        double y = street_segments[i].coordinates.y;
+//        
+//        
+//    }
+    
+    ezgl::renderer::free_surface(png_surface);
+}
+
+void clearHighlights(){
+    for(int i = 0;i < intersections.size();i++){
+        intersections[i].highlight = false;
+    }
+}
+
+
+
 void draw_main_canvas (ezgl::renderer *g){
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
@@ -917,6 +940,7 @@ void search_entry(GtkEntry *entry) {
         street = findStreetIdsFromPartialStreetName(text);
     } 
     
+    //after this include streets into entry completion
 //    for (int i = 0; i < street.size(); i++) {
 //        std::cout << getStreetName(street[i]) << std::endl;
 //    }
@@ -989,31 +1013,16 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         return;
     }
     
-   
-    
-    //draw stuff from here
-    app->refresh_drawing();
-
-        
+       
     if (intersectionResults.size() > 0) {
-    for (int i = 0; i < intersectionResults.size(); i++) {
-            
-        std::cout << intersections[intersectionResults[i]].coordinate.x << " "
-                  << intersections[intersectionResults[i]].coordinate.y << std::endl;
-        
-        intersections[intersectionResults[i]].highlight = true;
+        for (int i = 0; i < intersectionResults.size(); i++) {
+            intersections[intersectionResults[i]].highlight = true;
         }
     } else {
         std::cout << "No intersections found" << std::endl;
     }
     
-    
-     std::cout << "these are the intersections found" << std::endl;
-    for (int i = 0; i < intersectionResults.size(); i++) {
-        std::cout << intersectionResults[i] << " " 
-                  << intersections[intersectionResults[i]].highlight << " "
-                  << getIntersectionName(intersectionResults[i]) <<std::endl;
-    }
+    app -> refresh_drawing();
         
     //at the end delete vectors
     intersectionResults.clear();
