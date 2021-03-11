@@ -742,6 +742,10 @@ void draw_street_names (ezgl::renderer *g) {
         
     }
     
+<<<<<<< HEAD
+    //std::cout << count << " street names written" << std::endl;
+=======
+>>>>>>> added icon to UI, map loader can display map paths now
 }
 
 void draw_main_canvas (ezgl::renderer *g){
