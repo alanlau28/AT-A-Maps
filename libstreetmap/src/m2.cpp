@@ -377,13 +377,13 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
             if(street_segments[i].segment_type == "motorway_link" && zoom < 7){
                 draw = false;
             }
-            if(zoom > 25107){
+            if(zoom > 25000){
                 g->set_line_width(26);
             }
-            else if(zoom > 1171){
+            else if(zoom > 1100){
                 g->set_line_width(20);
             }
-            else if(zoom > 54){
+            else if(zoom > 50){
                 g ->set_line_width(8);
             }
             else if (zoom > 7){
@@ -396,25 +396,25 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
         else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
             draw = true;
             g ->set_color(200, 200, 200,255);
-            if(zoom > 25107){
+            if(zoom > 25000){
                 g->set_line_width(26);
             }
-            else if(zoom > 9038){
+            else if(zoom > 9000){
                 g->set_line_width(22);
             }
-            else if(zoom > 3253){
+            else if(zoom > 3200){
                 g->set_line_width(18);
             }
-            else if(zoom > 1171){
+            else if(zoom > 1100){
                 g->set_line_width(16);
             }
-            else if(zoom > 421){
+            else if(zoom > 420){
                 g->set_line_width(11);
             }
-            else if(zoom > 151){
+            else if(zoom > 150){
                 g->set_line_width(6);
             }
-            else if (zoom > 54){
+            else if (zoom > 50){
                 g->set_line_width(5);
             }
             else if (zoom > 19){
@@ -433,25 +433,25 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
                 g ->set_color(200, 200, 200,255);
                 draw = true;
             }
-            if(zoom > 25107){
+            if(zoom > 25000){
               g -> set_line_width(16);
               if(heavy) g->set_line_width(13);
             }
-            else if(zoom >9038){
+            else if(zoom >9000){
               g -> set_line_width(12);
               if(heavy) g->set_line_width(9);
             }
-            else if(zoom > 3253){
+            else if(zoom > 3200){
                 g->set_line_width(9);
                 if(heavy) g->set_line_width(6);
             }
-            else if(zoom > 1171){
+            else if(zoom > 1100){
                 g->set_line_width(6);
             }
-            else if(zoom > 421){
+            else if(zoom > 420){
                 g ->set_line_width(4);
             }
-            else if(zoom > 151){
+            else if(zoom > 150){
                 g ->set_line_width(3);
             }
             else if (zoom > 19){
@@ -468,32 +468,32 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
                 g ->set_color(200, 200, 200,255);
                 draw = true;
             }
-            if(zoom > 25107){
+            if(zoom > 25000){
               g -> set_line_width(18);
               if(heavy) g->set_line_width(15);
               
             }
-            else if(zoom > 9038){
+            else if(zoom > 9000){
               g -> set_line_width(11);
               if(heavy) g->set_line_width(8);
               
             }
-            else if(zoom > 3253){
+            else if(zoom > 3200){
                 g->set_line_width(9);
                 if(heavy) g->set_line_width(6);
                 
             }
-            else if(zoom > 1171){
+            else if(zoom > 1100){
                 g->set_line_width(6);
                 if(heavy){
                     g->set_line_width(3);
                 }
             }
-            else if(zoom > 421){
+            else if(zoom > 420){
                 g ->set_line_width(3);
                 if(heavy) g->set_line_width(1);
             }
-            else if(zoom > 151){
+            else if(zoom > 150){
                 g ->set_line_width(2);
                 if(heavy) g->set_line_width(0);
             }
@@ -503,31 +503,31 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
             }
         }
         else{
-            if(zoom > 151){
+            if(zoom > 150){
             g ->set_color(200, 200, 200,255);
             draw = true;
             }
-            if(zoom > 25071){
+            if(zoom > 25000){
                 g -> set_line_width(16);
                 if(heavy) g->set_line_width(13);
             }
-            else if(zoom > 9038){
+            else if(zoom > 9000){
                 g -> set_line_width(10);
                 if(heavy) g->set_line_width(10);
             }
-            else if(zoom > 3253){
+            else if(zoom > 3200){
                 g->set_line_width(6);
                 if(heavy) g->set_line_width(4);
             } 
-            else if(zoom > 1171){
+            else if(zoom > 1100){
                 g->set_line_width(3);
                 if(heavy) g->set_line_width(2);
             }
-            else if(zoom > 421){
+            else if(zoom > 420){
                 g->set_line_width(2);
                 if(heavy) g->set_line_width(1);
             }
-            else if(zoom > 151){
+            else if(zoom > 150){
                 g->set_line_width(1);
             }
         }
@@ -1218,7 +1218,6 @@ void search_entry(GtkEntry* entry) {
     
     
     //after that clear the entry and vector
-    
     street.clear();
 }
 
@@ -1352,4 +1351,5 @@ void close_map(){
     intersections.clear();
 
     street_types.clear();
+    
 }
