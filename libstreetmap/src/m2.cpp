@@ -541,7 +541,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
 }
 
 void drawOneWays(ezgl::renderer *g, double zoom){
-    
+    std::vector<ezgl::rectangle> drawn_arrow;
     g ->set_color(ezgl::BLACK);
     bool draw;
     for(int i = 0;i < street_segments.size(); i++){
@@ -558,13 +558,16 @@ void drawOneWays(ezgl::renderer *g, double zoom){
         else if (street_segments[i].segment_type == "residential"){
             draw = true;
         }
-        if(draw && street_segments[i].one_way){
+        ezgl::point2d start = street_segments[i].coordinates[0];
+        ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
+        if(draw && street_segments[i].one_way&& g->get_visible_world().contains(start)){
             double angle = street_segments[i].angle;
             if(angle < 0) angle += 180;
             g ->set_text_rotation(angle);
-            ezgl::point2d start = street_segments[i].coordinates[0];
-            ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
             
+            
+            if(!checkOverlap(g,drawn_arrow,start)){
+                convert_point(g, drawn_arrow, start);
             if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
                 if(zoom > 25107){
                     g -> draw_text(start,"←",100,100);
@@ -598,8 +601,10 @@ void drawOneWays(ezgl::renderer *g, double zoom){
                 }
             }
         }
+        }
+        
     }
-    
+    drawn_arrow.clear();
 }
 
 
