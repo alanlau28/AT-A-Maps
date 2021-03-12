@@ -300,7 +300,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListHongKong">
-            <property name="name">cad2/ece297s/public/maps/hong-kong_china.streets.bin</property>
+            <property name="name">/cad2/ece297s/public/maps/hong-kong_china.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
