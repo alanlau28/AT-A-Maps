@@ -862,7 +862,7 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
     
-    std::cout << bounds.area/area << std::endl;
+    //std::cout << bounds.area/area << std::endl;
 
     g -> set_color(243,243,239,255); 
     g -> fill_rectangle(world);
@@ -1041,7 +1041,7 @@ void search_entry_activate(GtkEntry* entry){
         street_segments[segments[i]].highlight = true;
         }
     
-    app->refresh_drawing();
+    global_app->refresh_drawing();
     street.clear();
     segments.clear();
     gtk_entry_set_text(entry, " ");
