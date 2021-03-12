@@ -381,11 +381,14 @@
       </packing>
     </child>
   </object>
+<<<<<<< HEAD
   <object class="GtkEntryCompletion" id="SearchEntryCompletion">
     <property name="minimum_key_length">2</property>
     <property name="text_column">0</property>
     <property name="popup_set_width">False</property>
   </object>
+=======
+>>>>>>> entry completion in progress
   <object class="GtkWindow" id="MainWindow">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -676,7 +679,6 @@
                     <property name="primary_icon_activatable">False</property>
                     <property name="primary_icon_sensitive">False</property>
                     <property name="placeholder_text" translatable="yes">Search some place here!</property>
-                    <property name="completion">SearchEntryCompletion</property>
                   </object>
                 </child>
               </object>
@@ -757,6 +759,20 @@
         <property name="margin_left">10</property>
         <property name="margin_right">10</property>
         <property name="label" translatable="yes">label</property>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="SearchEntryPopOver">
+    <property name="can_focus">False</property>
+    <property name="margin_left">10</property>
+    <property name="margin_right">10</property>
+    <property name="relative_to">SearchEntry</property>
+    <property name="position">bottom</property>
+    <property name="transitions_enabled">False</property>
+    <child>
+      <object class="GtkListBox" id="SearchEntryListBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
       </object>
     </child>
   </object>

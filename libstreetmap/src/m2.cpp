@@ -12,6 +12,11 @@
 #include <algorithm>
 #include <unordered_map>
 #include "load_database.h"
+<<<<<<< HEAD
+=======
+#include <gtk/gtk.h>
+
+>>>>>>> entry completion in progress
 #include <point.hpp>
 #include <unordered_set>
 
@@ -1083,9 +1088,17 @@ void map_list(GtkListBox* box) {
 //searchEntry
 void search_entry(GtkEntry* entry) {
     
-    GtkEntryCompletion *completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
-    GtkListStore *list = gtk_list_store_new(1, G_TYPE_STRING);
+//    GtkPopover* popOver = (GtkPopover*) global_app->get_object("SearchEntryPopOver");
+//    GtkListBox* list = (GtkListBox*) global_app->get_object("SearchEntryListBox");
+//    gtk_container_foreach (GTK_CONTAINER (list), (GtkCallback) gtk_widget_destroy, NULL);
+    
+    GtkEntryCompletion* completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
+    gtk_entry_set_completion(entry, completion);
+    g_object_unref(completion);
+    
+    GtkListStore* store = gtk_list_store_new(1, G_TYPE_STRING);
     GtkTreeIter iter;
+    
     
     // Get the text written in the widget
     std::string text = gtk_entry_get_text(entry);
@@ -1099,18 +1112,35 @@ void search_entry(GtkEntry* entry) {
             for (int i = 0; i < street.size(); i++) {
                 std::string name = getStreetName(street[i]);
                 
-                gtk_list_store_append(list, &iter);
-                gtk_list_store_set(list, &iter, 0, name, -1);
+                    gtk_list_store_append (store, &iter);
+                    gtk_list_store_set (store, &iter, 0, name.c_str(), -1);
+                  
+//                GtkWidget* row = gtk_list_box_row_new();
+//                GtkWidget* label = gtk_label_new(name.c_str());
+//                gtk_container_add((GtkContainer*)row, label);
+//                
+//                
+//                gtk_list_box_insert(list, row, -1);
+//                
+//                gtk_widget_show((GtkWidget*) row);
+//                gtk_widget_show((GtkWidget*) label);
+//                gtk_widget_set_can_focus((GtkWidget*) row, false);
+//                gtk_widget_set_can_focus((GtkWidget*) label, false);
                  
             }
+          
+//            gtk_popover_popup(popOver);
+//            gtk_widget_set_can_focus((GtkWidget*) popOver, false);
             
-            gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(list));
-            gtk_entry_set_completion(GTK_ENTRY(entry), completion);
-            gtk_entry_completion_set_text_column(completion, 0);
         }
     } 
     
+    GtkTreeModel* completion_model = GTK_TREE_MODEL(store);
+    gtk_entry_completion_set_model (completion, completion_model);
+    g_object_unref (completion_model);
+    gtk_entry_completion_set_text_column(completion, 0);
     
+    //gtk_list_store_clear(store);
     
     //after this include streets into entry completion
 //    for (int i = 0; i < street.size(); i++) {
@@ -1120,7 +1150,7 @@ void search_entry(GtkEntry* entry) {
     
     
     //after that clear the entry and vector
-    //gtk_list_store_clear(list);
+    
     street.clear();
 }
 
