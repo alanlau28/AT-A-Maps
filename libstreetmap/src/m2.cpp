@@ -11,7 +11,6 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-#include "load_database.h"
 
 #include <point.hpp>
 #include <unordered_set>
@@ -91,6 +90,8 @@ std::unordered_map <OSMID,std::string> street_types;
 std::unordered_map<std::string,std::string> map_paths;
 
 struct boundingbox bounds;
+
+std::string map_load_path = "/cad2/ece297s/public/maps/toronto_canada.streets.bin";
 
 ezgl::application* global_app;
 
@@ -981,6 +982,7 @@ void map_list(GtkListBox* box) {
     
     std::cout << selectedText << std::endl;
     close_map();
+    closeMap();
     map_load_path = selectedText;
     bool load_success = loadMap(map_load_path);
     if(!load_success) {
@@ -1144,7 +1146,6 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
 }
 
 void close_map(){
-    closeMap();
     closeOSMDatabase();
     street_segments.clear();
     features.clear();

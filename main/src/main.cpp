@@ -22,7 +22,6 @@
 #include <string>
 #include "m1.h"
 #include "m2.h"
-#include "load_database.h"
 
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everything went OK
@@ -67,13 +66,12 @@ int main(int argc, char** argv) {
   
     //do something in between
     
-    map_load_path = map_path;
     drawMap();
 
 
     //Clean-up the map data and related data structures
     std::cout << "Closing map\n";
-    //closeMap(); 
+    closeMap(); 
 
     return SUCCESS_EXIT_CODE;
 }
