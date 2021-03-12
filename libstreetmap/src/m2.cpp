@@ -92,7 +92,7 @@ std::unordered_map<std::string,std::string> map_paths;
 
 struct boundingbox bounds;
 
-ezgl::application* app;
+ezgl::application* global_app;
 
 void close_map();
 
@@ -334,7 +334,7 @@ void load_map(){
 
     
 
-void drawAllStreets(ezgl::renderer *g, double zoom){
+void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
     bool draw = false;
     g -> set_line_cap(ezgl::line_cap::round);
     for(int i = 0;i < street_segments.size(); i++){
@@ -402,13 +402,16 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
                 draw = true;
             }
             if(zoom > 25107){
-              g -> set_line_width(16);  
+              g -> set_line_width(16);
+              if(heavy) g->set_line_width(13);
             }
             else if(zoom >9038){
-              g -> set_line_width(12);  
+              g -> set_line_width(12);
+              if(heavy) g->set_line_width(9);
             }
             else if(zoom > 3253){
                 g->set_line_width(9);
+                if(heavy) g->set_line_width(6);
             }
             else if(zoom > 1171){
                 g->set_line_width(6);
@@ -421,9 +424,11 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
             }
             else if (zoom > 19){
                 g->set_line_width(2);
+                if(heavy) draw = false;
             }
             else if(zoom > 7){
                 g -> set_line_width(1);
+                if(heavy) draw = false;
             }
         }
         else if (street_segments[i].segment_type == "residential"){
@@ -432,25 +437,37 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
                 draw = true;
             }
             if(zoom > 25107){
-              g -> set_line_width(18);  
+              g -> set_line_width(18);
+              if(heavy) g->set_line_width(15);
+              
             }
             else if(zoom > 9038){
-              g -> set_line_width(11);  
+              g -> set_line_width(11);
+              if(heavy) g->set_line_width(8);
+              
             }
             else if(zoom > 3253){
                 g->set_line_width(9);
+                if(heavy) g->set_line_width(6);
+                
             }
             else if(zoom > 1171){
                 g->set_line_width(6);
+                if(heavy){
+                    g->set_line_width(3);
+                }
             }
             else if(zoom > 421){
                 g ->set_line_width(3);
+                if(heavy) g->set_line_width(1);
             }
             else if(zoom > 151){
                 g ->set_line_width(2);
+                if(heavy) g->set_line_width(0);
             }
             else if(zoom > 19){
                 g -> set_line_width(1);
+                if(heavy) draw = false;
             }
         }
         else{
@@ -459,19 +476,24 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
             draw = true;
             }
             if(zoom > 25071){
-                g -> set_line_width(16);  
+                g -> set_line_width(16);
+                if(heavy) g->set_line_width(13);
             }
             else if(zoom > 9038){
                 g -> set_line_width(10);
+                if(heavy) g->set_line_width(10);
             }
             else if(zoom > 3253){
-                g->set_line_width(6); 
+                g->set_line_width(6);
+                if(heavy) g->set_line_width(4);
             } 
             else if(zoom > 1171){
                 g->set_line_width(3);
+                if(heavy) g->set_line_width(2);
             }
             else if(zoom > 421){
                 g->set_line_width(2);
+                if(heavy) g->set_line_width(1);
             }
             else if(zoom > 151){
                 g->set_line_width(1);
@@ -755,8 +777,6 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      
      ezgl::renderer::free_surface(png_surface);   
      
-    
-
 }
 
 void draw_street_names (ezgl::renderer *g) {
@@ -835,22 +855,27 @@ void clearHighlights(){
 
 
 void draw_main_canvas (ezgl::renderer *g){
+    bool heavy_map = false;
     ezgl::rectangle world = g->get_visible_world();
     double area = world.area();
     double zoom = bounds.area/area;
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
     
-    //std::cout << bounds.area/area << std::endl;
-    std::cout << getNumStreetSegments() << std::endl;
+    std::cout << bounds.area/area << std::endl;
+
     g -> set_color(243,243,239,255); 
     g -> fill_rectangle(world);
     
-    if(getNumStreetSegments() > 1000000) zoom /= 3;
-    else if(getNumStreetSegments() < 5000) zoom *= 3;
-    
+    if(getNumStreetSegments() > 1000000){
+        zoom /= 3;
+        heavy_map = true;
+    }
+    else if(getNumStreetSegments() < 5000){
+        zoom *= 4;
+    }
     draw_features(g,zoom);
-    drawAllStreets(g,zoom);       
+    drawAllStreets(g,zoom,heavy_map);       
     
     if(zoom > 3249){
         drawOneWays(g,zoom);
@@ -933,12 +958,13 @@ void drawMap(){
     settings.canvas_identifier = "MainCanvas";
     
     ezgl::application application(settings);
-    app = &application;
+    global_app = &application;
    
     ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
     application.add_canvas("MainCanvas",draw_main_canvas,initial_background);
     application.run(initial_setup, act_on_mouse_click, nullptr,nullptr);
     
+    close_map();
     //connect search bar
     
     
@@ -955,13 +981,16 @@ void map_list(GtkListBox* box) {
     std::cout << selectedText << std::endl;
     close_map();
     map_load_path = selectedText;
-    bool load_successs = loadMap(map_load_path);
+    bool load_success = loadMap(map_load_path);
+    if(!load_success) {
+        std::cerr << "Failed to load map '" << map_load_path << "'\n";
+    }
     load_map();
     ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
-    app -> change_canvas_world_coordinates("MainCanvas",initial_background);
-    ezgl::zoom_fit(app -> get_canvas("MainCanvas"),initial_background);
-    bounds.area = app -> get_renderer() -> get_visible_world().area();
-    app -> refresh_drawing(); 
+    global_app -> change_canvas_world_coordinates("MainCanvas",initial_background);
+    ezgl::zoom_fit(global_app -> get_canvas("MainCanvas"),initial_background);
+    bounds.area = global_app -> get_renderer() -> get_visible_world().area();
+    global_app -> refresh_drawing(); 
 }
 
 //searchEntry
