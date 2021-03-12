@@ -354,13 +354,10 @@ void load_map(){
             
         }
     }
-<<<<<<< HEAD
 
-=======
-   
-   if(map_load_path.compare("/cad2/ece297s/public/maps/tehran_iran.streets.bin")==0) default_font = "Noto Sans";  
+   if(map_load_path.compare("/cad2/ece297s/public/maps/tehran_iran.streets.bin")==0) default_font = "Noto Sans Arabic";  
    else default_font = "Noto Sans CJK SC";
->>>>>>> commit to pull
+
 }
 
     
@@ -698,7 +695,7 @@ void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d 
     std::string font = "Noto Sans CJK SC";
     //font_slant a = 0;
     g->format_font(default_font, ezgl::font_slant::normal, ezgl::font_weight::normal);
-     g->set_font_size(20);
+     g->set_font_size(22);
              g->set_text_rotation(0);
              g->set_color(color);
              g->draw_text(point, word, 40, 20);
