@@ -934,6 +934,7 @@ void draw_street_names (ezgl::renderer *g) {
         
         //if straight street segment
         if (street_segments[i].coordinates.size() == 2 ) {
+
             double x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
             double y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
             
@@ -972,9 +973,7 @@ void draw_street_names (ezgl::renderer *g) {
                 }
 
             }
-        } else if (street_segments[i].coordinates.size() > 2) {
-            
-        }
+        } 
         
         
         
@@ -1013,7 +1012,11 @@ void drawHighlights(ezgl::renderer *g){
         
          if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
              if (street_segments[i].highlight) {
-                 g -> draw_surface(png_surface,{x, y});
+                 g->set_line_width(20);
+                 g->set_color(ezgl::RED);
+                 for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
+                     g->draw_line(street_segments[i].coordinates[j], street_segments[i].coordinates[j+1]);
+                 }
              }
          }
         
