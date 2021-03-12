@@ -724,7 +724,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      int count = 0;
      for(int i = 0; i<restaurant.size();i++){
          
-         if((restaurant[i].coordinate<large)&&(small<restaurant[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, restaurant[i].coordinate, 32, 37, 0))){  
+         if((restaurant[i].coordinate<large)&&(small<restaurant[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, restaurant[i].coordinate))){  
              count++;             
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png"); //zoom             
              point=restaurant[i].coordinate;             
@@ -753,7 +753,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      
      count = 0;
      for (int i = 0; i < fuel.size(); i++){         
-         if(fuel[i].coordinate<large&&(small<fuel[i].coordinate)&&(!checkOverlap(g,drawn, fuel[i].coordinate, 32, 37, 0))){
+         if(fuel[i].coordinate<large&&(small<fuel[i].coordinate)&&(!checkOverlap(g,drawn, fuel[i].coordinate))){
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
              point=fuel[i].coordinate;
              convert_point(g, drawn, point);
@@ -763,7 +763,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
          }       
      }
      for (int i = 0; i < bar.size(); i++){         
-         if(bar[i].coordinate<large&&(small<bar[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, bar[i].coordinate, 32, 37, 0))){
+         if(bar[i].coordinate<large&&(small<bar[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, bar[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/bar.png");//zoom
              point=bar[i].coordinate;
@@ -775,7 +775,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count = 0;
      for (int i = 0; i < school.size(); i++){         
-         if(school[i].coordinate<large&&(small<school[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, school[i].coordinate, 32, 37, 0))){
+         if(school[i].coordinate<large&&(small<school[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, school[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/university.png");
              point=school[i].coordinate;
@@ -787,7 +787,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count = 0;
      for (int i = 0; i < pharmacy.size(); i++){         
-         if(pharmacy[i].coordinate<large&&(small<pharmacy[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, pharmacy[i].coordinate, 32, 37, 0))){
+         if(pharmacy[i].coordinate<large&&(small<pharmacy[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, pharmacy[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/drugstore.png");
              point=pharmacy[i].coordinate;
@@ -798,7 +798,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
          }       
      }
      for (int i = 0; i < theatre.size(); i++){         
-         if(theatre[i].coordinate<large&&(small<theatre[i].coordinate)&&(!checkOverlap(g,drawn, theatre[i].coordinate, 32, 37, 0))){
+         if(theatre[i].coordinate<large&&(small<theatre[i].coordinate)&&(!checkOverlap(g,drawn, theatre[i].coordinate))){
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/theater.png");
              point=theatre[i].coordinate;
              convert_point(g, drawn, point);
@@ -809,7 +809,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count = 0;
      for (int i = 0; i < bank.size(); i++){         
-         if(bank[i].coordinate<large&&(small<bank[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, bank[i].coordinate, 32, 37, 0))){
+         if(bank[i].coordinate<large&&(small<bank[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, bank[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
              point=bank[i].coordinate;
@@ -821,7 +821,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count =0;
      for (int i = 0; i < cafe.size(); i++){         
-         if(cafe[i].coordinate<large&&(small<cafe[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, cafe[i].coordinate, 32, 37, 0))){
+         if(cafe[i].coordinate<large&&(small<cafe[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, cafe[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/coffee.png");//zoom
              point=cafe[i].coordinate;
@@ -833,7 +833,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count = 0;
      for (int i = 0; i < parking.size(); i++){         
-         if(parking[i].coordinate<large&&(small<parking[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, parking[i].coordinate, 32, 37, 0))){
+         if(parking[i].coordinate<large&&(small<parking[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, parking[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/parking.png");
              point=parking[i].coordinate;
@@ -844,7 +844,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
          }       
      }
      for (int i = 0; i < post_office.size(); i++){         
-         if(post_office[i].coordinate<large&&(small<post_office[i].coordinate)&&(!checkOverlap(g,drawn, post_office[i].coordinate, 32, 37, 0))){
+         if(post_office[i].coordinate<large&&(small<post_office[i].coordinate)&&(!checkOverlap(g,drawn, post_office[i].coordinate))){
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/postal.png");
              point=post_office[i].coordinate;
              convert_point(g, drawn, point);
@@ -855,7 +855,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count = 0;
     for (int i = 0; i < hospital.size(); i++){         
-         if(hospital[i].coordinate<large&&(small<hospital[i].coordinate)&&count<0&&(!checkOverlap(g,drawn, hospital[i].coordinate, 32, 37, 0))){
+         if(hospital[i].coordinate<large&&(small<hospital[i].coordinate)&&count<0&&(!checkOverlap(g,drawn, hospital[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
              point=hospital[i].coordinate;
@@ -867,7 +867,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count = 0;
      for (int i = 0; i < fastfood.size(); i++){         
-         if(fastfood[i].coordinate<large&&(small<fastfood[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, fastfood[i].coordinate, 32, 37, 0))){
+         if(fastfood[i].coordinate<large&&(small<fastfood[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, fastfood[i].coordinate))){
              count++;
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/fastfood.png");//zoom
              point=fastfood[i].coordinate;
@@ -879,7 +879,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
      }
      count = 0;
      for (int i = 0; i < art.size(); i++){         
-         if(art[i].coordinate<large&&(small<art[i].coordinate)&&(!checkOverlap(g,drawn, art[i].coordinate, 32, 37, 0))){
+         if(art[i].coordinate<large&&(small<art[i].coordinate)&&(!checkOverlap(g,drawn, art[i].coordinate))){
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/art.png");//zoom
              point=art[i].coordinate;
              convert_point(g, drawn, point);
@@ -889,7 +889,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
          }       
      }
      for (int i = 0; i < gym.size(); i++){         
-         if(gym[i].coordinate<large&&(small<gym[i].coordinate)&&(!checkOverlap(g,drawn, gym[i].coordinate, 32, 37, 0))){
+         if(gym[i].coordinate<large&&(small<gym[i].coordinate)&&(!checkOverlap(g,drawn, gym[i].coordinate))){
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/gym.png");//zoom
              point=gym[i].coordinate;
              convert_point(g, drawn, point);
@@ -899,7 +899,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
          }       
      }
      for (int i = 0; i < library.size(); i++){         
-         if(library[i].coordinate<large&&(small<library[i].coordinate)&&(!checkOverlap(g,drawn, library[i].coordinate, 32, 37, 0))){
+         if(library[i].coordinate<large&&(small<library[i].coordinate)&&(!checkOverlap(g,drawn, library[i].coordinate))){
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/library.png");//zoom
              point=library[i].coordinate;
              convert_point(g, drawn, point);
