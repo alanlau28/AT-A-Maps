@@ -977,10 +977,10 @@ void search_entry(GtkEntry* entry) {
     } 
     
     //after this include streets into entry completion
-//    for (int i = 0; i < street.size(); i++) {
-//        std::cout << getStreetName(street[i]) << std::endl;
-//    }
- 
+    for (int i = 0; i < street.size(); i++) {
+        std::cout << getStreetName(street[i]) << " ";
+    }
+    std::cout << std::endl;
     
     
     //after that clear the entry and vector
@@ -1021,6 +1021,9 @@ void search_entry_activate(GtkEntry* entry){
 //Find Button - right now works through command line
 void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
+    GtkPopover* popOver = (GtkPopover*) app->get_object("FindPopOver");
+    GtkLabel*   popOverLabel = (GtkLabel*) app->get_object("FindPopOverLabel");
+    
     GtkEntry* entry = (GtkEntry*) app->get_object("SearchEntry");
     std::string input = gtk_entry_get_text(entry);
     
@@ -1032,24 +1035,25 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     if (input.find(delim1) !=  std::string::npos) {
         street1 = input.substr(0, input.find(delim1));
         street2 = input.substr(input.find(delim1) + delim1.length(), input.size());
-        
        
     } else if (input.find(delim2) != std::string::npos) {
         street1 = input.substr(0, input.find(delim2));
         street2 = input.substr(input.find(delim2) + delim2.length(), input.size());
         
         std::cout << street1 << " " << street2 << std::endl;
-    } else {
-        //do something
-    }
+    } else {  
+        gtk_popover_popup(popOver);    
+        gtk_label_set_text(popOverLabel, "Put an 'and' or '&' \n between streets");
+        return;
+   }
     
-    //clear entry
-    gtk_entry_set_text(entry, " ");
+
     
     
     //find street ids
     std::vector<StreetIdx> streetOne = findStreetIdsFromPartialStreetName(street1);
     std::vector<StreetIdx> streetTwo = findStreetIdsFromPartialStreetName(street2);
+    
     
     //for holding intersections
     std::vector<IntersectionIdx> intersectionResults;
@@ -1060,21 +1064,24 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         
         intersectionResults = findIntersectionsOfTwoStreets(streets);
         
+        if (intersectionResults.size() > 0) {
+            for (int i = 0; i < intersectionResults.size(); i++) {
+                intersections[intersectionResults[i]].highlight = true;
+            }
+        } else {
+            gtk_popover_popup(popOver);    
+            gtk_label_set_text(popOverLabel, "No intersections found");
+            return;
+        }
        
     } else {
-        std::cout << "No suitable streets found" << std::endl;
+        gtk_popover_popup(popOver);    
+        gtk_label_set_text(popOverLabel, "No suitable streets found");
         return;
     }
     
-       
-    if (intersectionResults.size() > 0) {
-        for (int i = 0; i < intersectionResults.size(); i++) {
-            intersections[intersectionResults[i]].highlight = true;
-        }
-    } else {
-        std::cout << "No intersections found" << std::endl;
-    }
-    
+    //clear entry
+    gtk_entry_set_text(entry, " ");
     app -> refresh_drawing();
         
     //at the end delete vectors
