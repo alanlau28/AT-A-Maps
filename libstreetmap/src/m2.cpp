@@ -922,6 +922,7 @@ void initial_setup(ezgl::application *application, bool){
                      entry);
 
     
+    
     //connect "Find" button as signal
     GtkWidget* findButton = (GtkWidget*) application->get_object("SearchFindButton");
     g_signal_connect(findButton, "clicked", G_CALLBACK(find_button), application);
@@ -996,6 +997,10 @@ void map_list(GtkListBox* box) {
 //searchEntry
 void search_entry(GtkEntry* entry) {
     
+    GtkEntryCompletion *completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
+    GtkListStore *list = gtk_list_store_new(1, G_TYPE_STRING);
+    GtkTreeIter iter;
+    
     // Get the text written in the widget
     std::string text = gtk_entry_get_text(entry);
     
@@ -1003,21 +1008,40 @@ void search_entry(GtkEntry* entry) {
     
     if (text.size() > 2) {
         street = findStreetIdsFromPartialStreetName(text);
+        
+        if (street.size() > 0) {
+            for (int i = 0; i < street.size(); i++) {
+                std::string name = getStreetName(street[i]);
+                
+                gtk_list_store_append(list, &iter);
+                gtk_list_store_set(list, &iter, 0, name, -1);
+                 
+            }
+            
+            gtk_entry_completion_set_model(completion, GTK_TREE_MODEL(list));
+            gtk_entry_set_completion(GTK_ENTRY(entry), completion);
+            gtk_entry_completion_set_text_column(completion, 0);
+        }
     } 
     
+    
+    
     //after this include streets into entry completion
-    for (int i = 0; i < street.size(); i++) {
-        std::cout << getStreetName(street[i]) << " ";
-    }
-    std::cout << std::endl;
+//    for (int i = 0; i < street.size(); i++) {
+//        std::cout << getStreetName(street[i]) << " ";
+//    }
+//    std::cout << std::endl;
     
     
     //after that clear the entry and vector
+    //gtk_list_store_clear(list);
     street.clear();
 }
 
 void search_entry_activate(GtkEntry* entry){
     
+    //clear any previous highlights
+    clearHighlights();
     
     // Get the text written in the widget
     std::string text = gtk_entry_get_text(entry);
@@ -1050,6 +1074,11 @@ void search_entry_activate(GtkEntry* entry){
 //Find Button - right now works through command line
 void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
+    //clear any previous highlights
+    clearHighlights();
+    
+            
+    //for error handling
     GtkPopover* popOver = (GtkPopover*) app->get_object("FindPopOver");
     GtkLabel*   popOverLabel = (GtkLabel*) app->get_object("FindPopOverLabel");
     
@@ -1075,14 +1104,10 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         gtk_label_set_text(popOverLabel, "Put an 'and' or '&' \n between streets");
         return;
    }
-    
 
-    
-    
     //find street ids
     std::vector<StreetIdx> streetOne = findStreetIdsFromPartialStreetName(street1);
     std::vector<StreetIdx> streetTwo = findStreetIdsFromPartialStreetName(street2);
-    
     
     //for holding intersections
     std::vector<IntersectionIdx> intersectionResults;
@@ -1111,7 +1136,7 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
     //clear entry
     gtk_entry_set_text(entry, " ");
-    app -> refresh_drawing();
+    global_app -> refresh_drawing();
         
     //at the end delete vectors
     intersectionResults.clear();
