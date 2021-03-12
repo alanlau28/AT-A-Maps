@@ -300,7 +300,7 @@
         </child>
         <child>
           <object class="GtkListBoxRow" id="MapListHongKong">
-            <property name="name">/cad2/ece297s/public/maps/hong-kong_china.streets.bin</property>
+            <property name="name">cad2/ece297s/public/maps/hong-kong_china.streets.bin</property>
             <property name="width_request">100</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
@@ -751,20 +751,6 @@
         <property name="margin_left">10</property>
         <property name="margin_right">10</property>
         <property name="label" translatable="yes">label</property>
-      </object>
-    </child>
-  </object>
-  <object class="GtkPopover" id="SearchEntryPopOver">
-    <property name="can_focus">False</property>
-    <property name="margin_left">10</property>
-    <property name="margin_right">10</property>
-    <property name="relative_to">SearchEntry</property>
-    <property name="position">bottom</property>
-    <property name="transitions_enabled">False</property>
-    <child>
-      <object class="GtkListBox" id="SearchEntryListBox">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
       </object>
     </child>
   </object>

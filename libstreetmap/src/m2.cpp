@@ -967,6 +967,10 @@ void clearHighlights(){
     for(int i = 0;i < intersections.size();i++){
         intersections[i].highlight = false;
     }
+    
+    for (int i = 0; i < street_segments.size(); i++) {
+        street_segments[i].highlight = false;
+    }
 }
 
 
@@ -1049,7 +1053,7 @@ void initial_setup(ezgl::application *application, bool){
     g_signal_connect(mapList, "row-activated", G_CALLBACK(map_list), mapList);
     
     
-    
+    //for autocorrect
     entryCompletion.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
     gtk_entry_set_completion(entry, entryCompletion.completion);
     g_object_unref(entryCompletion.completion);
@@ -1121,13 +1125,7 @@ void map_list(GtkListBox* box) {
 
 //searchEntry
 void search_entry(GtkEntry* entry) {
-    
-//    GtkPopover* popOver = (GtkPopover*) global_app->get_object("SearchEntryPopOver");
-//    GtkListBox* list = (GtkListBox*) global_app->get_object("SearchEntryListBox");
-//    gtk_container_foreach (GTK_CONTAINER (list), (GtkCallback) gtk_widget_destroy, NULL);
-    
-    
-    
+      
     GtkListStore* store = gtk_list_store_new(1, G_TYPE_STRING);
     GtkTreeIter iter;
     
@@ -1146,23 +1144,9 @@ void search_entry(GtkEntry* entry) {
                 
                     gtk_list_store_append (store, &iter);
                     gtk_list_store_set (store, &iter, 0, name.c_str(), -1);
-                  
-//                GtkWidget* row = gtk_list_box_row_new();
-//                GtkWidget* label = gtk_label_new(name.c_str());
-//                gtk_container_add((GtkContainer*)row, label);
-//                
-//                
-//                gtk_list_box_insert(list, row, -1);
-//                
-//                gtk_widget_show((GtkWidget*) row);
-//                gtk_widget_show((GtkWidget*) label);
-//                gtk_widget_set_can_focus((GtkWidget*) row, false);
-//                gtk_widget_set_can_focus((GtkWidget*) label, false);
+                 
                  
             }
-          
-//            gtk_popover_popup(popOver);
-//            gtk_widget_set_can_focus((GtkWidget*) popOver, false);
             
         }
     } 
