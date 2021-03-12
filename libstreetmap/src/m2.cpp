@@ -929,7 +929,7 @@ void draw_street_names (ezgl::renderer *g) {
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
         g->set_color(0,0,0);
-        g->set_font_size(15);
+        g->set_font_size(12);
         
         //if straight street segment
         if (street_segments[i].coordinates.size() == 2 ) {
@@ -948,17 +948,18 @@ void draw_street_names (ezgl::renderer *g) {
             
 
                 
-                if (street_segments[i].name != "<unknown>" /*&& street_segments[i].name != previous*/) {
+                if (street_segments[i].name != "<unknown>" && street_segments[i].name != previous) {
 
                     //if (street_segments[i])
-                    if (street_segments[i].segment_type == "motorway" && width < 10000 ) {
+                    if ((street_segments[i].segment_type == "motorway" ||
+                        street_segments[i].segment_type == "primary" )&& width < 10000 ) {
                         g->set_text_rotation(theta);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
-                    else if ((street_segments[i].segment_type == "primary" || 
-                            street_segments[i].segment_type == "trunk" ||
+                    else if ((street_segments[i].segment_type == "trunk" ||
                             street_segments[i].segment_type == "secondary")&& width < 7000) {
                         g->set_text_rotation(theta);
+                        g->set_font_size(14);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     else if((street_segments[i].segment_type == "tertiary" || 
@@ -966,10 +967,13 @@ void draw_street_names (ezgl::renderer *g) {
                             street_segments[i].segment_type == "living_street" ||
                             street_segments[i].segment_type == "residential") && width < 3000){
                         g->set_text_rotation(theta);
+                        g->set_font_size(16);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     } 
                     else if (width < 1000){
+                        
                         g->set_text_rotation(theta);
+                        g->set_font_size(20);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     //std::cout << street_segments[i].name << " " << street_segments[i].angle << std::endl;
@@ -985,7 +989,7 @@ void draw_street_names (ezgl::renderer *g) {
         } 
         
         
-        
+        //global_app->refresh_drawing();
         
     }
 
