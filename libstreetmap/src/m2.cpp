@@ -81,7 +81,7 @@ std::vector<ezgl::point2d>  gym;
 std::vector<ezgl::point2d>  art;
 std::vector<ezgl::point2d>  library;
 std::vector<ezgl::point2d>  place_of_worship;
-
+std::vector<std::string> feature_priority;
 
 std::vector<intersection_data> intersections;
 
@@ -95,6 +95,10 @@ ezgl::application* global_app;
 
 void close_map();
 
+bool operator< (feature_data& first, feature_data& second){
+    if(std::find(feature_priority.begin(),feature_priority.end(),first.feature_type) - feature_priority.begin() < std::find(feature_priority.begin(),feature_priority.end(),second.feature_type) - feature_priority.begin()) return true;
+    else return false;
+}
 //(x, y) = (R·lon·cos(latavg), R·lat)
 LatLon latLonFromWorld(double x, double y){
     float lon = x / kEarthRadiusInMeters / cos(bounds.lat_avg) / kDegreeToRadian;
@@ -131,6 +135,18 @@ void load_bin(){
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/tehran_iran.streets.bin","/cad2/ece297s/public/maps/tehran_iran.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/tokyo_japan.streets.bin","/cad2/ece297s/public/maps/tokyo_japan.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/toronto_canada.streets.bin","/cad2/ece297s/public/maps/toronto_canada.osm.bin"));    
+}
+
+void loadFeaturePriority(){
+    feature_priority.push_back("lake");
+    feature_priority.push_back("island");
+    feature_priority.push_back("beach");
+    feature_priority.push_back("park");
+    feature_priority.push_back("greenspace");
+    feature_priority.push_back("golfcourse");
+    feature_priority.push_back("river");
+    feature_priority.push_back("stream");
+    feature_priority.push_back("building");
 }
 
 void load_map(){
@@ -248,7 +264,7 @@ void load_map(){
         }
     }
     
-
+    std::sort(features.begin(),features.end());
     
     //Gets coordinate of each intersection
     //-------------------------------------------------
@@ -930,7 +946,7 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
     
-    std::cout << bounds.area/area << std::endl;
+    //std::cout << bounds.area/area << std::endl;
 
     g -> set_color(243,243,239,255); 
     g -> fill_rectangle(world);
@@ -1020,6 +1036,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
 
 void drawMap(){
     load_bin();
+    loadFeaturePriority();
     load_map();
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
