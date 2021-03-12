@@ -703,7 +703,7 @@ void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d 
 
 void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2d large){
      ezgl::surface *png_surface; 
-    png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
+     png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
      ezgl::point2d point {.0,.0};
      ezgl::point2d offset {-56, 40};
      ezgl::point2d text_offset {30,0};
