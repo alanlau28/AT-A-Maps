@@ -60,10 +60,6 @@ struct intersection_data{
 };
 
 
-struct callback_struct{
-    GObject* widget;
-    ezgl::application* app;
-};
 
 std::vector<street_segment_data> street_segments;
 std::vector<feature_data> features;
@@ -877,7 +873,7 @@ void draw_main_canvas (ezgl::renderer *g){
 
 //UI function declarations for convenience
 void search_entry(GtkEntry* entry );
-void search_entry_activate(GObject* entry, ezgl::application *app);
+void search_entry_activate(GtkEntry* entry);
 void find_button(GtkWidget * /*widget*/ , ezgl::application *app);
 void map_list(GtkListBox* box);
 
@@ -888,19 +884,17 @@ void initial_setup(ezgl::application *application, bool){
     
     //UI stuff
     //connect search bar entry as signal
-    callback_struct* entryCallback = new callback_struct();
-    entryCallback->widget = application->get_object("SearchEntry");
-    entryCallback->app = application;
+    GtkEntry* entry = (GtkEntry*) application->get_object("SearchEntry");
     
-    g_signal_connect((GtkEntry*)entryCallback->widget, 
+    g_signal_connect(entry, 
                      "search-changed", 
                      G_CALLBACK(search_entry), 
-                     (GtkEntry*)entryCallback->widget);
+                     entry);
     
-    g_signal_connect((GtkEntry*)entryCallback->widget, 
-                      "activate", 
-                      G_CALLBACK(search_entry_activate),  
-                      entryCallback);
+    g_signal_connect(entry, 
+                     "activate", 
+                     G_CALLBACK(search_entry_activate),  
+                     entry);
 
     
     //connect "Find" button as signal
@@ -983,22 +977,21 @@ void search_entry(GtkEntry* entry) {
     } 
     
     //after this include streets into entry completion
-    for (int i = 0; i < street.size(); i++) {
-        std::cout << getStreetName(street[i]) << std::endl;
-    }
-   
+//    for (int i = 0; i < street.size(); i++) {
+//        std::cout << getStreetName(street[i]) << std::endl;
+//    }
+ 
     
     
     //after that clear the entry and vector
     street.clear();
 }
 
-void search_entry_activate(GObject* entry, ezgl::application *app){
+void search_entry_activate(GtkEntry* entry){
     
-    GtkEntry* search_entry = (GtkEntry*) entry;
     
     // Get the text written in the widget
-    std::string text = gtk_entry_get_text(search_entry);
+    std::string text = gtk_entry_get_text(entry);
     
     std::vector<StreetIdx> street;
     
@@ -1019,21 +1012,40 @@ void search_entry_activate(GObject* entry, ezgl::application *app){
         street_segments[segments[i]].highlight = true;
         }
     
+    app->refresh_drawing();
     street.clear();
     segments.clear();
-    gtk_entry_set_text(search_entry, " ");
+    gtk_entry_set_text(entry, " ");
 }
 
 //Find Button - right now works through command line
 void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
-    std::cout<< "Insert your streets" << std::endl;
+    GtkEntry* entry = (GtkEntry*) app->get_object("SearchEntry");
+    std::string input = gtk_entry_get_text(entry);
+    
+    std::string delim1 = "and";
+    std::string delim2 = "&";
     
     std::string street1, street2;
     
-    //get street names
-    std::getline(std::cin, street1);
-    std::getline(std::cin, street2);
+    if (input.find(delim1) !=  std::string::npos) {
+        street1 = input.substr(0, input.find(delim1));
+        street2 = input.substr(input.find(delim1) + delim1.length(), input.size());
+        
+       
+    } else if (input.find(delim2) != std::string::npos) {
+        street1 = input.substr(0, input.find(delim2));
+        street2 = input.substr(input.find(delim2) + delim2.length(), input.size());
+        
+        std::cout << street1 << " " << street2 << std::endl;
+    } else {
+        //do something
+    }
+    
+    //clear entry
+    gtk_entry_set_text(entry, " ");
+    
     
     //find street ids
     std::vector<StreetIdx> streetOne = findStreetIdsFromPartialStreetName(street1);
