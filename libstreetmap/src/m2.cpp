@@ -254,7 +254,8 @@ void load_map(){
         double delta_x = street_segments[street_segment_id].coordinates[0].x - street_segments[street_segment_id].coordinates[1].x;
         double delta_y = street_segments[street_segment_id].coordinates[0].y - street_segments[street_segment_id].coordinates[1].y;
         double theta = atan2(delta_y, delta_x)* (180/3.141592653);
-
+        if (theta > 90) theta -= 180;
+        if (theta < -90) theta += 180;
         
 
         
@@ -941,8 +942,6 @@ void draw_street_names (ezgl::renderer *g) {
             double yBound = std::abs(street_segments[i].coordinates[1].y - street_segments[i].coordinates[0].y);
             
             double theta = street_segments[i].angle;
-            if (theta > 90) theta -= 180;
-            if (theta < -90) theta += 180;
             
             if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
             
