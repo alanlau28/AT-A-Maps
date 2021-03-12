@@ -912,15 +912,20 @@ void initial_setup(ezgl::application *application, bool){
 
 
 
-void act_on_mouse_click(ezgl::application* app, GdkEventButton* /*event*/,double x, double y){
-    clearHighlights();
-    
-    LatLon position = latLonFromWorld(x,y);
-    int id = findClosestIntersection(position);
-    intersections[id].highlight = true;
-    app -> refresh_drawing();
-
-    app -> update_message("Point clicked at " + intersections[id].name);
+void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, double y){
+    if(event -> button == 1){
+        clearHighlights();
+        LatLon position = latLonFromWorld(x,y);
+        int id = findClosestIntersection(position);
+        intersections[id].highlight = true;
+        app -> refresh_drawing();
+        app -> update_message("Pin placed at " + intersections[id].name);
+    }
+    else if(event -> button == 3){
+        clearHighlights();
+        app -> refresh_drawing();
+        app -> update_message("Pin removed");
+    }
 }
 
 void drawMap(){
