@@ -26,6 +26,7 @@
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
 #include <unordered_map>
+#include "load_database.h"
 
 struct SegmentData{
     double travel_time;
@@ -81,7 +82,7 @@ bool loadMap(std::string map_streets_database_filename) {
     //Indicates whether the map has loaded successfully
     bool load_successful = false; 
     
-
+    map_load_path = map_streets_database_filename;
     std::cout << "loadMap: " << map_streets_database_filename << std::endl;
 
     load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);

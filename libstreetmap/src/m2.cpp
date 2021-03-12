@@ -11,7 +11,7 @@
 #include <utility>
 #include <algorithm>
 #include <unordered_map>
-
+#include "load_database.h"
 #include <point.hpp>
 #include <unordered_set>
 
@@ -90,8 +90,6 @@ std::unordered_map <OSMID,std::string> street_types;
 std::unordered_map<std::string,std::string> map_paths;
 
 struct boundingbox bounds;
-
-std::string map_load_path = "/cad2/ece297s/public/maps/toronto_canada.streets.bin";
 
 ezgl::application* global_app;
 
@@ -1067,7 +1065,7 @@ void search_entry_activate(GtkEntry* entry){
         street_segments[segments[i]].highlight = true;
         }
     
-    app->refresh_drawing();
+    global_app->refresh_drawing();
     street.clear();
     segments.clear();
     gtk_entry_set_text(entry, " ");
