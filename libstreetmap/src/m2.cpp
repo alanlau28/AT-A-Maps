@@ -88,8 +88,6 @@ std::vector<ezgl::point2d>  library;
 std::vector<ezgl::point2d>  place_of_worship;
 
 
-
-
 std::vector<intersection_data> intersections;
 
 std::unordered_map <OSMID,std::string> street_types;
@@ -97,6 +95,10 @@ std::unordered_map <OSMID,std::string> street_types;
 std::unordered_map<std::string,std::string> map_paths;
 
 struct boundingbox bounds;
+
+ezgl::application* app;
+
+void close_map();
 
 //(x, y) = (R·lon·cos(latavg), R·lat)
 LatLon latLonFromWorld(double x, double y){
@@ -137,8 +139,6 @@ void load_bin(){
 }
 
 void load_map(){
-
-    load_bin();
     loadOSMDatabaseBIN(map_paths.find(map_load_path) -> second);
     
     street_segments.resize(getNumStreetSegments());
@@ -844,8 +844,11 @@ void draw_main_canvas (ezgl::renderer *g){
     double zoom = bounds.area/area;
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
-
+    
     //std::cout << bounds.area/area << std::endl;
+    
+    if(getNumStreetSegments() > 1000000) zoom /= 3;
+    
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
     
@@ -863,7 +866,6 @@ void draw_main_canvas (ezgl::renderer *g){
      if(zoom>1500){
         draw_POI(g,zoom,small, large);
     }
-
 
 
 }
@@ -917,10 +919,10 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* /*event*/,double
     app -> refresh_drawing();
 
     app -> update_message("Point clicked at " + intersections[id].name);
-
 }
 
 void drawMap(){
+    load_bin();
     load_map();
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
@@ -928,7 +930,7 @@ void drawMap(){
     settings.canvas_identifier = "MainCanvas";
     
     ezgl::application application(settings);
-    
+    app = &application;
    
     ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
     application.add_canvas("MainCanvas",draw_main_canvas,initial_background);
@@ -936,8 +938,6 @@ void drawMap(){
     
     //connect search bar
     
-    
-    closeOSMDatabase();
     
 }
 
@@ -950,6 +950,15 @@ void map_list(GtkListBox* box) {
     std::string selectedText = gtk_widget_get_name((GtkWidget *)selected);
     
     std::cout << selectedText << std::endl;
+    close_map();
+    map_load_path = selectedText;
+    bool load_successs = loadMap(map_load_path);
+    load_map();
+    ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
+    app -> change_canvas_world_coordinates("MainCanvas",initial_background);
+    ezgl::zoom_fit(app -> get_canvas("MainCanvas"),initial_background);
+    bounds.area = app -> get_renderer() -> get_visible_world().area();
+     
 }
 
 //searchEntry
@@ -1052,3 +1061,30 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
  
 }
 
+void close_map(){
+    closeMap();
+    closeOSMDatabase();
+    street_segments.clear();
+    features.clear();
+    pointOfInterests.clear();
+    street_segments_of_street.clear();
+    fuel.clear();
+    school.clear();
+    restaurant.clear();
+    parking.clear();
+    theatre.clear();
+    bank.clear();
+    bar.clear();
+    cafe.clear();
+    fastfood.clear();
+    pharmacy.clear(); 
+    hospital.clear();
+    post_office.clear();
+    gym.clear();
+    art.clear();
+    library.clear();
+
+    intersections.clear();
+
+    street_types.clear();
+}
