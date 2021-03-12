@@ -90,7 +90,10 @@ std::vector<POI_data>  post_office;
 std::vector<POI_data>  gym;
 std::vector<POI_data>  art;
 std::vector<POI_data>  library;
-std::vector<POI_data>  place_of_worship;
+
+std::string default_font;
+//std::string arabic = "Noto Sans Arabic";
+
 
 
 std::vector<intersection_data> intersections;
@@ -351,7 +354,13 @@ void load_map(){
             
         }
     }
+<<<<<<< HEAD
 
+=======
+   
+   if(map_load_path.compare("/cad2/ece297s/public/maps/tehran_iran.streets.bin")==0) default_font = "Noto Sans";  
+   else default_font = "Noto Sans CJK SC";
+>>>>>>> commit to pull
 }
 
     
@@ -686,10 +695,13 @@ void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl:
 }
 
 void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d point){
+    std::string font = "Noto Sans CJK SC";
+    //font_slant a = 0;
+    g->format_font(default_font, ezgl::font_slant::normal, ezgl::font_weight::normal);
      g->set_font_size(20);
              g->set_text_rotation(0);
              g->set_color(color);
-             g->draw_text(point, word, 20, 20);
+             g->draw_text(point, word, 40, 20);
 }
 
 void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2d large){
@@ -897,6 +909,7 @@ void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2
 void draw_street_names (ezgl::renderer *g) {
     
     ezgl::rectangle world = g->get_visible_world();
+    g->format_font(default_font, ezgl::font_slant::normal, ezgl::font_weight::normal);
      
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
@@ -981,7 +994,7 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
     
-
+    std::cout<<zoom<<std::endl;
 
     g -> set_color(243,243,239,255); 
     g -> fill_rectangle(world);
