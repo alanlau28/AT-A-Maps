@@ -591,22 +591,22 @@ void drawOneWays(ezgl::renderer *g, double zoom){
         ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
         if(draw && street_segments[i].one_way&& g->get_visible_world().contains(start)){
             double angle = street_segments[i].angle;
-            if(angle < 0) angle += 180;
+
             g ->set_text_rotation(angle);
             
             
             if(!checkOverlap(g,drawn_arrow,start)){
                 convert_point(g, drawn_arrow, start);
             if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
-                if(zoom > 25107){
-                    g -> draw_text(start,"←",100,100);
+                if(zoom > 25000){
+                    g -> draw_text(start,"→",100,100); 
                 }
                 else{
-                    g -> draw_text(start,"←",50,50);
+                    g -> draw_text(start,"→",50,50);
                 }
             }
             else if(start.x - finish.x <= 0 && start.y - finish.y <= 0){
-                if(zoom > 25107){
+                if(zoom > 25000){
                     g -> draw_text(start,"→",100,100);
                 }
                 else{
@@ -614,7 +614,7 @@ void drawOneWays(ezgl::renderer *g, double zoom){
                 }
             }
             else if(start.x - finish.x >= 0 && start.y - finish.y >= 0){
-                if(zoom > 25107){
+                if(zoom > 25000){
                     g -> draw_text(start,"←",100,100);
                 }
                 else{
@@ -622,11 +622,11 @@ void drawOneWays(ezgl::renderer *g, double zoom){
                 }
             }
             else{
-                if(zoom > 25107){
-                    g -> draw_text(start,"→",100,100);
+                if(zoom > 25000){
+                    g -> draw_text(start,"←",100,100);
                 }
                 else{
-                    g -> draw_text(start,"→",50,50);
+                    g -> draw_text(start,"←",50,50);
                 }
             }
         }
