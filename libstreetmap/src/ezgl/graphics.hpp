@@ -197,7 +197,7 @@ public:
    * @param box: a rectangle in world coordinates
    */
   rectangle world_to_screen(const rectangle& box);
-
+  
   /**** Functions to set graphics attributes (for all subsequent drawing calls). ****/
 
   /**

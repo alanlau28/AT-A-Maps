@@ -70,7 +70,7 @@ public:
   {
     return {lhs.x + rhs.x, lhs.y + rhs.y};
   }
-
+  
   /**
    * Add one point to another point.
    */
