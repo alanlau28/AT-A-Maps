@@ -12,11 +12,10 @@
 #include <algorithm>
 #include <unordered_map>
 #include "load_database.h"
-<<<<<<< HEAD
-=======
+
 #include <gtk/gtk.h>
 
->>>>>>> entry completion in progress
+
 #include <point.hpp>
 #include <unordered_set>
 
@@ -63,7 +62,10 @@ struct intersection_data{
     std::string name;
 };
 
-
+struct entry_completion{
+    GtkEntryCompletion* completion;
+    GtkTreeModel* completion_model;
+};
 
 std::vector<street_segment_data> street_segments;
 std::vector<feature_data> features;
@@ -95,6 +97,7 @@ std::unordered_map <OSMID,std::string> street_types;
 std::unordered_map<std::string,std::string> map_paths;
 
 struct boundingbox bounds;
+struct entry_completion entryCompletion;
 
 ezgl::application* global_app;
 
@@ -1019,6 +1022,12 @@ void initial_setup(ezgl::application *application, bool){
     //listbox for picking new maps
     GtkListBox* mapList = (GtkListBox*) application->get_object("MapList");
     g_signal_connect(mapList, "row-activated", G_CALLBACK(map_list), mapList);
+    
+    
+    
+    entryCompletion.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
+    gtk_entry_set_completion(entry, entryCompletion.completion);
+    g_object_unref(entryCompletion.completion);
 }
 
 
@@ -1092,9 +1101,7 @@ void search_entry(GtkEntry* entry) {
 //    GtkListBox* list = (GtkListBox*) global_app->get_object("SearchEntryListBox");
 //    gtk_container_foreach (GTK_CONTAINER (list), (GtkCallback) gtk_widget_destroy, NULL);
     
-    GtkEntryCompletion* completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
-    gtk_entry_set_completion(entry, completion);
-    g_object_unref(completion);
+    
     
     GtkListStore* store = gtk_list_store_new(1, G_TYPE_STRING);
     GtkTreeIter iter;
@@ -1135,10 +1142,10 @@ void search_entry(GtkEntry* entry) {
         }
     } 
     
-    GtkTreeModel* completion_model = GTK_TREE_MODEL(store);
-    gtk_entry_completion_set_model (completion, completion_model);
-    g_object_unref (completion_model);
-    gtk_entry_completion_set_text_column(completion, 0);
+    entryCompletion.completion_model = GTK_TREE_MODEL(store);
+    gtk_entry_completion_set_model (entryCompletion.completion, entryCompletion.completion_model);
+    g_object_unref (entryCompletion.completion_model);
+    gtk_entry_completion_set_text_column(entryCompletion.completion, 0);
     
     //gtk_list_store_clear(store);
     

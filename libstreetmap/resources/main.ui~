@@ -381,14 +381,6 @@
       </packing>
     </child>
   </object>
-<<<<<<< HEAD
-  <object class="GtkEntryCompletion" id="SearchEntryCompletion">
-    <property name="minimum_key_length">2</property>
-    <property name="text_column">0</property>
-    <property name="popup_set_width">False</property>
-  </object>
-=======
->>>>>>> entry completion in progress
   <object class="GtkWindow" id="MainWindow">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -776,4 +768,5 @@
       </object>
     </child>
   </object>
+  <object class="GtkEntryCompletion" id="SearchEntryCompletion"/>
 </interface>
