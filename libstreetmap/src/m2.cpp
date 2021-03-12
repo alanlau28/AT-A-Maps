@@ -254,10 +254,9 @@ void load_map(){
         double delta_x = street_segments[street_segment_id].coordinates[0].x - street_segments[street_segment_id].coordinates[1].x;
         double delta_y = street_segments[street_segment_id].coordinates[0].y - street_segments[street_segment_id].coordinates[1].y;
         double theta = atan2(delta_y, delta_x)* (180/3.141592653);
-        //if (theta > 180) theta -= 180;
-        if (theta > 90) theta -= 180;
-        if (theta < -90) theta += 180;
-        //if (theta < -180) theta += 180;
+
+        
+
         
         street_segments[street_segment_id].angle = theta;
     }
@@ -943,11 +942,15 @@ void draw_street_names (ezgl::renderer *g) {
             
             if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
             
+                double theta = street_segments[i].angle;
+                if (theta > 90) theta -= 180;
+                if (theta < -90) theta += 180;
+                
                 if (street_segments[i].name != "<unknown>" /*&& street_segments[i].name != previous*/) {
 
                     //if (street_segments[i])
                     if (street_segments[i].segment_type == "motorway" && width < 10000 ) {
-                        g->set_text_rotation(street_segments[i].angle);
+                        g->set_text_rotation(theta);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     else if ((street_segments[i].segment_type == "primary" || 
@@ -973,6 +976,10 @@ void draw_street_names (ezgl::renderer *g) {
                 }
 
             }
+        } 
+        //handle curved streets
+        else if (street_segments[i].coordinates.size() > 2) {
+            
         } 
         
         
