@@ -367,7 +367,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
             draw = true;
-            g ->set_color(213,216,219,255);
+            g ->set_color(200, 200, 200,255);
             if(zoom > 25107){
                 g->set_line_width(26);
             }
@@ -402,7 +402,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
             if(zoom > 7){
-                g ->set_color(213,216,219,255);
+                g ->set_color(200, 200, 200,255);
                 draw = true;
             }
             if(zoom > 25107){
@@ -432,7 +432,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else if (street_segments[i].segment_type == "residential"){
             if(zoom > 54){
-                g ->set_color(213,216,219,255);
+                g ->set_color(200, 200, 200,255);
                 draw = true;
             }
             if(zoom > 25107){
@@ -459,7 +459,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom){
         }
         else{
             if(zoom > 151){
-            g ->set_color(213,216,219,255);
+            g ->set_color(200, 200, 200,255);
             draw = true;
             }
             if(zoom > 25071){
@@ -846,6 +846,8 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d large = world.top_right();
     
     //std::cout << bounds.area/area << std::endl;
+    g -> set_color(243,243,239,255); 
+    g -> fill_rectangle(world);
     
     if(getNumStreetSegments() > 1000000) zoom /= 3;
     
