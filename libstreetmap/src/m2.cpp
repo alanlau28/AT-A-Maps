@@ -539,6 +539,36 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
     }
     
 }
+bool checkOverlap (ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d coordinate){
+    //ezgl::point2d offset {width/2, height};
+    ezgl::rectangle source = ezgl::rectangle(coordinate, 3.0, -5.0);
+             //std::cout<<point.x<<" "<<point.y<<std::endl;
+             
+    ezgl::point2d target = g->world_to_screen(source).bottom_left();
+    for(int i = 0; i <drawn.size(); i++){
+       
+        if (drawn[i].contains(target)){
+            return true;
+        }
+    }
+    return false;
+}
+
+void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d point){
+    ezgl::point2d offset {-156, 80};
+    ezgl::rectangle source = ezgl::rectangle(point, 3.0, -5.0);
+             //std::cout<<point.x<<" "<<point.y<<std::endl;
+             
+             ezgl::point2d target = g->world_to_screen(source).bottom_left();
+             //std::cout<<target.x<<" "<<target.y<<std::endl;
+             
+             g->set_coordinate_system(ezgl::SCREEN);
+             //g->fill_rectangle(target+offset, 310,-117);
+             
+             drawn.push_back(ezgl::rectangle (target+offset, 310,-197));
+             std::cout<<drawn.size()<<std::endl;
+             g->set_coordinate_system(ezgl::WORLD);
+}
 
 void drawOneWays(ezgl::renderer *g, double zoom){
     std::vector<ezgl::rectangle> drawn_arrow;
@@ -668,36 +698,6 @@ void draw_features(ezgl::renderer *g, double zoom){
        
         }
     }
-}
-
-bool checkOverlap (ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d coordinate, double width, double height,double spacing){
-    //ezgl::point2d offset {width/2, height};
-    ezgl::rectangle source = ezgl::rectangle(coordinate, 3.0, -5.0);
-             //std::cout<<point.x<<" "<<point.y<<std::endl;
-             
-    ezgl::point2d target = g->world_to_screen(source).bottom_left();
-    for(int i = 0; i <drawn.size(); i++){
-       
-        if (drawn[i].contains(target)){
-            return true;
-        }
-    }
-    return false;
-}
-
-void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d point){
-    ezgl::point2d offset {-156, 40};
-    ezgl::rectangle source = ezgl::rectangle(point, 3.0, -5.0);
-             //std::cout<<point.x<<" "<<point.y<<std::endl;
-             
-             ezgl::point2d target = g->world_to_screen(source).bottom_left();
-             //std::cout<<target.x<<" "<<target.y<<std::endl;
-             
-             g->set_coordinate_system(ezgl::SCREEN);
-             //g->fill_rectangle(target+offset, 310,-117);
-             
-             drawn.push_back(ezgl::rectangle (target+offset, 310,-117));
-             g->set_coordinate_system(ezgl::WORLD);
 }
 
 void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d point){
