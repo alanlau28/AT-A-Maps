@@ -556,7 +556,7 @@ void drawOneWays(ezgl::renderer *g, double zoom){
 void draw_features(ezgl::renderer *g, double zoom){
     for (int i = 0; i<features.size();i++){
         if (features[i].feature_type == "park"&&features[i].numFeaturePoints>1){
-            g ->set_color(195, 236, 178,255);
+            g ->set_color(185, 226, 168,255);
             if(features[i].area>200000){
                 //std::cout<<features[i].area;
             g->fill_poly(features[i].coordinates);
@@ -570,7 +570,7 @@ void draw_features(ezgl::renderer *g, double zoom){
             
             g->fill_poly(features[i].coordinates);
         }else if (features[i].feature_type == "greenspace"&&features[i].numFeaturePoints>1){
-            g ->set_color(181, 219, 167,255);
+            g ->set_color(171, 209, 157,255);
             if(features[i].area>200000){
             g->fill_poly(features[i].coordinates);
             }
@@ -600,7 +600,7 @@ void draw_features(ezgl::renderer *g, double zoom){
             
             g->fill_poly(features[i].coordinates);
         }else if(features[i].feature_type == "building"&&features[i].numFeaturePoints>1&&zoom>1500){
-            g ->set_color(200, 200, 200,255);
+            g ->set_color(180, 180, 180,255);
           
             g->fill_poly(features[i].coordinates);
         }else if((features[i].feature_type == "stream"||features[i].feature_type == "river")&&features[i].numFeaturePoints>1){
@@ -846,10 +846,12 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d large = world.top_right();
     
     //std::cout << bounds.area/area << std::endl;
+    std::cout << getNumStreetSegments() << std::endl;
     g -> set_color(243,243,239,255); 
     g -> fill_rectangle(world);
     
     if(getNumStreetSegments() > 1000000) zoom /= 3;
+    else if(getNumStreetSegments() < 5000) zoom *= 3;
     
     draw_features(g,zoom);
     drawAllStreets(g,zoom);       
@@ -965,7 +967,7 @@ void map_list(GtkListBox* box) {
     app -> change_canvas_world_coordinates("MainCanvas",initial_background);
     ezgl::zoom_fit(app -> get_canvas("MainCanvas"),initial_background);
     bounds.area = app -> get_renderer() -> get_visible_world().area();
-     
+    app -> refresh_drawing(); 
 }
 
 //searchEntry
