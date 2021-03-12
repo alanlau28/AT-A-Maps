@@ -352,8 +352,6 @@ void load_map(){
         }
     }
 
-  
-   
 }
 
     
@@ -991,9 +989,6 @@ void draw_main_canvas (ezgl::renderer *g){
     if(getNumStreetSegments() > 1000000){
         zoom /= 3;
         heavy_map = true;
-    }
-    else if(getNumStreetSegments() < 5000){
-        zoom *= 4;
     }
     draw_features(g,zoom);
     drawAllStreets(g,zoom,heavy_map);       
