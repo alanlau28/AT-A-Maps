@@ -25,7 +25,7 @@ void close_map();
 LatLon latLonFromWorld(double x, double y);
 
 
-ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_avg);
+ezgl::point2d convertCoordinates(double longitude, double latitude);
 
 
 void load_bin();
