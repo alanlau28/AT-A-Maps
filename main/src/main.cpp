@@ -56,8 +56,12 @@ int main(int argc, char** argv) {
     //Load the map and related data structures
     bool load_success = loadMap(map_path);
     if(!load_success) {
-        std::cerr << "Failed to load map '" << map_path << "'\n";
-        return ERROR_EXIT_CODE;
+        do{
+            std::cerr << "Failed to load map '" << map_path << "'\n";
+            std::cout << "Please enter a new map path: " << std::endl;
+            std::cin >> map_path;
+            load_success = loadMap(map_path);
+        }while(!load_success);
     }
 
     std::cout << "Successfully loaded map '" << map_path << "'\n";

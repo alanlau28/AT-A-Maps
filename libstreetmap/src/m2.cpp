@@ -1172,7 +1172,7 @@ void draw_main_canvas (ezgl::renderer *g){
     g -> set_color(243,243,239,255); //LIGHT GREY
     g -> fill_rectangle(world); //fill background of map
     
-    if(getNumStreetSegments() > 1000000) heavy_map = true; //the map is a very large map if it has over 1000000 street segments
+    if(getNumStreetSegments() > 1000000 || bounds.area > 2e+11) heavy_map = true; //check if the map is very large
     
     draw_features(g,zoom);
     drawAllStreets(g,zoom,heavy_map);       
@@ -1181,12 +1181,11 @@ void draw_main_canvas (ezgl::renderer *g){
     
     //draw street names
     draw_street_names(g);
-
+    
+    if(zoom>1500) draw_POI(g, small, large);
 
     drawHighlights(g);
 
-
-     if(zoom>1500) draw_POI(g, small, large);
 }
 
 void initial_setup(ezgl::application *application, bool){
@@ -1444,6 +1443,7 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
  
 }
 
+//clears data structures
 void close_map(){
     closeOSMDatabase();
     street_segments.clear();
