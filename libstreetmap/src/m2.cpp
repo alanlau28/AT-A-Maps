@@ -924,7 +924,6 @@ void draw_street_names (ezgl::renderer *g) {
 
     double width = world.width();
     //std::cout << width << std::endl;
-    std::string previous;
 
      
     for (int i = 0; i < getNumStreetSegments(); i++) {
@@ -947,7 +946,7 @@ void draw_street_names (ezgl::renderer *g) {
             
 
                 
-                if (street_segments[i].name != "<unknown>" && street_segments[i].name != previous) {
+                if (street_segments[i].name != "<unknown>") {
 
                     //if (street_segments[i])
                     if ((street_segments[i].segment_type == "motorway" ||
@@ -977,7 +976,6 @@ void draw_street_names (ezgl::renderer *g) {
                     }
                     //std::cout << street_segments[i].name << " " << street_segments[i].angle << std::endl;
                     
-                    previous = street_segments[i].name;
                 }
 
             }
@@ -1128,6 +1126,9 @@ void initial_setup(ezgl::application *application, bool){
     //for autocorrect
     entryCompletion.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
     gtk_entry_set_completion(entry, entryCompletion.completion);
+    
+    GtkLabel*   mapLoaderLabel = (GtkLabel*) application->get_object("MapLoaderDescription");
+    gtk_label_set_text(mapLoaderLabel, "Now Showing \nToronto, Canada");
 }
 
 
@@ -1190,6 +1191,14 @@ void map_list(GtkListBox* box) {
     global_app -> change_canvas_world_coordinates("MainCanvas",initial_background);
     ezgl::zoom_fit(global_app -> get_canvas("MainCanvas"),initial_background);
     bounds.area = global_app -> get_renderer() -> get_visible_world().area();
+    
+    GtkLabel*   mapLoaderLabel = (GtkLabel*) global_app->get_object("MapLoaderDescription");
+    
+    std::string text = "Now Showing\n ";
+    text.append(gtk_widget_get_tooltip_text ((GtkWidget*) selected));
+    gtk_label_set_text(mapLoaderLabel,text.c_str());
+    
+    
     global_app -> refresh_drawing(); 
 }
 
@@ -1224,16 +1233,7 @@ void search_entry(GtkEntry* entry) {
     entryCompletion.completion_model = GTK_TREE_MODEL(store);
     gtk_entry_completion_set_model (entryCompletion.completion, entryCompletion.completion_model);
     gtk_entry_completion_set_text_column(entryCompletion.completion, 0);
-    
-    //gtk_list_store_clear(store);
-    
-    //after this include streets into entry completion
-//    for (int i = 0; i < street.size(); i++) {
-//        std::cout << getStreetName(street[i]) << " ";
-//    }
-//    std::cout << std::endl;
-    
-    
+
     //after that clear the entry and vector
     street.clear();
 }

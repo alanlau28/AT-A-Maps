@@ -16,6 +16,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Toronto, Canada</property>
             <child>
               <object class="GtkLabel" id="Toronto">
                 <property name="visible">True</property>
@@ -36,6 +37,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Tokyo, Japan</property>
             <child>
               <object class="GtkLabel" id="Tokyo">
                 <property name="name">Tokyo</property>
@@ -56,6 +58,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">New York City, USA</property>
             <child>
               <object class="GtkLabel" id="NewYork">
                 <property name="name">NewYork</property>
@@ -76,6 +79,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Beijing, China</property>
             <child>
               <object class="GtkLabel" id="Beijing">
                 <property name="visible">True</property>
@@ -95,6 +99,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Cairo, Egypt</property>
             <child>
               <object class="GtkLabel" id="Cairo">
                 <property name="name">Cairo</property>
@@ -115,6 +120,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Tehran, Iran</property>
             <child>
               <object class="GtkLabel" id="Tehran">
                 <property name="visible">True</property>
@@ -134,6 +140,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Iceland</property>
             <child>
               <object class="GtkLabel" id="Iceland">
                 <property name="visible">True</property>
@@ -153,6 +160,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Singapore</property>
             <child>
               <object class="GtkLabel" id="Singapore">
                 <property name="visible">True</property>
@@ -172,6 +180,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Sydney, Australia</property>
             <child>
               <object class="GtkLabel" id="Sydney">
                 <property name="visible">True</property>
@@ -191,11 +200,12 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">St. Helena Island</property>
             <child>
               <object class="GtkLabel" id="StHelena">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">St. Helena</property>
+                <property name="label" translatable="yes">St. Helena Island</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
@@ -210,6 +220,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Rio De Janeiro, Brazil</property>
             <child>
               <object class="GtkLabel" id="RioDeJaneiro">
                 <property name="visible">True</property>
@@ -229,6 +240,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">New Delhi, India</property>
             <child>
               <object class="GtkLabel" id="NewDelhi">
                 <property name="visible">True</property>
@@ -252,7 +264,7 @@
               <object class="GtkLabel" id="Moscow">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Moscow</property>
+                <property name="label" translatable="yes">Moscow, Russia</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
@@ -267,11 +279,12 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">London, England</property>
             <child>
               <object class="GtkLabel" id="London">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">London</property>
+                <property name="label" translatable="yes">London, England</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
@@ -286,11 +299,15 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Interlaken, Switzerland</property>
             <child>
               <object class="GtkLabel" id="Interlaken">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Interlaken</property>
+                <property name="margin_top">3</property>
+                <property name="margin_bottom">3</property>
+                <property name="label" translatable="yes">Interlaken, 
+Switzerland</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
@@ -305,6 +322,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Hong Kong</property>
             <child>
               <object class="GtkLabel" id="HongKong">
                 <property name="visible">True</property>
@@ -324,6 +342,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Cape Town</property>
             <child>
               <object class="GtkLabel" id="CapeTown">
                 <property name="visible">True</property>
@@ -343,11 +362,12 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Hamilton, Canada</property>
             <child>
               <object class="GtkLabel" id="Hamilton">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Hamilton</property>
+                <property name="label" translatable="yes">Hamilton, Canada</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
@@ -362,11 +382,16 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Golden Horseshoe, Canada</property>
             <child>
               <object class="GtkLabel" id="GoldenHorseshoe">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Golden Horseshoe</property>
+                <property name="margin_top">3</property>
+                <property name="margin_bottom">3</property>
+                <property name="label" translatable="yes">Golden Horseshoe,
+Canada</property>
+                <property name="justify">center</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
@@ -618,6 +643,25 @@
               <packing>
                 <property name="left_attach">0</property>
                 <property name="top_attach">0</property>
+                <property name="width">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="MapLoaderDescription">
+                <property name="width_request">100</property>
+                <property name="height_request">100</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">label</property>
+                <property name="justify">center</property>
+                <attributes>
+                  <attribute name="font-desc" value="Serif 15"/>
+                  <attribute name="weight" value="medium"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">10</property>
                 <property name="width">3</property>
               </packing>
             </child>
