@@ -983,15 +983,14 @@ void draw_street_names (ezgl::renderer *g) {
     ezgl::rectangle world = g->get_visible_world();
 
     g->format_font(default_font, ezgl::font_slant::normal, ezgl::font_weight::normal);
-
+    
+    
     double width = world.width();
-    //std::cout << width << std::endl;
-
-    std::string previous = ""; 
+    std::cout << width << std::endl;
     
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
-        g->set_color(0,0,0);
+        g->set_color(ezgl::GREY_75);
         g->set_font_size(15);
         
         //if straight street segment
@@ -1005,23 +1004,24 @@ void draw_street_names (ezgl::renderer *g) {
             
             if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {            
                 
-                if (street_segments[i].name != "<unknown>" && street_segments[i].name != previous) {
+                if (street_segments[i].name != "<unknown>") {
 
                     //if (street_segments[i])
                     if ((street_segments[i].segment_type == "motorway" ||
+                         street_segments[i].segment_type == "motorway_link" ||
                         street_segments[i].segment_type == "primary" )&& width < 10000 ) {
                         g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     else if ((street_segments[i].segment_type == "trunk" ||
-                            street_segments[i].segment_type == "secondary")&& width < 7000) {
+                            street_segments[i].segment_type == "secondary")&& width < 7500) {
                         g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     else if((street_segments[i].segment_type == "tertiary" || 
                             street_segments[i].segment_type == "unclassified" || 
                             street_segments[i].segment_type == "living_street" ||
-                            street_segments[i].segment_type == "residential") && width < 3000){
+                            street_segments[i].segment_type == "residential") && width < 3500){
                         g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     } 
@@ -1030,7 +1030,6 @@ void draw_street_names (ezgl::renderer *g) {
                         g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
-                    previous = street_segments[i].name;
                     //std::cout << street_segments[i].name << " " << street_segments[i].angle << std::endl;
                     
                 }
@@ -1058,22 +1057,22 @@ void draw_street_names (ezgl::renderer *g) {
 
                         //if (street_segments[i])
                         if ((street_segments[i].segment_type == "motorway" ||
-                            street_segments[i].segment_type == "primary" )&& width < 10000 ) {
+                             street_segments[i].segment_type == "motorway_link" ||
+                             street_segments[i].segment_type == "primary" ) && width < 10000 ) {
                             g->set_text_rotation(street_segments[i].angle[j]);
                             g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                         }
                         else if ((street_segments[i].segment_type == "trunk" ||
-                                street_segments[i].segment_type == "secondary")&& width < 7000) {
+                                street_segments[i].segment_type == "secondary")&& width < 7500) {
                             g->set_text_rotation(street_segments[i].angle[j]);
                             g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                         }
                         else if((street_segments[i].segment_type == "tertiary" || 
                                 street_segments[i].segment_type == "unclassified" || 
                                 street_segments[i].segment_type == "living_street" ||
-                                street_segments[i].segment_type == "residential") && width < 3000){
+                                street_segments[i].segment_type == "residential") && width < 3500){
                             g->set_text_rotation(street_segments[i].angle[j]);
-                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
-                            //std::cout << street_segments[i].name << " " << street_segments[i].angle << std::endl;
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);          
                         } 
                         else if (width < 1000){
 
