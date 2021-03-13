@@ -841,7 +841,7 @@ void draw_features(ezgl::renderer *g, double zoom){
 void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d point){
     //format font to default
     g->format_font(default_font, ezgl::font_slant::normal, ezgl::font_weight::normal);
-    g->set_font_size(22);
+    g->set_font_size(20);
     g->set_text_rotation(0);
     g->set_color(color);
     g->draw_text(point, word, 50, 25);
