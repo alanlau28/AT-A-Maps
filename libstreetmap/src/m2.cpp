@@ -14,25 +14,25 @@
 #include <point.hpp>
 #include <unordered_set>
 
-
-struct boundingbox{
-    double max_x;
+struct boundingBox{
+    double max_x; // the max and min x,y coordinates of the map
     double max_y;
     double min_x;
     double min_y;
-    double lat_avg;
-    double area;
+    
+    double lat_avg; //the average latitude of the city drawn
+    double area; //the area of the map
 };
 
 struct street_segment_data{
-    std::vector<ezgl::point2d> coordinates;
-    std::string name;
-    double angle;
-    float speed_limit;
-    StreetIdx street_id;
-    std::string segment_type;
-    bool one_way;
-    bool highlight;
+    std::vector<ezgl::point2d> coordinates;         //x,y coordinate of every point on the street segment in point2d
+    std::string name;           //name of the street
+    double angle;       //angle of the segment with respect to the x-axis
+    float speed_limit;      //speed limit of the street segment
+    StreetIdx street_id;        //street id of street the segment is apart of
+    std::string segment_type;        //type of street eg.motorway, primary, secondary
+    bool one_way;       //true if street is a one way, false otherwise
+    bool highlight;         //true if the street segment is highlighted on the map, false otherwise
 };
 
 
@@ -63,12 +63,24 @@ struct entry_completion{
     GtkTreeModel* completion_model;
 };
 
+//holds all the street segments and its respective data
+//street segment id as indices
 std::vector<street_segment_data> street_segments;
+
+//holds all the features and its respective data
+//feature id as indices
 std::vector<feature_data> features;
+
 std::vector<POI_data> pointOfInterests;
+
+//holds every intersection and its respective data
+//intersection id as indices
+std::vector<intersection_data> intersections;
+
+
 std::vector<std::vector<StreetSegmentIdx>> street_segments_of_street;
 
-
+//holds the priority of each feature to be drawn as strings in order
 std::vector<std::string> feature_priority;
 
 std::vector<POI_data>  fuel;
@@ -90,41 +102,57 @@ std::vector<POI_data>  library;
 std::string default_font;
 
 
-
-
-std::vector<intersection_data> intersections;
-
+//holds the street type of every street
+//OSMID as the key and the street type string as the value
 std::unordered_map <OSMID,std::string> street_types;
 
+//holes the osm.bin path for every city in the database
+//streets.bin path as the key and osm.bin path as the value
 std::unordered_map<std::string,std::string> map_paths;
 
-struct boundingbox bounds;
+//holds the bounds of the map
+struct boundingBox bounds;
+
 struct entry_completion entryCompletion;
 
+//pointer to application when application.run is run
 ezgl::application* global_app;
 
 
 
 bool operator< (feature_data& first, feature_data& second){
-    if(std::find(feature_priority.begin(),feature_priority.end(),first.feature_type) - feature_priority.begin() < std::find(feature_priority.begin(),feature_priority.end(),second.feature_type) - feature_priority.begin()) return true;
-    else return false;
+    auto begin = feature_priority.begin();
+    auto end = feature_priority.end();
+    
+    //return true if the first feature is a lower priority than the second feature
+    //else return false
+    if(std::find(begin,end,first.feature_type) - begin < std::find(begin,end,second.feature_type) - begin){
+        return true;
+    }
+    else {
+        return false;
+    }
 }
-//(x, y) = (R·lon·cos(latavg), R·lat)
+//converts world coordinates (x,y) to latitude and longitude
 LatLon latLonFromWorld(double x, double y){
+    
     float lon = x / kEarthRadiusInMeters / cos(bounds.lat_avg) / kDegreeToRadian;
     float lat = y / kEarthRadiusInMeters / kDegreeToRadian;
     LatLon position(lat,lon);
+    
     return position;
 }
-ezgl::point2d convertCoordinates(double longitude, double latitude, double lat_avg){
+//converts latitude and longitude into a world coordinate (x,y)
+ezgl::point2d convertCoordinates(double longitude, double latitude){
     
-    double x = kEarthRadiusInMeters * longitude * cos(lat_avg) * kDegreeToRadian;
+    double x = kEarthRadiusInMeters * longitude * cos(bounds.lat_avg) * kDegreeToRadian;
     double y = kEarthRadiusInMeters * latitude * kDegreeToRadian;
     ezgl::point2d point(x,y);
     
     return point;
 }
 
+//loads an unordered map of all the paths to streets.bin and osm.bin
 void load_bin(){
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/beijing_china.streets.bin","/cad2/ece297s/public/maps/beijing_china.osm.bin"));
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/cairo_egypt.streets.bin","/cad2/ece297s/public/maps/cairo_egypt.osm.bin"));
@@ -147,6 +175,7 @@ void load_bin(){
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/toronto_canada.streets.bin","/cad2/ece297s/public/maps/toronto_canada.osm.bin"));    
 }
 
+//loads the priority of features into a vector
 void loadFeaturePriority(){
     feature_priority.push_back("lake");
     feature_priority.push_back("island");
@@ -160,6 +189,7 @@ void loadFeaturePriority(){
 }
 
 void load_map(){
+    
     loadOSMDatabaseBIN(map_paths.find(map_load_path) -> second);
     
     street_segments.resize(getNumStreetSegments());
@@ -184,16 +214,21 @@ void load_map(){
     bounds.min_x = kEarthRadiusInMeters * min_lon * cos(bounds.lat_avg) * kDegreeToRadian;
     bounds.min_y = kEarthRadiusInMeters * min_lat * kDegreeToRadian;
     
-    
+    //loops through all the osm ways to find the street types and loads it into the street segment data
     for(int i =0;i < getNumberOfWays();i++){
-        const OSMWay *curr = getWayByIndex(i);
+        const OSMWay *curr = getWayByIndex(i); //pointer to the way
+        
+        //loop through the tags of the current way
         for (int j = 0; j < getTagCount(curr); j++) {
             std::pair<std::string, std::string> tagPair = getTagPair(curr, j);
+            
+            //if the tag is the street type, load it into data and go onto next tag
             if(tagPair.first == "highway"){
                 std::pair<OSMID,std::string> street_type = std::make_pair(curr->id(),tagPair.second);
                 street_types.insert(street_type);
                 break;
             }
+            
         }
     }
     
@@ -219,11 +254,11 @@ void load_map(){
             LatLon pos_from = getIntersectionPosition(street_seg_info.from);
             LatLon pos_to = getIntersectionPosition(street_seg_info.to);
             
-            ezgl::point2d coordinate = convertCoordinates(pos_from.longitude(),pos_from.latitude(),bounds.lat_avg);
+            ezgl::point2d coordinate = convertCoordinates(pos_from.longitude(),pos_from.latitude());
             street_segments[street_segment_id].coordinates.push_back(coordinate);
             
             
-            coordinate = convertCoordinates(pos_to.longitude(),pos_to.latitude(),bounds.lat_avg);
+            coordinate = convertCoordinates(pos_to.longitude(),pos_to.latitude());
             street_segments[street_segment_id].coordinates.push_back(coordinate);
            
         }
@@ -231,17 +266,17 @@ void load_map(){
         //if the street segment has curve points
         else{
             LatLon point = getIntersectionPosition(street_seg_info.from);
-            ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+            ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude());
             street_segments[street_segment_id].coordinates.push_back(coordinate);
             
             for(int i = 0; i < numCurvePoints; i++){
                 point = getStreetSegmentCurvePoint(street_segment_id,i);
-                coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+                coordinate = convertCoordinates(point.longitude(),point.latitude());
                 street_segments[street_segment_id].coordinates.push_back(coordinate);
             }
 
             point = getIntersectionPosition(street_seg_info.to);
-            coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+            coordinate = convertCoordinates(point.longitude(),point.latitude());
             street_segments[street_segment_id].coordinates.push_back(coordinate);
         }
         
@@ -272,7 +307,7 @@ void load_map(){
         features[featureidx].numFeaturePoints = getNumFeaturePoints(featureidx);
         for(int i = 0; i < features[featureidx].numFeaturePoints; i++){
             LatLon point = getFeaturePoint(featureidx,i);
-            ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+            ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude());
             features[featureidx].coordinates.push_back(coordinate);
             //std::cout<<" wwww\n"<<features[featureidx].feature_type;
         }
@@ -287,7 +322,7 @@ void load_map(){
     
     for (int i = 0; i < getNumIntersections(); i++) {
         LatLon point = getIntersectionPosition(i);
-        ezgl::point2d coordinate = convertCoordinates(point.longitude(), point.latitude(), bounds.lat_avg);
+        ezgl::point2d coordinate = convertCoordinates(point.longitude(), point.latitude());
         intersections[i].highlight = false;
         intersections[i].position = point;
         intersections[i].coordinate = coordinate;
@@ -306,7 +341,7 @@ void load_map(){
         pointOfInterests[poiidx].name = getPOIName(poiidx);
         pointOfInterests[poiidx].type = poitype;
         LatLon point = getPOIPosition(poiidx);
-       ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude(),bounds.lat_avg);
+       ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude());
         pointOfInterests[poiidx].coordinate = coordinate;
         //types.push_back(getPOIType(poiidx));
         
@@ -365,6 +400,7 @@ void load_map(){
 void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
     bool draw = false;
     g -> set_line_cap(ezgl::line_cap::round);
+    if(heavy) zoom /= 3;
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
         if(street_segments[i].segment_type == "motorway" ||street_segments[i].segment_type == "motorway_link"){
@@ -565,9 +601,10 @@ void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl:
              g->set_coordinate_system(ezgl::WORLD);
 }
 
-void drawOneWays(ezgl::renderer *g, double zoom){
+void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
     std::vector<ezgl::rectangle> drawn_arrow;
     g ->set_color(ezgl::BLACK);
+    if(heavy) zoom /= 3;
     bool draw;
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
@@ -593,39 +630,40 @@ void drawOneWays(ezgl::renderer *g, double zoom){
             
             if(!checkOverlap(g,drawn_arrow,start)){
                 convert_point(g, drawn_arrow, start);
-            if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
-                if(zoom > 25000){
-                    g -> draw_text(start,"→",100,100); 
+                start.x -= 2;
+                if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
+                    if(zoom > 25000 && !heavy){
+                        g -> draw_text(start,"→",100,100); 
+                    }
+                    else{
+                        g -> draw_text(start,"→",50,50);
+                    }
+                }
+                else if(start.x - finish.x <= 0 && start.y - finish.y <= 0){
+                    if(zoom > 25000 && !heavy){
+                        g -> draw_text(start,"→",100,100);
+                    }
+                    else{
+                        g -> draw_text(start,"→",50,50);
+                    }
+                }
+                else if(start.x - finish.x >= 0 && start.y - finish.y >= 0){
+                    if(zoom > 25000 && !heavy){
+                        g -> draw_text(start,"←",100,100);
+                    }
+                    else{
+                        g -> draw_text(start,"←",50,50);
+                    }
                 }
                 else{
-                    g -> draw_text(start,"→",50,50);
+                    if(zoom > 25000 && !heavy){
+                        g -> draw_text(start,"←",100,100);
+                    }
+                    else{
+                        g -> draw_text(start,"←",50,50);
+                    }
                 }
             }
-            else if(start.x - finish.x <= 0 && start.y - finish.y <= 0){
-                if(zoom > 25000){
-                    g -> draw_text(start,"→",100,100);
-                }
-                else{
-                    g -> draw_text(start,"→",50,50);
-                }
-            }
-            else if(start.x - finish.x >= 0 && start.y - finish.y >= 0){
-                if(zoom > 25000){
-                    g -> draw_text(start,"←",100,100);
-                }
-                else{
-                    g -> draw_text(start,"←",50,50);
-                }
-            }
-            else{
-                if(zoom > 25000){
-                    g -> draw_text(start,"←",100,100);
-                }
-                else{
-                    g -> draw_text(start,"←",50,50);
-                }
-            }
-        }
         }
         
     }
@@ -709,7 +747,9 @@ void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d 
 
 }
 //all png used in this function come from https://mapicons.mapsmarker.com/
+//Map Icons Collection. [Online]. Available: https://mapicons.mapsmarker.com/.
 void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){    
+
      ezgl::surface *png_surface; 
      png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
      ezgl::point2d point {.0,.0};
@@ -1057,14 +1097,13 @@ void draw_main_canvas (ezgl::renderer *g){
     g -> fill_rectangle(world);
     
     if(getNumStreetSegments() > 1000000){
-        zoom /= 3;
         heavy_map = true;
     }
     draw_features(g,zoom);
     drawAllStreets(g,zoom,heavy_map);       
     
     if(zoom > 3249){
-        drawOneWays(g,zoom);
+        drawOneWays(g,zoom,heavy_map);
     }
     
     //draw street names
