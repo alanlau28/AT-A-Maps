@@ -332,16 +332,16 @@ void load_map(){
         features[featureidx].feature_type = asString(getFeatureType(featureidx));
         features[featureidx].area = findFeatureArea(featureidx);
         features[featureidx].numFeaturePoints = getNumFeaturePoints(featureidx);
+        
         //load all points of a feature to vector
         for(int i = 0; i < features[featureidx].numFeaturePoints; i++){
             LatLon point = getFeaturePoint(featureidx,i);
             ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude());
-            features[featureidx].coordinates.push_back(coordinate);
-            
+            features[featureidx].coordinates.push_back(coordinate);  
         }
     }
     
-    //sort using overloaded operator<
+    //sort the vector to be in the order to be drawn
     std::sort(features.begin(),features.end()); 
     
     //Gets coordinate of each intersection
