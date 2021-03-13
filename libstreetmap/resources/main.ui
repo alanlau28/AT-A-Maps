@@ -330,7 +330,7 @@ Switzerland</property>
               <object class="GtkLabel" id="HongKong">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Hong Kong</property>
+                <property name="label" translatable="yes">Hong Kong, China</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
@@ -350,7 +350,7 @@ Switzerland</property>
               <object class="GtkLabel" id="CapeTown">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Cape Town</property>
+                <property name="label" translatable="yes">Cape Town, South Africa</property>
                 <attributes>
                   <attribute name="foreground" value="#000000000000"/>
                 </attributes>
