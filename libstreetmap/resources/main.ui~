@@ -58,7 +58,8 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="tooltip_text" translatable="yes">New York City, USA</property>
+            <property name="tooltip_text" translatable="yes">New York City, 
+USA</property>
             <child>
               <object class="GtkLabel" id="NewYork">
                 <property name="name">NewYork</property>
@@ -220,7 +221,8 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="tooltip_text" translatable="yes">Rio De Janeiro, Brazil</property>
+            <property name="tooltip_text" translatable="yes">Rio De Janeiro, 
+Brazil</property>
             <child>
               <object class="GtkLabel" id="RioDeJaneiro">
                 <property name="visible">True</property>
@@ -260,6 +262,7 @@
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Moscow, Russia</property>
             <child>
               <object class="GtkLabel" id="Moscow">
                 <property name="visible">True</property>
@@ -382,7 +385,8 @@ Switzerland</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="tooltip_text" translatable="yes">Golden Horseshoe, Canada</property>
+            <property name="tooltip_text" translatable="yes">Golden Horseshoe, 
+Canada</property>
             <child>
               <object class="GtkLabel" id="GoldenHorseshoe">
                 <property name="visible">True</property>

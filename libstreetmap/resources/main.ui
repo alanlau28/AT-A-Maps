@@ -262,6 +262,7 @@ Brazil</property>
             <property name="height_request">50</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="tooltip_text" translatable="yes">Moscow, Russia</property>
             <child>
               <object class="GtkLabel" id="Moscow">
                 <property name="visible">True</property>

@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include "load_database.h"
 #include "m2_header.h"
+#include <gtk/gtk.h>
 #include <point.hpp>
 #include <unordered_set>
 
@@ -27,12 +28,13 @@ struct boundingBox{
 struct street_segment_data{
     std::vector<ezgl::point2d> coordinates;         //x,y coordinate of every point on the street segment in point2d
     std::string name;           //name of the street
-    double angle;       //angle of the segment with respect to the x-axis
+    std::vector <double> angle;       //angle of the segment with respect to the x-axis
     float speed_limit;      //speed limit of the street segment
     StreetIdx street_id;        //street id of street the segment is apart of
     std::string segment_type;        //type of street eg.motorway, primary, secondary
     bool one_way;       //true if street is a one way, false otherwise
     bool highlight;         //true if the street segment is highlighted on the map, false otherwise
+
 };
 
 
@@ -282,15 +284,16 @@ void load_map(){
         
         
         //get angle of street
-        double delta_x = street_segments[street_segment_id].coordinates[0].x - street_segments[street_segment_id].coordinates[1].x;
-        double delta_y = street_segments[street_segment_id].coordinates[0].y - street_segments[street_segment_id].coordinates[1].y;
-        double theta = atan2(delta_y, delta_x)* (180/3.141592653);
-        if (theta > 90) theta -= 180;
-        if (theta < -90) theta += 180;
+        for (int i = 0; i < street_segments[street_segment_id].coordinates.size()-1; i++) {
+            double delta_x = street_segments[street_segment_id].coordinates[i].x - street_segments[street_segment_id].coordinates[i+1].x;
+            double delta_y = street_segments[street_segment_id].coordinates[i].y - street_segments[street_segment_id].coordinates[i+1].y;
+            double theta = atan2(delta_y, delta_x)* (180/3.141592653);
+            if (theta > 90) theta -= 180;
+            if (theta < -90) theta += 180;
         
-
+            street_segments[street_segment_id].angle.push_back(theta);
+        }
         
-        street_segments[street_segment_id].angle = theta;
     }
     
    
@@ -623,7 +626,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
         ezgl::point2d start = street_segments[i].coordinates[0];
         ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
         if(draw && street_segments[i].one_way&& g->get_visible_world().contains(start)){
-            double angle = street_segments[i].angle;
+            double angle = street_segments[i].angle[0];
 
             g ->set_text_rotation(angle);
             
@@ -960,11 +963,12 @@ void draw_street_names (ezgl::renderer *g) {
     double width = world.width();
     //std::cout << width << std::endl;
 
-     
+    std::string previous = ""; 
+    
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
         g->set_color(0,0,0);
-        g->set_font_size(12);
+        g->set_font_size(15);
         
         //if straight street segment
         if (street_segments[i].coordinates.size() == 2 ) {
@@ -975,40 +979,34 @@ void draw_street_names (ezgl::renderer *g) {
             double xBound = std::abs(street_segments[i].coordinates[1].x - street_segments[i].coordinates[0].x);
             double yBound = std::abs(street_segments[i].coordinates[1].y - street_segments[i].coordinates[0].y);
             
-            double theta = street_segments[i].angle;
-            
-            if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
-            
-
+            if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {            
                 
-                if (street_segments[i].name != "<unknown>") {
+                if (street_segments[i].name != "<unknown>" && street_segments[i].name != previous) {
 
                     //if (street_segments[i])
                     if ((street_segments[i].segment_type == "motorway" ||
                         street_segments[i].segment_type == "primary" )&& width < 10000 ) {
-                        g->set_text_rotation(theta);
+                        g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     else if ((street_segments[i].segment_type == "trunk" ||
                             street_segments[i].segment_type == "secondary")&& width < 7000) {
-                        g->set_text_rotation(theta);
-                        g->set_font_size(14);
+                        g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     else if((street_segments[i].segment_type == "tertiary" || 
                             street_segments[i].segment_type == "unclassified" || 
                             street_segments[i].segment_type == "living_street" ||
                             street_segments[i].segment_type == "residential") && width < 3000){
-                        g->set_text_rotation(theta);
-                        g->set_font_size(16);
+                        g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     } 
                     else if (width < 1000){
                         
-                        g->set_text_rotation(theta);
-                        g->set_font_size(20);
+                        g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
+                    previous = street_segments[i].name;
                     //std::cout << street_segments[i].name << " " << street_segments[i].angle << std::endl;
                     
                 }
@@ -1017,11 +1015,52 @@ void draw_street_names (ezgl::renderer *g) {
         } 
         //handle curved streets
         else if (street_segments[i].coordinates.size() > 2) {
-            
+            for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
+                double x = (street_segments[i].coordinates[j+1].x + 
+                            street_segments[i].coordinates[j].x)/2;
+                
+                double y = (street_segments[i].coordinates[j+1].y + 
+                            street_segments[i].coordinates[j].y)/2;
+
+                double xBound = std::abs(street_segments[i].coordinates[j+1].x  
+                                       - street_segments[i].coordinates[j].x);
+
+                double yBound = std::abs(street_segments[i].coordinates[j+1].y
+                                       - street_segments[i].coordinates[j].y);
+                
+                
+                if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
+                    if (street_segments[i].name != "<unknown>" ) {
+
+                        //if (street_segments[i])
+                        if ((street_segments[i].segment_type == "motorway" ||
+                            street_segments[i].segment_type == "primary" )&& width < 10000 ) {
+                            g->set_text_rotation(street_segments[i].angle[j]);
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                        }
+                        else if ((street_segments[i].segment_type == "trunk" ||
+                                street_segments[i].segment_type == "secondary")&& width < 7000) {
+                            g->set_text_rotation(street_segments[i].angle[j]);
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                        }
+                        else if((street_segments[i].segment_type == "tertiary" || 
+                                street_segments[i].segment_type == "unclassified" || 
+                                street_segments[i].segment_type == "living_street" ||
+                                street_segments[i].segment_type == "residential") && width < 3000){
+                            g->set_text_rotation(street_segments[i].angle[j]);
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                            //std::cout << street_segments[i].name << " " << street_segments[i].angle << std::endl;
+                        } 
+                        else if (width < 1000){
+
+                            g->set_text_rotation(street_segments[i].angle[j]);
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                        }
+                        
+                    }
+                }
+            }
         } 
-        
-        
-        //global_app->refresh_drawing();
         
     }
 
@@ -1304,8 +1343,7 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
     //clear any previous highlights
     clearHighlights();
-    
-            
+        
     //for error handling
     GtkPopover* popOver = (GtkPopover*) app->get_object("FindPopOver");
     GtkLabel*   popOverLabel = (GtkLabel*) app->get_object("FindPopOverLabel");
