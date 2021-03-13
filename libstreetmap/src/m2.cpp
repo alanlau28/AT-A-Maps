@@ -1,8 +1,6 @@
 #include "StreetsDatabaseAPI.h"
 #include "m2.h"
 #include "m1.h"
-#include "ezgl/application.hpp"
-#include "ezgl/graphics.hpp"
 #include "OSMDatabaseAPI.h"
 #include <math.h>
 #include <iostream>
@@ -12,10 +10,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include "load_database.h"
-
-#include <gtk/gtk.h>
-
-
+#include "m2_header.h"
 #include <point.hpp>
 #include <unordered_set>
 
@@ -48,6 +43,7 @@ struct feature_data{
     int numFeaturePoints;
     double area;
 };
+bool operator< (feature_data& first, feature_data& second);
 
 struct POI_data{
     ezgl::point2d coordinate {.0, .0};
@@ -92,7 +88,7 @@ std::vector<POI_data>  art;
 std::vector<POI_data>  library;
 
 std::string default_font;
-//std::string arabic = "Noto Sans Arabic";
+
 
 
 
@@ -107,7 +103,7 @@ struct entry_completion entryCompletion;
 
 ezgl::application* global_app;
 
-void close_map();
+
 
 bool operator< (feature_data& first, feature_data& second){
     if(std::find(feature_priority.begin(),feature_priority.end(),first.feature_type) - feature_priority.begin() < std::find(feature_priority.begin(),feature_priority.end(),second.feature_type) - feature_priority.begin()) return true;
@@ -560,13 +556,12 @@ void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl:
              //std::cout<<point.x<<" "<<point.y<<std::endl;
              
              ezgl::point2d target = g->world_to_screen(source).bottom_left();
-             //std::cout<<target.x<<" "<<target.y<<std::endl;
-             
+                          
              g->set_coordinate_system(ezgl::SCREEN);
-             //g->fill_rectangle(target+offset, 310,-117);
+             //g->fill_rectangle(target+offset, 310,-197);
              
              drawn.push_back(ezgl::rectangle (target+offset, 310,-197));
-             std::cout<<drawn.size()<<std::endl;
+             //std::cout<<drawn.size()<<std::endl;
              g->set_coordinate_system(ezgl::WORLD);
 }
 
@@ -714,7 +709,7 @@ void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d 
 
 }
 //all png used in this function come from https://mapicons.mapsmarker.com/
-void draw_POI (ezgl::renderer *g, double zoom, ezgl::point2d small, ezgl::point2d large){    
+void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){    
      ezgl::surface *png_surface; 
      png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
      ezgl::point2d point {.0,.0};
@@ -1056,7 +1051,7 @@ void draw_main_canvas (ezgl::renderer *g){
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
     
-    std::cout<<zoom<<std::endl;
+    //std::cout<<zoom<<std::endl;
 
     g -> set_color(243,243,239,255); 
     g -> fill_rectangle(world);
@@ -1080,18 +1075,12 @@ void draw_main_canvas (ezgl::renderer *g){
 
 
      if(zoom>1500){
-        draw_POI(g,zoom,small, large);
+        draw_POI(g, small, large);
     }
 
 
 }
 
-
-//UI function declarations for convenience
-void search_entry(GtkEntry* entry );
-void search_entry_activate(GtkEntry* entry);
-void find_button(GtkWidget * /*widget*/ , ezgl::application *app);
-void map_list(GtkListBox* box);
 
 
 void initial_setup(ezgl::application *application, bool){
