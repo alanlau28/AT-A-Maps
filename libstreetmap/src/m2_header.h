@@ -39,7 +39,15 @@ void load_map();
 
 void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy);
 
-
+/**
+ * Provides functions to check for overlapping of points. 
+ * 
+ * Given a vector of bounding boxes, check if the new point is within any boxes.
+ * 
+ * @param *g: ezgl renderer
+ * @param drawn: vector of bounding boxes
+ * @param coordinate: coordinate of point in question, in point2d
+ */
 bool checkOverlap (ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d coordinate);
 
 /**
