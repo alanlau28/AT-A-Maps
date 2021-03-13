@@ -990,7 +990,7 @@ void draw_street_names (ezgl::renderer *g) {
     
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
-        g->set_color(ezgl::GREY_75);
+        g->set_color(95, 95, 95);
         g->set_font_size(15);
         
         //if straight street segment
@@ -1025,7 +1025,7 @@ void draw_street_names (ezgl::renderer *g) {
                         g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     } 
-                    else if (width < 1000){
+                    else if (width < 2500){
                         
                         g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
@@ -1074,7 +1074,7 @@ void draw_street_names (ezgl::renderer *g) {
                             g->set_text_rotation(street_segments[i].angle[j]);
                             g->draw_text({x, y}, street_segments[i].name, xBound, yBound);          
                         } 
-                        else if (width < 1000){
+                        else if (width < 2500){
 
                             g->set_text_rotation(street_segments[i].angle[j]);
                             g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
