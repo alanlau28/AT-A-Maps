@@ -844,7 +844,7 @@ void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d 
     g->set_font_size(22);
     g->set_text_rotation(0);
     g->set_color(color);
-    g->draw_text(point, word, 40, 20);
+    g->draw_text(point, word, 50, 25);
 }
 
 //all png used in this function come from https://mapicons.mapsmarker.com/
