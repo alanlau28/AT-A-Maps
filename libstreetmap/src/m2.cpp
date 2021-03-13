@@ -59,6 +59,7 @@ struct intersection_data{
     std::string name;
 };
 
+//global variable used for entry completion to work properly
 struct entry_completion{
     GtkEntryCompletion* completion;
     GtkTreeModel* completion_model;
@@ -76,7 +77,9 @@ std::vector<feature_data> features;
 //intersection id as indices
 std::vector<intersection_data> intersections;
 
-
+//vector of vectors, stores [street Index] [street segment numbers]
+//used to precompute the street segments of each street and return 
+//it efficiently
 std::vector<std::vector<StreetSegmentIdx>> street_segments_of_street;
 
 //holds the priority of each feature to be drawn as strings in order
@@ -114,6 +117,9 @@ std::unordered_map<std::string,std::string> map_paths;
 //holds the bounds of the map
 struct boundingBox bounds;
 
+//global variable used to set entryCompletion
+//used so that the same entry completion can be used 
+//for every instance the search entry is changed
 struct entry_completion entryCompletion;
 
 //pointer to application when application.run is run
@@ -285,11 +291,14 @@ void load_map(){
         }
         
         
-        //get angle of street
+        //get angle of each street segment and push to vector containing street segment angles
         for (int i = 0; i < street_segments[street_segment_id].coordinates.size()-1; i++) {
+            
             double theta;
             double delta_x = street_segments[street_segment_id].coordinates[i].x - street_segments[street_segment_id].coordinates[i+1].x;
             double delta_y = street_segments[street_segment_id].coordinates[i].y - street_segments[street_segment_id].coordinates[i+1].y;
+            
+            //if street is vertical or horizontal, set angles, otherwise use equation
             if (std::abs(delta_x) > 0 && std::abs(delta_y) > 0) {
                 theta = atan2(delta_y, delta_x)* (180/3.141592653);
             } else if (delta_x == 0) {
@@ -298,6 +307,8 @@ void load_map(){
                 theta = 0;
             }
             
+            //needed for making every street name oriented properly, otherwise
+            //we get upside down street names
             if (theta > 90) theta -= 180;
             if (theta < -90) theta += 180;
         
@@ -1034,41 +1045,44 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
 
 }
 
+//draws the streets names of each street by iterating through all visible street segments
+//runs once each time screen is refreshed
 void draw_street_names (ezgl::renderer *g) {
     
+    //for checking if visible within screen
     ezgl::rectangle world = g->get_visible_world();
-
+    
+    //for handling maps with different languages
     g->format_font(default_font, ezgl::font_slant::normal, ezgl::font_weight::normal);
     
-    
+    //width used to calculate zoom level
     double width = world.width();
-    //std::cout << width << std::endl;
-    
-    std::string previous = " ";
     
     for (int i = 0; i < getNumStreetSegments(); i++) {
         
+        //set text color to dark gray for looking good
         g->set_color(95, 95, 95);
         g->set_font_size(15);
         
         //if straight street segment
         if (street_segments[i].coordinates.size() == 2 ) {
-
+            
+            //find midpoint of street segment
             double x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
             double y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
-            
 
-            
+            //if visible within world, then draw
             if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {            
-                
+            
+            //sets bounds for text to be drawn, if text doesn't fit it doesn't get drawn
             double xBound = std::abs(street_segments[i].coordinates[1].x 
                                      - street_segments[i].coordinates[0].x) + 5.0;
             double yBound = std::abs(street_segments[i].coordinates[1].y 
                                      - street_segments[i].coordinates[0].y) + 5.0;
-            
+                
                 if (street_segments[i].name != "<unknown>" ) {
 
-                    //if (street_segments[i])
+                    //draw streets at different zoom levels, draw more important streets first
                     if ((street_segments[i].segment_type == "motorway" ||
                          street_segments[i].segment_type == "motorway_link" ||
                          street_segments[i].segment_type == "primary"  ||
@@ -1090,35 +1104,34 @@ void draw_street_names (ezgl::renderer *g) {
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     } 
                     else if (width < 2500){
-                        
                         g->set_text_rotation(street_segments[i].angle[0]);
                         g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
-                    //std::cout << street_segments[i].name << " " << xBound << " " << yBound << std::endl;
-
                 }
-
             }
         } 
         //handle curved streets
         else if (street_segments[i].coordinates.size() > 2) {
             for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
+                
+                //find midpoint of curved segment
                 double x = (street_segments[i].coordinates[j+1].x + 
                             street_segments[i].coordinates[j].x)/2;
                 
                 double y = (street_segments[i].coordinates[j+1].y + 
                             street_segments[i].coordinates[j].y)/2;
 
-                
+                //if visible within screen, then draw
                 if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
                     if (street_segments[i].name != "<unknown>") {
-                     
+                        
+                        //sets bounds for text to be drawn, if text doesn't fit it doesn't get drawn
                         double xBound = std::abs(street_segments[i].coordinates[j+1].x  
                                        - street_segments[i].coordinates[j].x) + 5.0;
 
                         double yBound = std::abs(street_segments[i].coordinates[j+1].y
                                        - street_segments[i].coordinates[j].y) + 5.0;
-                        //if (street_segments[i])
+                        //draw streets at different zoom levels, draw more important streets first
                         if ((street_segments[i].segment_type == "motorway" ||
                              street_segments[i].segment_type == "motorway_link" ||
                              street_segments[i].segment_type == "primary"  ||
@@ -1131,19 +1144,16 @@ void draw_street_names (ezgl::renderer *g) {
                             g->set_text_rotation(street_segments[i].angle[j]);
                             g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                         }
-                        if(( 
-                                street_segments[i].segment_type == "unclassified" || 
-                                street_segments[i].segment_type == "living_street" ||
-                                street_segments[i].segment_type == "residential") && width < 3500){
+                        if((street_segments[i].segment_type == "unclassified" || 
+                            street_segments[i].segment_type == "living_street" ||
+                            street_segments[i].segment_type == "residential") && width < 3500){
                             g->set_text_rotation(street_segments[i].angle[j]);
                             g->draw_text({x, y}, street_segments[i].name, xBound, yBound);          
                         } 
                         else if (width < 2500){
-
                             g->set_text_rotation(street_segments[i].angle[j]);
                             g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                         }
-
                     }
                 }
             }
@@ -1191,22 +1201,23 @@ void drawHighlights(ezgl::renderer *g){
                 g->set_line_width(20);
                 g->set_color(ezgl::RED);
                 
+                //highlight street segments
                 for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
                     g->draw_line(street_segments[i].coordinates[j], street_segments[i].coordinates[j+1]);
                 }
             } 
         }
     }
-    
     ezgl::renderer::free_surface(png_surface);
 }
 
 //changes the highlight in every intersection and street segment to be false
 void clearHighlights(){
+    //set all intersections highlights
     for(int i = 0;i < intersections.size();i++){
         intersections[i].highlight = false;
     }
-    
+    //set all street segment highlights
     for (int i = 0; i < street_segments.size(); i++) {
         street_segments[i].highlight = false;
     }
@@ -1254,6 +1265,7 @@ void draw_main_canvas (ezgl::renderer *g){
 
 }
 
+//initial setup, runs once at the start of drawMap()
 void initial_setup(ezgl::application *application, bool){
     ezgl::rectangle world = application-> get_renderer()->get_visible_world();
     bounds.area = world.area();
@@ -1261,12 +1273,12 @@ void initial_setup(ezgl::application *application, bool){
     //UI stuff
     //connect search bar entry as signal
     GtkEntry* entry = (GtkEntry*) application->get_object("SearchEntry");
-    
+    //callback for typing into search entry
     g_signal_connect(entry, 
                      "search-changed", 
                      G_CALLBACK(search_entry), 
                      entry);
-    
+    //callback for pressing enter in search entry
     g_signal_connect(entry, 
                      "activate", 
                      G_CALLBACK(search_entry_activate),  
@@ -1283,16 +1295,17 @@ void initial_setup(ezgl::application *application, bool){
     g_signal_connect(mapList, "row-activated", G_CALLBACK(map_list), mapList);
     
     
-    //for autocorrect
+    //for autocomplete
     entryCompletion.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
     gtk_entry_set_completion(entry, entryCompletion.completion);
     
+    //changes label under "choose map" button
     GtkLabel*   mapLoaderLabel = (GtkLabel*) application->get_object("MapLoaderDescription");
     gtk_label_set_text(mapLoaderLabel, "Now Showing \nToronto, Canada");
 }
 
 
-
+//callback for left clicking on street segments or intersections
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, double y){
     //if user left clicks
     if(event -> button == 1){
@@ -1338,29 +1351,35 @@ void drawMap(){
 }
 
 
-//UI stuff from here
+//callback function for "choose map" button
+//lets user pick which map to show out of 19 possible
 void map_list(GtkListBox* box) {
     
+    //gets map path which is stored in widget name
     GtkListBoxRow* selected = gtk_list_box_get_selected_row(box);
-    
     std::string selectedText = gtk_widget_get_name((GtkWidget *)selected);
     
-    std::cout << selectedText << std::endl;
+    //close current map
     close_map();
     closeMap();
+    
+    //load new map
     map_load_path = selectedText;
     bool load_success = loadMap(map_load_path);
     if(!load_success) {
         std::cerr << "Failed to load map '" << map_load_path << "'\n";
     }
     load_map();
+    
+    //set up ezgl
     ezgl::rectangle initial_background({bounds.min_x,bounds.min_y},{bounds.max_x,bounds.max_y});
     global_app -> change_canvas_world_coordinates("MainCanvas",initial_background);
     ezgl::zoom_fit(global_app -> get_canvas("MainCanvas"),initial_background);
     bounds.area = global_app -> get_renderer() -> get_visible_world().area();
     
+    //get text from widget tooltip to show under "choose map" button
+    //tells user which map is currently being shown
     GtkLabel*   mapLoaderLabel = (GtkLabel*) global_app->get_object("MapLoaderDescription");
-    
     std::string text = "Now Showing\n ";
     text.append(gtk_widget_get_tooltip_text ((GtkWidget*) selected));
     gtk_label_set_text(mapLoaderLabel,text.c_str());
@@ -1369,34 +1388,37 @@ void map_list(GtkListBox* box) {
     global_app -> refresh_drawing(); 
 }
 
-//searchEntry
+//callbak for search entry, runs each time user changes input in search entry
+//shows entry completion under it relating to user input
 void search_entry(GtkEntry* entry) {
-      
+    
+    //entry completion is stored as a list
     GtkListStore* store = gtk_list_store_new(1, G_TYPE_STRING);
     GtkTreeIter iter;
-    
-    
+
     // Get the text written in the widget
     std::string text = gtk_entry_get_text(entry);
     
     std::vector<StreetIdx> street;
     
     if (text.size() > 2) {
+        //find street ids from partialStreetName
         street = findStreetIdsFromPartialStreetName(text);
         
         if (street.size() > 0) {
             for (int i = 0; i < street.size(); i++) {
                 std::string name = getStreetName(street[i]);
                 
-                    gtk_list_store_append (store, &iter);
-                    gtk_list_store_set (store, &iter, 0, name.c_str(), -1);
-                 
-                 
+                //insert street names into gtk List, to be shown with entry completion
+                gtk_list_store_append (store, &iter);
+                gtk_list_store_set (store, &iter, 0, name.c_str(), -1);
+
             }
             
         }
     } 
     
+    //set entry completion model and which column to show
     entryCompletion.completion_model = GTK_TREE_MODEL(store);
     gtk_entry_completion_set_model (entryCompletion.completion, entryCompletion.completion_model);
     gtk_entry_completion_set_text_column(entryCompletion.completion, 0);
@@ -1405,6 +1427,8 @@ void search_entry(GtkEntry* entry) {
     street.clear();
 }
 
+//callback for search entry, runs when user pressed "enter" after completing an entry
+//highlights the street 
 void search_entry_activate(GtkEntry* entry){
     
     //clear any previous highlights
@@ -1415,47 +1439,64 @@ void search_entry_activate(GtkEntry* entry){
     
     std::vector<StreetIdx> street;
     
+    //partial street name not run if input isn't bigger than 2 characters
     if (text.size() > 2) {
         street = findStreetIdsFromPartialStreetName(text);
     } 
      
     std::vector<StreetSegmentIdx> segments;
     
+    //finds first match for partialStreetName
     if (street.size() > 0) {
+        //get street segments from global variable
         segments = street_segments_of_street[street[0]]; 
     } else {
-        std::cout << "No matching street found" << std::endl;
+        //otherwise show error message in popup saying no street found
+        GtkPopover* popOver = (GtkPopover*) global_app->get_object("SearchEntryPopOver");
+        GtkLabel*   popOverLabel = (GtkLabel*) global_app->get_object("SearchEntryPopOverLabel");
+        
+        //show popup and text
+        gtk_popover_popup(popOver);    
+        gtk_label_set_text(popOverLabel, "No matching street found");
     }
     
-     
+    //set street segment highlights to be true
     for (int i = 0; i < segments.size(); i++) {
         street_segments[segments[i]].highlight = true;
         }
     
     global_app->refresh_drawing();
+    
+    //clear vectors
     street.clear();
     segments.clear();
     gtk_entry_set_text(entry, " ");
 }
 
-//Find Button - right now works through command line
+//Find Button callback, finds intersections between two streets
+//can search two streets in search entry with a delimiter like "and"
+// and '&'. If matches are found, they are highlighted with pins
+//otherwise shows popup with error message
 void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
     //clear any previous highlights
     clearHighlights();
         
-    //for error handling
+    //popups for error handling
     GtkPopover* popOver = (GtkPopover*) app->get_object("FindPopOver");
     GtkLabel*   popOverLabel = (GtkLabel*) app->get_object("FindPopOverLabel");
     
+    //get text in the entry
     GtkEntry* entry = (GtkEntry*) app->get_object("SearchEntry");
     std::string input = gtk_entry_get_text(entry);
     
+    //delimiters
     std::string delim1 = "and";
     std::string delim2 = "&";
     
     std::string street1, street2;
     
+    //split substring by delimiter and populate street1 and street2
     if (input.find(delim1) !=  std::string::npos) {
         street1 = input.substr(0, input.find(delim1));
         street2 = input.substr(input.find(delim1) + delim1.length(), input.size());
@@ -1465,7 +1506,8 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         street2 = input.substr(input.find(delim2) + delim2.length(), input.size());
         
         std::cout << street1 << " " << street2 << std::endl;
-    } else {  
+    } else { 
+        //otherwise show error message
         gtk_popover_popup(popOver);    
         gtk_label_set_text(popOverLabel, "Put an 'and' or '&' \n between streets");
         return;
@@ -1484,17 +1526,20 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         
         intersectionResults = findIntersectionsOfTwoStreets(streets);
         
+        //set highlights
         if (intersectionResults.size() > 0) {
             for (int i = 0; i < intersectionResults.size(); i++) {
                 intersections[intersectionResults[i]].highlight = true;
             }
         } else {
+            //otherwise show error message
             gtk_popover_popup(popOver);    
             gtk_label_set_text(popOverLabel, "No intersections found");
             return;
         }
        
     } else {
+        //show another error message
         gtk_popover_popup(popOver);    
         gtk_label_set_text(popOverLabel, "No suitable streets found");
         return;
