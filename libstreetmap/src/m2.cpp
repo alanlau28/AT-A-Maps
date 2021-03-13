@@ -216,10 +216,12 @@ void load_map(){
     
     bounds.lat_avg = ((max_lat + min_lat)/2) * kDegreeToRadian;
     
-    bounds.max_x = kEarthRadiusInMeters * max_lon * cos(bounds.lat_avg) * kDegreeToRadian;
-    bounds.max_y = kEarthRadiusInMeters * max_lat * kDegreeToRadian;
-    bounds.min_x = kEarthRadiusInMeters * min_lon * cos(bounds.lat_avg) * kDegreeToRadian;
-    bounds.min_y = kEarthRadiusInMeters * min_lat * kDegreeToRadian;
+    ezgl::point2d max = convertCoordinates(max_lon,max_lat);
+    ezgl::point2d min = convertCoordinates(min_lon,min_lat);
+    bounds.max_x = max.x;
+    bounds.max_y = max.y;
+    bounds.min_x = min.x;
+    bounds.min_y = min.y;
     
     //loops through all the osm ways to find the street types and loads it into the street segment data
     for(int i =0;i < getNumberOfWays();i++){
