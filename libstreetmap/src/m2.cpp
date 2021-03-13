@@ -643,7 +643,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
         
         //get the start point and end point of the street segment 
         ezgl::point2d start = street_segments[i].coordinates[0];
-        ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
+        ezgl::point2d finish = street_segments[i].coordinates[1];
         
         //if the arrow should be drawn and if the arrow is within the visible world
         if(draw && street_segments[i].one_way&& g->get_visible_world().contains(start)){
@@ -653,7 +653,6 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
             //check if the arrow will be drawn within the bounding box of any other arrow
             if(!checkOverlap(g,drawn_arrow,start)){
                 convert_point(g, drawn_arrow, start);
-                start.x -= 2; //arrow is offset by 2m to the left
                 
                 //if the start point is up to the left of finish point
                 if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
