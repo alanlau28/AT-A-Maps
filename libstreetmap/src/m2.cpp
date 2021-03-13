@@ -1042,7 +1042,7 @@ void draw_street_names (ezgl::renderer *g) {
     
     
     double width = world.width();
-    std::cout << width << std::endl;
+    //std::cout << width << std::endl;
     
     std::string previous = " ";
     
@@ -1230,6 +1230,8 @@ void draw_main_canvas (ezgl::renderer *g){
     g -> fill_rectangle(world); //fill background of map
     
     if(getNumStreetSegments() > 1000000 || bounds.area > 2e+11) heavy_map = true; //check if the map is very large
+    
+    if(zoom > 500000 && !heavy_map) ezgl::zoom_out(global_app -> get_canvas("MainCanvas"),5.0/3.0); //blocks zoom
     
     draw_features(g,zoom);
     drawAllStreets(g,zoom,heavy_map);       
