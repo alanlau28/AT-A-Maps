@@ -712,41 +712,41 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                 //if the start point is up to the left of finish point
                 if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
                     if(zoom > 25000 && !heavy){
-                        g -> draw_text(start,"→",100,100); 
+                        g -> draw_text(start,"→"); 
                     }
                     else{
-                        start.x -= 1; //offset x by 1m
-                        g -> draw_text(start,"→",50,50);
+                        g -> set_font_size(15);
+                        g -> draw_text(start,"→");
                     }
                 }
                 //if the start point is down to the left of finish point
                 else if(start.x - finish.x <= 0 && start.y - finish.y <= 0){
                     if(zoom > 25000 && !heavy){
-                        g -> draw_text(start,"→",100,100);
+                        g -> draw_text(start,"→");
                     }
                     else{
-                        start.x -= 1; //offset x by 1m
-                        g -> draw_text(start,"→",50,50);
+                        g -> set_font_size(15);
+                        g -> draw_text(start,"→");
                     }
                 }
                 //if the start point is up to the right of finish point
                 else if(start.x - finish.x >= 0 && start.y - finish.y >= 0){
                     if(zoom > 25000 && !heavy){
-                        g -> draw_text(start,"←",100,100);
+                        g -> draw_text(start,"←");
                     }
                     else{
-                        start.x -= 1; //offset x by 1m
-                        g -> draw_text(start,"←",50,50);
+                        g -> set_font_size(15);
+                        g -> draw_text(start,"←");
                     }
                 }
                 //if the start point is down to the right of finish point
                 else{
                     if(zoom > 25000 && !heavy){
-                        g -> draw_text(start,"←",100,100);
+                        g -> draw_text(start,"←");
                     }
                     else{
-                        start.x -= 1; //offset x by 1m
-                        g -> draw_text(start,"←",50,50);
+                        g -> set_font_size(15);
+                        g -> draw_text(start,"←");
                     }
                 }
             }
