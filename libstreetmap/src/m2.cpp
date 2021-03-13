@@ -238,6 +238,7 @@ void load_map(){
         struct StreetSegmentInfo street_seg_info = getStreetSegmentInfo(street_segment_id);
         int numCurvePoints = street_seg_info.numCurvePoints;
         
+        //load into street segment data
         street_segments[street_segment_id].speed_limit = street_seg_info.speedLimit;
         street_segments[street_segment_id].street_id = street_seg_info.streetID;
         street_segments[street_segment_id].one_way = street_seg_info.oneWay;
@@ -246,9 +247,11 @@ void load_map(){
         
         street_segments_of_street[street_seg_info.streetID].push_back(street_segment_id);
         
-        
+        //load street type into street segment data
         auto it = street_types.find(street_seg_info.wayOSMID);
         street_segments[street_segment_id].segment_type = it -> second;
+        
+        //load coordinates into street segment data
         //if the street segment is straight
         if(numCurvePoints == 0){
             
@@ -625,7 +628,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
     std::vector<ezgl::rectangle> drawn_arrow; //holds the bounding box of each arrow drawn
     bool draw; //if true the one way will be drawn
     
-    g ->set_color(ezgl::BLACK); //set colour of the arrow
+    g ->set_color(125,125,125,255); //set colour of the arrow
     
     if(heavy) zoom /= 3; //if the map is very large 
     
@@ -660,6 +663,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                         g -> draw_text(start,"→",100,100); 
                     }
                     else{
+                        start.x -= 1; //offset x by 1m
                         g -> draw_text(start,"→",50,50);
                     }
                 }
@@ -669,6 +673,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                         g -> draw_text(start,"→",100,100);
                     }
                     else{
+                        start.x -= 1; //offset x by 1m
                         g -> draw_text(start,"→",50,50);
                     }
                 }
@@ -678,6 +683,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                         g -> draw_text(start,"←",100,100);
                     }
                     else{
+                        start.x -= 1; //offset x by 1m
                         g -> draw_text(start,"←",50,50);
                     }
                 }
@@ -687,6 +693,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                         g -> draw_text(start,"←",100,100);
                     }
                     else{
+                        start.x -= 1; //offset x by 1m
                         g -> draw_text(start,"←",50,50);
                     }
                 }
