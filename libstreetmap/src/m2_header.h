@@ -42,16 +42,33 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy);
 
 bool checkOverlap (ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d coordinate);
 
-
+/**
+ * Provides functions convert point to screen coordinate and add bounding box to vector.
+ * 
+ * Apply enough offset to define bounding box
+ * 
+ * @param *g: ezgl renderer
+ * @param drawn: vector of bounding boxes
+ * @param coordinate: coordinate of point in question, in point2d
+ */
 void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d point);
+
 
 
 void drawOneWays(ezgl::renderer *g, double zoom,bool heavy);
 
 
+
 void draw_features(ezgl::renderer *g, double zoom);
 
-
+/**
+ * Provides functions to draw text at certain location with given color.
+ * 
+ * @param *g: ezgl renderer
+  * @param word: text
+ * @param color: color of text
+ * @param point: coordinate of text, in point2d
+ */
 void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d point);
 
 

@@ -38,16 +38,16 @@ struct street_segment_data{
 
 
 struct feature_data{
-    std::vector<ezgl::point2d> coordinates;
-    std::string name;
-    std::string feature_type;
-    int numFeaturePoints;
-    double area;
+    std::vector<ezgl::point2d> coordinates; //x,y coordinates of a given feature as point2d
+    std::string name;  
+    std::string feature_type; 
+    int numFeaturePoints;  //number of feature points (coordinates)
+    double area;  //area of feature
 };
-bool operator< (feature_data& first, feature_data& second);
+bool operator< (feature_data& first, feature_data& second); //checks priority of features
 
 struct POI_data{
-    ezgl::point2d coordinate {.0, .0};
+    ezgl::point2d coordinate {.0, .0}; 
     std::string name;
     std::string type;
 };
@@ -72,8 +72,6 @@ std::vector<street_segment_data> street_segments;
 //feature id as indices
 std::vector<feature_data> features;
 
-std::vector<POI_data> pointOfInterests;
-
 //holds every intersection and its respective data
 //intersection id as indices
 std::vector<intersection_data> intersections;
@@ -84,6 +82,8 @@ std::vector<std::vector<StreetSegmentIdx>> street_segments_of_street;
 //holds the priority of each feature to be drawn as strings in order
 std::vector<std::string> feature_priority;
 
+
+//hold data of POIs that are of same type
 std::vector<POI_data>  fuel;
 std::vector<POI_data>  school;
 std::vector<POI_data>  restaurant;
@@ -100,7 +100,7 @@ std::vector<POI_data>  gym;
 std::vector<POI_data>  art;
 std::vector<POI_data>  library;
 
-std::string default_font;
+std::string default_font; //default font
 
 
 //holds the street type of every street
@@ -311,22 +311,25 @@ void load_map(){
     
     //-------------------------------------------------
     
-    features.resize(getNumFeatures());
+    features.resize(getNumFeatures());  //resize to number of features
     
     for(FeatureIdx featureidx = 0; featureidx<getNumFeatures(); featureidx++){
+        //load data into vector
         features[featureidx].name = getFeatureName(featureidx);
         features[featureidx].feature_type = asString(getFeatureType(featureidx));
         features[featureidx].area = findFeatureArea(featureidx);
         features[featureidx].numFeaturePoints = getNumFeaturePoints(featureidx);
+        //load all points of a feature to vector
         for(int i = 0; i < features[featureidx].numFeaturePoints; i++){
             LatLon point = getFeaturePoint(featureidx,i);
             ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude());
             features[featureidx].coordinates.push_back(coordinate);
-            //std::cout<<" wwww\n"<<features[featureidx].feature_type;
+            
         }
     }
     
-    std::sort(features.begin(),features.end());
+    //sort using overloaded operator<
+    std::sort(features.begin(),features.end()); 
     
     //Gets coordinate of each intersection
     //-------------------------------------------------
@@ -344,28 +347,30 @@ void load_map(){
  
 
     //-------------------------------
-   pointOfInterests.resize(getNumPointsOfInterest());
-   std::vector <std::string> types;
-   // int count = 0;
     
+    //load poi data
     for (POIIdx poiidx = 0; poiidx < getNumPointsOfInterest(); poiidx++){
         std::string poitype = getPOIType(poiidx);
         std::string poiname = getPOIName(poiidx);
-        pointOfInterests[poiidx].name = getPOIName(poiidx);
-        pointOfInterests[poiidx].type = poitype;
-        LatLon point = getPOIPosition(poiidx);
-       ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude());
-        pointOfInterests[poiidx].coordinate = coordinate;
-        //types.push_back(getPOIType(poiidx));
         
+        LatLon point = getPOIPosition(poiidx);
+        ezgl::point2d coordinate = convertCoordinates(point.longitude(),point.latitude());
+        
+        //check for types needed, insert data into corresponding vectors
         if(poitype.compare("fuel")==0||poitype.compare("parking")==0){
             if(poitype=="parking"){
                 parking.push_back(POI_data{coordinate,poiname,poitype});
             }
-            else {fuel.push_back(POI_data{coordinate,poiname,poitype});}
+            else {
+                fuel.push_back(POI_data{coordinate,poiname,poitype});
+            }
         }else if (poitype.compare("theatre")==0||poitype.compare("cinema")==0||poitype.compare("post_office")==0){
-            if (poitype.compare("post_office")==0) post_office.push_back(POI_data{coordinate,poiname,poitype});
-            else theatre.push_back(POI_data{coordinate,poiname,poitype});
+            if (poitype.compare("post_office")==0){
+                post_office.push_back(POI_data{coordinate,poiname,poitype});
+            }
+            else{
+                theatre.push_back(POI_data{coordinate,poiname,poitype});
+            }
         }else if (poitype=="school"||poitype=="kindergarten"||poitype=="preschool"||poitype=="college"||poitype=="university"){
             school.push_back(POI_data{coordinate,poiname,poitype});
         }else if (poitype=="bank"||poitype=="artwork"||poitype=="arts_centre"){
@@ -375,8 +380,12 @@ void load_map(){
             bank.push_back(POI_data{coordinate,poiname,poitype});
             }
         }else if (poitype=="pharmacy"||poitype=="restaurant"){
-            if(poitype=="restaurant") restaurant.push_back(POI_data{coordinate,poiname,poitype});
-            else pharmacy.push_back(POI_data{coordinate,poiname,poitype});
+            if(poitype=="restaurant"){
+                restaurant.push_back(POI_data{coordinate,poiname,poitype});
+            }
+            else{
+                pharmacy.push_back(POI_data{coordinate,poiname,poitype});
+            }
         }else if (poitype=="pub"||poitype=="bar"||poitype=="gym"||poitype=="gymnasium"||poitype=="swimming_pool"||poitype=="pool; fitness centre; ice rinks"){
             if (poitype=="gym"||poitype=="gymnasium"||poitype=="swimming_pool"||poitype=="pool; fitness centre; ice rinks"){
                 gym.push_back(POI_data{coordinate,poiname,poitype});
@@ -389,22 +398,27 @@ void load_map(){
             if(poitype.compare("cafe")==0){
                 cafe.push_back(POI_data{coordinate,poiname,poitype});
             }
-            else fastfood.push_back(POI_data{coordinate,poiname,poitype});            
+            else{
+                fastfood.push_back(POI_data{coordinate,poiname,poitype});            
+            }
         }
         else if (poitype=="hospital"||poitype=="doctors"||poitype.compare("library")==0){       
             if (poitype.compare("library")==0){
                 library.push_back(POI_data{coordinate,poiname,poitype});
-                //std::cout<<getPOIName(poiidx)<<std::endl;
             }
             else{
                 hospital.push_back(POI_data{coordinate,poiname,poitype});
-            }
-            
+            }            
         }
     }
-
-   if(map_load_path.compare("/cad2/ece297s/public/maps/tehran_iran.streets.bin")==0) default_font = "Noto Sans Arabic";  
-   else default_font = "Noto Sans CJK SC";
+    
+   //check if loading Tehran, if so load Arabic font
+   if(map_load_path.compare("/cad2/ece297s/public/maps/tehran_iran.streets.bin")==0){
+       default_font = "Noto Sans Arabic";  
+   }
+   else{
+       default_font = "Noto Sans CJK SC";
+   }
 
 }
 
@@ -601,14 +615,23 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
     }
     
 }
+
+/**
+ * Provides functions to check for overlapping of points. 
+ * 
+ * Given a vector of bounding boxes, check if the new point is within any boxes.
+ * 
+ * @param *g: ezgl renderer
+ * @param drawn: vector of bounding boxes
+ * @param coordinate: coordinate of point in question, in point2d
+ */
 bool checkOverlap (ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d coordinate){
-    //ezgl::point2d offset {width/2, height};
-    ezgl::rectangle source = ezgl::rectangle(coordinate, 3.0, -5.0);
-             //std::cout<<point.x<<" "<<point.y<<std::endl;
-             
+    //create a rectangle, then convert to screen coordinate
+    ezgl::rectangle source = ezgl::rectangle(coordinate, 3.0, -5.0);      
     ezgl::point2d target = g->world_to_screen(source).bottom_left();
-    for(int i = 0; i <drawn.size(); i++){
-       
+    
+    //check for overlap
+    for(int i = 0; i <drawn.size(); i++){       
         if (drawn[i].contains(target)){
             return true;
         }
@@ -616,23 +639,32 @@ bool checkOverlap (ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl:
     return false;
 }
 
+/**
+ * Provides functions convert point to screen coordinate and add bounding box to vector.
+ * 
+ * Apply enough offset to define bounding box
+ * 
+ * @param *g: ezgl renderer
+ * @param drawn: vector of bounding boxes
+ * @param point: coordinate of point in question, in point2d
+ */
 void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d point){
-    ezgl::point2d offset {-156, 80};
-    ezgl::rectangle source = ezgl::rectangle(point, 3.0, -5.0);
-             //std::cout<<point.x<<" "<<point.y<<std::endl;
-             
-             ezgl::point2d target = g->world_to_screen(source).bottom_left();
-                          
-             g->set_coordinate_system(ezgl::SCREEN);
-             //g->fill_rectangle(target+offset, 310,-197);
-             
-             drawn.push_back(ezgl::rectangle (target+offset, 310,-197));
-             //std::cout<<drawn.size()<<std::endl;
-             g->set_coordinate_system(ezgl::WORLD);
+    ezgl::point2d offset {-156, 80}; //define offset
+    
+    //convert to screen coordinate
+    ezgl::rectangle source = ezgl::rectangle(point, 3.0, -5.0);             
+    ezgl::point2d target = g->world_to_screen(source).bottom_left();                          
+    g->set_coordinate_system(ezgl::SCREEN);
+    //g->fill_rectangle(target+offset, 310,-197);
+    //add bounding box       
+    drawn.push_back(ezgl::rectangle (target+offset, 310,-197));
+     //restore world coordinate
+    g->set_coordinate_system(ezgl::WORLD);
 }
 
 //draws arrows on street segments that are one ways
 void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
+
     std::vector<ezgl::rectangle> drawn_arrow; //holds the bounding box of each arrow drawn
     bool draw; //if true the one way will be drawn
     
@@ -640,6 +672,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
     
     if(heavy) zoom /= 3; //if the map is very large 
     
+
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
         std::string type = street_segments[i].segment_type;
@@ -712,24 +745,28 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
     drawn_arrow.clear(); 
 }
 
-
+//draw all features, verify that there are more than one feature point before drawing
 void draw_features(ezgl::renderer *g, double zoom){
     for (int i = 0; i<features.size();i++){
-        if (features[i].feature_type == "park"&&features[i].numFeaturePoints>1){
+        bool more_than_one = features[i].numFeaturePoints>1; //check if more than one feature point
+        
+        //draw park depending on zoom and size, only draw smaller parks when zoomed in
+        if (features[i].feature_type == "park"&& more_than_one){
             g ->set_color(185, 226, 168,255);
-            if(features[i].area>200000){
-                //std::cout<<features[i].area;
+            if(features[i].area>200000){                
             g->fill_poly(features[i].coordinates);
             } else if (features[i].area>10000&&zoom>5){
                 g->fill_poly(features[i].coordinates);
             }else if (features[i].area<=10000&&zoom>100){
                 g->fill_poly(features[i].coordinates);
             }
-        } else if (features[i].feature_type == "golfcourse"&&features[i].numFeaturePoints>1){
-            g ->set_color(178, 217, 163,255);
             
+        } else if (features[i].feature_type == "golfcourse"&& more_than_one){
+            g ->set_color(178, 217, 163,255);            
             g->fill_poly(features[i].coordinates);
-        }else if (features[i].feature_type == "greenspace"&&features[i].numFeaturePoints>1){
+            
+        //draw greenspace depending on zoom and size, only draw smaller parks when zoomed in
+        }else if (features[i].feature_type == "greenspace"&& more_than_one){
             g ->set_color(171, 209, 157,255);
             if(features[i].area>200000){
             g->fill_poly(features[i].coordinates);
@@ -740,7 +777,9 @@ void draw_features(ezgl::renderer *g, double zoom){
                 g->fill_poly(features[i].coordinates);
             }
         }
-        else if(features[i].feature_type == "lake" &&features[i].numFeaturePoints>1){
+        
+        //draw lake depending on zoom and size, only draw smaller parks when zoomed in
+        else if(features[i].feature_type == "lake" && more_than_one){
             g ->set_color(170, 218, 255,255);
             if(features[i].area>200000){
             g->fill_poly(features[i].coordinates);
@@ -751,19 +790,24 @@ void draw_features(ezgl::renderer *g, double zoom){
                 g->fill_poly(features[i].coordinates);
             }
         }
-        else if(features[i].feature_type == "island"&&features[i].numFeaturePoints>1){
-            g ->set_color(232, 232, 232,255);
-          
+        
+        else if(features[i].feature_type == "island"&& more_than_one){
+            g ->set_color(232, 232, 232,255);          
             g->fill_poly(features[i].coordinates);
-        }else if(features[i].feature_type == "beach"&&features[i].numFeaturePoints>1){
-            g ->set_color(255, 242, 175,255);
-            
+        }
+        
+        else if(features[i].feature_type == "beach"&& more_than_one){
+            g ->set_color(255, 242, 175,255);            
             g->fill_poly(features[i].coordinates);
-        }else if(features[i].feature_type == "building"&&features[i].numFeaturePoints>1&&zoom>1500){
-            g ->set_color(180, 180, 180,255);
-          
+        }
+        
+        else if(features[i].feature_type == "building"&& more_than_one &&zoom>1500){
+            g ->set_color(180, 180, 180,255);          
             g->fill_poly(features[i].coordinates);
-        }else if((features[i].feature_type == "stream"||features[i].feature_type == "river")&&features[i].numFeaturePoints>1){
+        }
+        
+        //draw rivers (thicker) first, then draw thinner stream when zoomed in more
+        else if((features[i].feature_type == "stream"||features[i].feature_type == "river")&&more_than_one){
             g ->set_color(170, 218, 255,255);
             g->set_line_width(0);
             if(features[i].feature_type == "river") g->set_line_width(3);
@@ -775,60 +819,58 @@ void draw_features(ezgl::renderer *g, double zoom){
     }
 }
 
+/**
+ * Provides functions to draw text at certain location with given color.
+ * 
+ * @param *g: ezgl renderer
+ * @param word: text
+ * @param color: color of text
+ * @param point: coordinate of text, in point2d
+ */
 void text(ezgl::renderer *g, std::string word, ezgl::color color, ezgl::point2d point){
-
-    std::string font = "Noto Sans CJK SC";
-    //font_slant a = 0;
+    //format font to default
     g->format_font(default_font, ezgl::font_slant::normal, ezgl::font_weight::normal);
-     g->set_font_size(22);
-             g->set_text_rotation(0);
-             g->set_color(color);
-
-             g->draw_text(point, word, 50, 20);
-
-
+    g->set_font_size(22);
+    g->set_text_rotation(0);
+    g->set_color(color);
+    g->draw_text(point, word, 40, 20);
 }
+
 //all png used in this function come from https://mapicons.mapsmarker.com/
 //Map Icons Collection. [Online]. Available: https://mapicons.mapsmarker.com/.
 void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){    
-
+     //define surface
      ezgl::surface *png_surface; 
-     png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png");
+     png_surface = ezgl::renderer::load_png("libstreetmap/resources/blank.png"); //default png if no poi
      ezgl::point2d point {.0,.0};
-     ezgl::point2d offset {-56, 40};
-     ezgl::point2d text_offset {30,0};
+     
+     //vector that holds bounding boxes of drawn poi icon
      std::vector<ezgl::rectangle>  drawn;
-     int count = 0;
+     
+     int count = 0;//limiter for number of poi drawn
+     
      for(int i = 0; i<restaurant.size();i++){
-         
+         //make sure poi is within visible screen, and do not overlap other poi
+         //also limit number of POI drawn to increase performance
          if((restaurant[i].coordinate<large)&&(small<restaurant[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, restaurant[i].coordinate))){  
              count++;             
-             png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png"); //zoom             
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png"); //load icon      
              point=restaurant[i].coordinate;             
-             convert_point(g, drawn, point);
-             /*ezgl::rectangle source = ezgl::rectangle(point, 3.0, -5.0);
-             //std::cout<<point.x<<" "<<point.y<<std::endl;
-             
-             ezgl::point2d target = g->world_to_screen(source).bottom_left();
-             //std::cout<<target.x<<" "<<target.y<<std::endl;
-             
-             g->set_coordinate_system(ezgl::SCREEN);
-             
-             
-             drawn.push_back(ezgl::rectangle (target+offset, 110,-117));
-             g->set_coordinate_system(ezgl::WORLD);
-            */
-             
+             convert_point(g, drawn, point);             
              g->draw_surface(png_surface, point);
-             text(g, restaurant[i].name, ezgl::color {211, 108, 0,255}, point);
-             //std::cout<<restaurant[i].name<<std::endl;
-             //ezgl::renderer::free_surface(png_surface);             
+             
+             //drawn name of poi
+             text(g, restaurant[i].name, ezgl::color {211, 108, 0,255}, point);       
          }         
          
      }
+     count = 0; //reset limiter
      
      
-     count = 0;
+     //identical logic applies to other POI types
+     //  .
+     //  .
+     //  .
      for (int i = 0; i < fuel.size(); i++){         
          if(fuel[i].coordinate<large&&(small<fuel[i].coordinate)&&(!checkOverlap(g,drawn, fuel[i].coordinate))){
              png_surface = ezgl::renderer::load_png("libstreetmap/resources/fillingstation.png");
@@ -836,18 +878,17 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, fuel[i].name, ezgl::color {121, 134, 203,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
          }       
      }
+     count = 0;
      for (int i = 0; i < bar.size(); i++){         
          if(bar[i].coordinate<large&&(small<bar[i].coordinate)&&count<5&&(!checkOverlap(g,drawn, bar[i].coordinate))){
              count++;
-             png_surface = ezgl::renderer::load_png("libstreetmap/resources/bar.png");//zoom
+             png_surface = ezgl::renderer::load_png("libstreetmap/resources/bar.png");
              point=bar[i].coordinate;
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
-             text(g, bar[i].name, ezgl::color {211, 108, 0,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             text(g, bar[i].name, ezgl::color {211, 108, 0,255}, point);             
          }       
      }
      count = 0;
@@ -859,7 +900,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, school[i].name, ezgl::color {84,145,245,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      count = 0;
@@ -871,7 +912,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, pharmacy[i].name, ezgl::color {238, 103, 92,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      for (int i = 0; i < theatre.size(); i++){         
@@ -881,7 +922,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, theatre[i].name, ezgl::color {52, 68, 149,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      count = 0;
@@ -893,7 +934,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, bank[i].name, ezgl::color {92, 108, 191,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+            
          }       
      }
      count =0;
@@ -905,7 +946,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, cafe[i].name, ezgl::color {211, 108, 0,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      count = 0;
@@ -917,7 +958,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, parking[i].name, ezgl::color {47, 59, 118,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      for (int i = 0; i < post_office.size(); i++){         
@@ -927,7 +968,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, post_office[i].name, ezgl::color {47, 59, 118,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      count = 0;
@@ -939,7 +980,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
             text(g, hospital[i].name, ezgl::color {238, 103, 92,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      count = 0;
@@ -951,7 +992,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, fastfood[i].name, ezgl::color {211, 108, 0,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      count = 0;
@@ -962,7 +1003,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, art[i].name, ezgl::color {18, 181, 203,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      for (int i = 0; i < gym.size(); i++){         
@@ -972,7 +1013,7 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, gym[i].name, ezgl::color {47, 59, 118,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      for (int i = 0; i < library.size(); i++){         
@@ -982,13 +1023,13 @@ void draw_POI (ezgl::renderer *g, ezgl::point2d small, ezgl::point2d large){
              convert_point(g, drawn, point);
              g->draw_surface(png_surface, point);
              text(g, library[i].name, ezgl::color {47, 59, 118,255}, point);
-             //ezgl::renderer::free_surface(png_surface);
+             
          }       
      }
      
-     ezgl::renderer::free_surface(png_surface);   
+     ezgl::renderer::free_surface(png_surface);  //free surfaces drawn
 
-     drawn.clear();
+     drawn.clear(); //clear drawn boxes
     
 
 }
@@ -1201,6 +1242,13 @@ void draw_main_canvas (ezgl::renderer *g){
     if(zoom>1500) draw_POI(g, small, large);
 
     drawHighlights(g);
+
+
+    //only start to draw POI when zoomed in slightly
+    if(zoom>800){
+        draw_POI(g, small, large);
+    }
+
 
 }
 
@@ -1464,7 +1512,6 @@ void close_map(){
     closeOSMDatabase();
     street_segments.clear();
     features.clear();
-    pointOfInterests.clear();
     street_segments_of_street.clear();
     fuel.clear();
     school.clear();
