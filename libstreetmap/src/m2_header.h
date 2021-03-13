@@ -46,7 +46,7 @@ bool checkOverlap (ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl:
 void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl::point2d point);
 
 
-void drawOneWays(ezgl::renderer *g, double zoom);
+void drawOneWays(ezgl::renderer *g, double zoom,bool heavy);
 
 
 void draw_features(ezgl::renderer *g, double zoom);

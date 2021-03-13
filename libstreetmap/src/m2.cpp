@@ -20,7 +20,6 @@ struct boundingBox{
     double max_y;
     double min_x;
     double min_y;
-    
     double lat_avg; //the average latitude of the city drawn
     double area; //the area of the map
 };
@@ -234,7 +233,7 @@ void load_map(){
         }
     }
     
-    
+    //loop through all street segments 
     for(int street_segment_id = 0;street_segment_id < getNumStreetSegments();street_segment_id++){
         struct StreetSegmentInfo street_seg_info = getStreetSegmentInfo(street_segment_id);
         int numCurvePoints = street_seg_info.numCurvePoints;
@@ -399,17 +398,25 @@ void load_map(){
 }
 
     
-
+//draws every street segment
+//draws different types of streets at different zoom levels
+//when the user zooms more, more streets are drawn
 void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
-    bool draw = false;
+    bool draw = false; //bool to draw street segment, if true street segment will be drawn
     g -> set_line_cap(ezgl::line_cap::round);
-    if(heavy) zoom /= 3;
+    
+    if(heavy) zoom /= 3; //if the map is a very large map
+    
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
-        if(street_segments[i].segment_type == "motorway" ||street_segments[i].segment_type == "motorway_link"){
+        std::string type = street_segments[i].segment_type; 
+        
+        if(type == "motorway" ||type == "motorway_link"){
             draw = true;
-            g ->set_color(246,207,101,255);
-            if(street_segments[i].segment_type == "motorway_link" && zoom < 7){
+            g ->set_color(246,207,101,255); //MOTORWAY ORANGE
+            
+            //set line widths for different zoom levels
+            if(type == "motorway_link" && zoom < 7){
                 draw = false;
             }
             if(zoom > 25000){
@@ -428,9 +435,11 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
                 g ->set_line_width(3);
             }
         }
-        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+        else if(type == "primary" || type == "secondary" || type == "trunk"){
             draw = true;
             g ->set_color(200, 200, 200,255);
+            
+            //set line widths for different zoom levels
             if(zoom > 25000){
                 g->set_line_width(26);
             }
@@ -463,11 +472,13 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
             }
 
         }
-        else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){
+        else if(type == "tertiary" || type == "unclassified" || type == "living_street"){
             if(zoom > 7){
-                g ->set_color(200, 200, 200,255);
+                g ->set_color(200, 200, 200,255); //GREY
                 draw = true;
             }
+            
+            //set line widths for different zoom levels
             if(zoom > 25000){
               g -> set_line_width(16);
               if(heavy) g->set_line_width(13);
@@ -497,12 +508,14 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
                 g -> set_line_width(1);
                 if(heavy) draw = false;
             }
-        }
-        else if (street_segments[i].segment_type == "residential"){
+        }       
+        else if (type == "residential"){
             if(zoom > 54){
                 g ->set_color(200, 200, 200,255);
                 draw = true;
             }
+            
+            //set line widths for different zoom levels
             if(zoom > 25000){
               g -> set_line_width(18);
               if(heavy) g->set_line_width(15);
@@ -537,7 +550,9 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
                 if(heavy) draw = false;
             }
         }
+        //any other street type
         else{
+            //set line widths for different zoom levels
             if(zoom > 150){
             g ->set_color(200, 200, 200,255);
             draw = true;
@@ -566,6 +581,7 @@ void drawAllStreets(ezgl::renderer *g, double zoom,bool heavy){
                 g->set_line_width(1);
             }
         }
+        //drawing loop, draws line through each coordinate on the segment
         for(int j = 0; j < street_segments[i].coordinates.size()-1; j++){
             if(draw){
                 g->draw_line(street_segments[i].coordinates[j],street_segments[i].coordinates[j+1]);
@@ -604,36 +620,42 @@ void convert_point(ezgl::renderer *g, std::vector<ezgl::rectangle> &drawn, ezgl:
              g->set_coordinate_system(ezgl::WORLD);
 }
 
+//draws arrows on street segments that are one ways
 void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
-    std::vector<ezgl::rectangle> drawn_arrow;
-    g ->set_color(ezgl::BLACK);
-    if(heavy) zoom /= 3;
-    bool draw;
+    std::vector<ezgl::rectangle> drawn_arrow; //holds the bounding box of each arrow drawn
+    bool draw; //if true the one way will be drawn
+    
+    g ->set_color(ezgl::BLACK); //set colour of the arrow
+    
+    if(heavy) zoom /= 3; //if the map is very large 
+    
     for(int i = 0;i < street_segments.size(); i++){
         draw = false;
-        if(street_segments[i].segment_type == "motorway_link"){
+        std::string type = street_segments[i].segment_type;
+        
+        //draw arrows only for specified types of streets
+        if(type == "motorway_link" || type == "primary" || type == "secondary" || type == "trunk"){
                 draw = true;
         }
-        else if(street_segments[i].segment_type == "primary" || street_segments[i].segment_type == "secondary" ||street_segments[i].segment_type == "trunk"){
+        else if(type == "tertiary" || type == "unclassified" || type == "living_street" || type == "residential"){     
             draw = true;
         }
-        else if(street_segments[i].segment_type == "tertiary" || street_segments[i].segment_type == "unclassified" || street_segments[i].segment_type == "living_street"){     
-            draw = true;
-        }
-        else if (street_segments[i].segment_type == "residential"){
-            draw = true;
-        }
+        
+        //get the start point and end point of the street segment 
         ezgl::point2d start = street_segments[i].coordinates[0];
         ezgl::point2d finish = street_segments[i].coordinates[street_segments[i].coordinates.size()-1];
+        
+        //if the arrow should be drawn and if the arrow is within the visible world
         if(draw && street_segments[i].one_way&& g->get_visible_world().contains(start)){
             double angle = street_segments[i].angle[0];
-
             g ->set_text_rotation(angle);
             
-            
+            //check if the arrow will be drawn within the bounding box of any other arrow
             if(!checkOverlap(g,drawn_arrow,start)){
                 convert_point(g, drawn_arrow, start);
-                start.x -= 2;
+                start.x -= 2; //arrow is offset by 2m to the left
+                
+                //if the start point is up to the left of finish point
                 if(start.x - finish.x <= 0 && start.y - finish.y >= 0){
                     if(zoom > 25000 && !heavy){
                         g -> draw_text(start,"→",100,100); 
@@ -642,6 +664,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                         g -> draw_text(start,"→",50,50);
                     }
                 }
+                //if the start point is down to the left of finish point
                 else if(start.x - finish.x <= 0 && start.y - finish.y <= 0){
                     if(zoom > 25000 && !heavy){
                         g -> draw_text(start,"→",100,100);
@@ -650,6 +673,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                         g -> draw_text(start,"→",50,50);
                     }
                 }
+                //if the start point is up to the right of finish point
                 else if(start.x - finish.x >= 0 && start.y - finish.y >= 0){
                     if(zoom > 25000 && !heavy){
                         g -> draw_text(start,"←",100,100);
@@ -658,6 +682,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
                         g -> draw_text(start,"←",50,50);
                     }
                 }
+                //if the start point is down to the right of finish point
                 else{
                     if(zoom > 25000 && !heavy){
                         g -> draw_text(start,"←",100,100);
@@ -670,7 +695,7 @@ void drawOneWays(ezgl::renderer *g, double zoom, bool heavy){
         }
         
     }
-    drawn_arrow.clear();
+    drawn_arrow.clear(); 
 }
 
 
@@ -1066,20 +1091,23 @@ void draw_street_names (ezgl::renderer *g) {
 
 }
 
-
+//places a pin png wherever there is a highlighted intersection or street segment
+//Google, "Adding a Google Map with a Marker to Your Website,"Google Map Platform. [Online]. 
+// Available: https://developers.google.com/maps/documentation/javascript/adding-a-google-map.
 void drawHighlights(ezgl::renderer *g){
-    ezgl::surface *png_surface;
-    
+    //create surface of the pin png
+    ezgl::surface *png_surface;  
     png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
     
     ezgl::rectangle world = g->get_visible_world();
     
+    //loops through all intersections and places pins at the ones that are highlighted
     for(int i = 0;i < intersections.size();i++){
         
         double x = intersections[i].coordinate.x;
         double y = intersections[i].coordinate.y;
         
-        //check that intersections are within world bounds
+        //check that intersections are within visible world bounds
         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
             if(intersections[i].highlight){
                 g -> draw_surface(png_surface,intersections[i].coordinate);
@@ -1089,27 +1117,29 @@ void drawHighlights(ezgl::renderer *g){
         
     }
     
-    //highlight street 
+    //loops through all street segments and draws the ones that are highlighted
     for (int i = 0; i < street_segments.size(); i++) {
+        
         double x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
         double y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
         
-         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
-             if (street_segments[i].highlight) {
-                 g->set_line_width(20);
-                 g->set_color(ezgl::RED);
-                 for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
-                     g->draw_line(street_segments[i].coordinates[j], street_segments[i].coordinates[j+1]);
-                 }
-             }
-         }
-        
-        
+        //check if street segment is within visible world bounds
+        if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
+            if (street_segments[i].highlight) {
+                g->set_line_width(20);
+                g->set_color(ezgl::RED);
+                
+                for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
+                    g->draw_line(street_segments[i].coordinates[j], street_segments[i].coordinates[j+1]);
+                }
+            } 
+        }
     }
     
     ezgl::renderer::free_surface(png_surface);
 }
 
+//changes the highlight in every intersection and street segment to be false
 void clearHighlights(){
     for(int i = 0;i < intersections.size();i++){
         intersections[i].highlight = false;
@@ -1124,26 +1154,25 @@ void clearHighlights(){
 
 void draw_main_canvas (ezgl::renderer *g){
     bool heavy_map = false;
+    
     ezgl::rectangle world = g->get_visible_world();
+    
     double area = world.area();
-    double zoom = bounds.area/area;
+    double zoom = bounds.area/area; //zoom level is the ratio between the area of the initial world
+                                    //to the area of the visible world
+    
     ezgl::point2d small = world.bottom_left();
     ezgl::point2d large = world.top_right();
-    
-    //std::cout<<zoom<<std::endl;
 
-    g -> set_color(243,243,239,255); 
-    g -> fill_rectangle(world);
+    g -> set_color(243,243,239,255); //LIGHT GREY
+    g -> fill_rectangle(world); //fill background of map
     
-    if(getNumStreetSegments() > 1000000){
-        heavy_map = true;
-    }
+    if(getNumStreetSegments() > 1000000) heavy_map = true; //the map is a very large map if it has over 1000000 street segments
+    
     draw_features(g,zoom);
     drawAllStreets(g,zoom,heavy_map);       
     
-    if(zoom > 3249){
-        drawOneWays(g,zoom,heavy_map);
-    }
+    if(zoom > 3249) drawOneWays(g,zoom,heavy_map);
     
     //draw street names
     draw_street_names(g);
@@ -1152,14 +1181,8 @@ void draw_main_canvas (ezgl::renderer *g){
     drawHighlights(g);
 
 
-     if(zoom>1500){
-        draw_POI(g, small, large);
-    }
-
-
+     if(zoom>1500) draw_POI(g, small, large);
 }
-
-
 
 void initial_setup(ezgl::application *application, bool){
     ezgl::rectangle world = application-> get_renderer()->get_visible_world();
@@ -1201,14 +1224,19 @@ void initial_setup(ezgl::application *application, bool){
 
 
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, double y){
+    //if user left clicks
     if(event -> button == 1){
         clearHighlights();
+        
+        //finds the intersection that the user clicks
         LatLon position = latLonFromWorld(x,y);
         int id = findClosestIntersection(position);
         intersections[id].highlight = true;
+        
         app -> refresh_drawing();
         app -> update_message("Pin placed at " + intersections[id].name);
     }
+    //if user right clicks, the highlights are cleared
     else if(event -> button == 3){
         clearHighlights();
         app -> refresh_drawing();
@@ -1217,9 +1245,12 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
 }
 
 void drawMap(){
+    //load data structures
     load_bin();
     loadFeaturePriority();
     load_map();
+    
+    //initial ezgl setup
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
     settings.window_identifier = "MainWindow";
@@ -1232,8 +1263,7 @@ void drawMap(){
     application.add_canvas("MainCanvas",draw_main_canvas,initial_background);
     application.run(initial_setup, act_on_mouse_click, nullptr,nullptr);
     
-    close_map();
-    //connect search bar
+    close_map(); //clear data structures and close osm database
     
 }
 
