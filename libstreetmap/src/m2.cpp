@@ -1319,7 +1319,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         intersections[id].highlight = true;
         
         app -> refresh_drawing();
-        app -> update_message("Pin placed at " + intersections[id].name);
+        app -> update_message("Pin placed at " + intersections[id].name + " " + std::to_string(id));
     }
     //if user right clicks, the highlights are cleared
     else if(event -> button == 3){
@@ -1507,7 +1507,7 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
         street1 = input.substr(0, input.find(delim2));
         street2 = input.substr(input.find(delim2) + delim2.length(), input.size());
         
-        std::cout << street1 << " " << street2 << std::endl;
+        std::cout << street1 << " and" << street2 << std::endl;
     } else { 
         //otherwise show error message
         gtk_popover_popup(popOver);    
@@ -1519,20 +1519,70 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     std::vector<StreetIdx> streetOne = findStreetIdsFromPartialStreetName(street1);
     std::vector<StreetIdx> streetTwo = findStreetIdsFromPartialStreetName(street2);
     
+    
+    
     //for holding intersections
     std::vector<IntersectionIdx> intersectionResults;
     
     if (streetOne.size() > 0 && streetTwo.size() > 0) {
         //first matches are used as arguments
-        std::pair<StreetIdx, StreetIdx> streets (streetOne[0], streetTwo[0]);
         
-        intersectionResults = findIntersectionsOfTwoStreets(streets);
+        std::vector<std::pair<StreetIdx, StreetIdx>> street_pairs;
+        
+             
+            
+        int size = streetOne.size() > streetTwo.size()? streetOne.size() : streetTwo.size();
+        if (size > 3) size = 3;
+        
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                
+                std::pair<StreetIdx, StreetIdx> pair (streetOne[i], streetTwo[j]);
+                
+                std::string pair1(getStreetName(streetOne[i]));
+                std::string pair2(getStreetName(streetTwo[j]));
+                
+                //formatting: lowercase and remove spaces
+                pair1.erase(std::remove_if(pair1.begin(), pair1.end(), ::isspace), pair1.end());
+                std::transform(pair1.begin(), pair1.end(), pair1.begin(), ::tolower);
+                
+                //formatting: lowercase and remove spaces
+                pair2.erase(std::remove_if(pair2.begin(), pair2.end(), ::isspace), pair2.end());
+                std::transform(pair2.begin(), pair2.end(), pair2.begin(), ::tolower);
+                
+                //formatting: lowercase and remove spaces
+                street1.erase(std::remove_if(street1.begin(), street1.end(), ::isspace), street1.end());
+                std::transform(street1.begin(), street1.end(), street1.begin(), ::tolower);
+                
+                //formatting: lowercase and remove spaces
+                street2.erase(std::remove_if(street2.begin(), street2.end(), ::isspace), street2.end());
+                std::transform(street2.begin(), street2.end(), street2.begin(), ::tolower);
+                
+                if (pair1 == street1 && pair2 == street2) {
+                    
+                    std::vector<IntersectionIdx> matches = findIntersectionsOfTwoStreets(pair);
+            
+                    intersectionResults.insert(intersectionResults.end(), matches.begin(), matches.end());
+                }
+                
+            }
+            
+        }
+        
+        
+        
+       
+        for (int i = 0; i < intersectionResults.size(); i++) {
+            std::cout << intersectionResults[i] << std::endl;
+        }
+        
         
         //set highlights
         if (intersectionResults.size() > 0) {
             for (int i = 0; i < intersectionResults.size(); i++) {
                 intersections[intersectionResults[i]].highlight = true;
             }
+
         } else {
             //otherwise show error message
             gtk_popover_popup(popOver);    

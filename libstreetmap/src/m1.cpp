@@ -176,16 +176,22 @@ bool loadMap(std::string map_streets_database_filename) {
             if (street_seg_info.streetID == street_id) {
                 street_data[street_id].intersections.push_back(street_seg_info.to);
                 street_data[street_id].intersections.push_back(street_seg_info.from);
+                
+  
             }
         }
+        
+  
 
         //sort array in ascending order, delete duplicates
         auto begin = street_data[street_id].intersections.begin();
         auto end = street_data[street_id].intersections.end();
         std::sort(begin, end);
         auto last = std::unique(begin,end);
-        street_data[street_id].intersections.erase(last, end);       
+        street_data[street_id].intersections.resize(std::distance
+                    (street_data[street_id].intersections.begin(), last));       
     }
+    
     
     //fill multimap of <string streetName, streetIdx>
     for (StreetIdx street_id = 0; street_id < getNumStreets();street_id++){
@@ -507,6 +513,7 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
     //make two vectors with the intersections of each street
     std::vector<IntersectionIdx> street1 = street_data[street_ids.first].intersections;
     std::vector<IntersectionIdx> street2 = street_data[street_ids.second].intersections;
+    
     
     //corner case when streetIds are same
     //return all the intersections along street
