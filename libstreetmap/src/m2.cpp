@@ -125,7 +125,8 @@ struct entry_completion entryCompletion;
 //pointer to application when application.run is run
 ezgl::application* global_app;
 
-
+intersection_data path_from;
+intersection_data path_to;
 
 bool operator< (feature_data& first, feature_data& second){
     auto begin = feature_priority.begin();
@@ -357,7 +358,8 @@ void load_map(){
         intersections[i].coordinate = coordinate;
         intersections[i].name = getIntersectionName(i);
     }
- 
+    path_from = intersections[0];
+    path_to = intersections[0];
 
     //-------------------------------
     
@@ -1175,27 +1177,30 @@ void drawHighlights(ezgl::renderer *g){
     
     ezgl::rectangle world = g->get_visible_world();
     
-    //loops through all intersections and places pins at the ones that are highlighted
-    for(int i = 0;i < intersections.size();i++){
-        
-        double x = intersections[i].coordinate.x;
-        double y = intersections[i].coordinate.y;
+    //highlights the start intersection and the end intersection      
+        double x = path_from.coordinate.x;
+        double y = path_from.coordinate.y;
         
         //check that intersections are within visible world bounds
         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
-            if(intersections[i].highlight){
-                g -> draw_surface(png_surface,intersections[i].coordinate);
-                
+            if(path_from.highlight){
+                g -> draw_surface(png_surface,path_from.coordinate);
             }
         }
         
-    }
+        x = path_to.coordinate.x;
+        y = path_to.coordinate.y;
     
+        if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
+            if(path_to.highlight){
+                g -> draw_surface(png_surface,path_to.coordinate);
+            }
+        }
     //loops through all street segments and draws the ones that are highlighted
     for (int i = 0; i < street_segments.size(); i++) {
         
-        double x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
-        double y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
+         x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
+         y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
         
         //check if street segment is within visible world bounds
         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
@@ -1219,6 +1224,8 @@ void clearHighlights(){
     for(int i = 0;i < intersections.size();i++){
         intersections[i].highlight = false;
     }
+    path_from.highlight = false;
+    path_to.highlight = false;
     //set all street segment highlights
     for (int i = 0; i < street_segments.size(); i++) {
         street_segments[i].highlight = false;
@@ -1311,13 +1318,15 @@ void initial_setup(ezgl::application *application, bool){
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, double y){
     //if user left clicks
     if(event -> button == 1){
-        clearHighlights();
-        
+        if(path_to.highlight) clearHighlights();
+            
         //finds the intersection that the user clicks
         LatLon position = latLonFromWorld(x,y);
         int id = findClosestIntersection(position);
         intersections[id].highlight = true;
-        
+        if(path_from.highlight) path_to = intersections[id];
+        else path_from = intersections[id];
+            
         app -> refresh_drawing();
         app -> update_message("Pin placed at " + intersections[id].name + " " + std::to_string(id));
     }
