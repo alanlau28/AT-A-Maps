@@ -119,6 +119,8 @@ void reveal_search_activate(GtkEntry* entry);
 
 void reveal_search_entry(GtkEntry* entry);
 
+void display_path(const std::vector<StreetIdx> path);
+
 
 
 
