@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-
+void loadGraph();
 
 
 #ifdef __cplusplus
