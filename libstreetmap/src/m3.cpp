@@ -8,8 +8,7 @@
 #include <iostream>
 #include <climits>
 #include <unordered_map>
-
-
+#include <queue>
 
 
 class Node{
@@ -34,9 +33,21 @@ struct waveElement{
     Node *node;
     StreetSegmentIdx edgeID;
     double traveltime;
+    
+    waveElement(Node *n, int id, double time){
+        node = n;
+        edgeID = id;
+        traveltime = time;
+    }
+    
+    bool operator<(waveElement& rhs){
+        if(traveltime >= rhs.traveltime) return true;
+        else return false;
+    }
 };
 
 std::vector<Node> Graph;
+std::priority_queue<waveElement> wavefront;
 
 void loadGraph(){
     int num = getNumIntersections();
@@ -71,9 +82,10 @@ void loadGraph(){
  *        end.leading = edge
  */
 
-
-/*
- * initialize
- * visited = null
- * 
- */
+std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
+        const IntersectionIdx intersect_id_destination, const double turn_penalty){
+    std::vector<int> q;
+    return q;
+    
+    
+}

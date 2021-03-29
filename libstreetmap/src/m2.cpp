@@ -324,9 +324,13 @@ void load_map(){
         
             street_segments[street_segment_id].angle.push_back(theta);
         }
-        
-        adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.from));
-        adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.to));
+        if(street_seg_info.oneWay){
+            adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.to));
+        }
+        else{
+            adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.from));
+            adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.to));
+        }
         
     }
     
@@ -1206,6 +1210,7 @@ void drawHighlights(ezgl::renderer *g){
                 g -> draw_surface(png_surface,path_to.coordinate);
             }
         }
+        
     //loops through all street segments and draws the ones that are highlighted
     for (int i = 0; i < street_segments.size(); i++) {
         
@@ -1341,8 +1346,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         int id = findClosestIntersection(position);
         intersections[id].highlight = true;
         if(path_from.highlight) path_to = intersections[id];
-        else path_from = intersections[id];
-            
+        else path_from = intersections[id]; 
         app -> refresh_drawing();
         app -> update_message("Pin placed at " + intersections[id].name + " " + std::to_string(id));
     }
