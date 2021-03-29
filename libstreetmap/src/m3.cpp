@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 #include "m3.h"
+#include "m3_header.h"
 #include "m1.h"
 #include <iostream>
 #include <climits>
@@ -82,10 +83,21 @@ void loadGraph(){
  *        end.leading = edge
  */
 
+bool path(Node* source_node, IntersectionIdx destination){
+    wavefront.push(waveElement(source_node,0, 0));
+    //for(auto begin = )
+    
+    
+}
+
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
         const IntersectionIdx intersect_id_destination, const double turn_penalty){
-    std::vector<int> q;
-    return q;
+    std::vector<StreetSegmentIdx> path;
+    //Node *start = Graph[intersect_id_start];
+    
+    
+    
+    return path;
     
     
 }

@@ -18,6 +18,8 @@
 #include "ezgl/graphics.hpp"
 #include <gtk/gtk.h>
 
+extern std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
+
 
 void close_map();
 

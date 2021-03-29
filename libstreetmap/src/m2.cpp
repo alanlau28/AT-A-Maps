@@ -1,6 +1,7 @@
 #include "StreetsDatabaseAPI.h"
 #include "m2.h"
 #include "m1.h"
+#include "m3_header.h"
 #include "OSMDatabaseAPI.h"
 #include <math.h>
 #include <iostream>
@@ -338,7 +339,7 @@ void load_map(){
         
     }
     
-   
+    loadGraph();
     
     
     //-------------------------------------------------
