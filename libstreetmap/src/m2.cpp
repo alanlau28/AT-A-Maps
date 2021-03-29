@@ -133,9 +133,9 @@ ezgl::application* global_app;
 intersection_data path_from;
 intersection_data path_to;
 
-std::vector<StreetIdx> global_path = {4997, 4996, 4995, 4994, 4993, 173584, 173583, 
-150785, 150783, 23687, 23688, 44264, 132379, 132380, 132381, 210472, 111217, 111218, 
-111219, 178981, 175921};
+std::vector<StreetIdx> global_path = {218238, 186224, 186223, 2582, 2583, 2584, 2585, 
+2586, 2587, 2588, 2589, 2590, 2591,  2592, 17207, 45151, 37364, 37363 ,159898, 159899, 
+159897,  159890, 159891};
 
 bool operator< (feature_data& first, feature_data& second){
     auto begin = feature_priority.begin();
@@ -1128,7 +1128,6 @@ void draw_street_names (ezgl::renderer *g) {
                     else if (width < 2500){
                         g->set_text_rotation(street_segments[i].angle[0]);
                         //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
-                        
                         g->draw_text({x,y}, std::to_string(i), xBound, yBound);
                     }
                 }
@@ -1287,9 +1286,9 @@ void draw_main_canvas (ezgl::renderer *g){
     if(zoom>1500) draw_POI(g, small, large);
 
     drawHighlights(g);
-    
-    display_path(global_path);
 
+    display_path(global_path);
+    
     //only start to draw POI when zoomed in slightly
     if(zoom>800){
         draw_POI(g, small, large);
@@ -1343,6 +1342,14 @@ void initial_setup(ezgl::application *application, bool){
     gtk_label_set_text(mapLoaderLabel, "Now Showing \nToronto, Canada");
 }
 
+//draws path given vector of street segments, as well as directions
+void display_path(const std::vector<StreetIdx> path) {
+    
+    for (int i = 0; i < path.size(); i++) {
+        street_segments[path[i]].highlight = true;
+    }
+}
+
 
 //callback for left clicking on street segments or intersections
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, double y){
@@ -1390,15 +1397,6 @@ void drawMap(){
     
 }
 
-//draws a path between two intersections given a vector of street segments
-void display_path(const std::vector<StreetIdx> path) {
-    
-    //draw highlights
-    for (int i = 0; i < path.size(); i++) {
-        street_segments[path[i]].highlight = true;
-    }
-}
-
 
 //callback function for "choose map" button
 //lets user pick which map to show out of 19 possible
@@ -1437,7 +1435,6 @@ void map_list(GtkListBox* box) {
     global_app -> refresh_drawing(); 
 }
 
-//callback for revealing the 2nd search bar once "find directions" button has been clicked
 void reveal_search_bar() {
     GtkRevealer* revealer = (GtkRevealer*) global_app->get_object("DirectionsRevealer");
     
@@ -1455,7 +1452,6 @@ void reveal_search_bar() {
     
 }
 
-//function for doing stuff with the input inside the 2nd search entry
 void reveal_search_activate(GtkEntry* entry) {
     std::string text = gtk_entry_get_text(entry);
     gtk_entry_set_text(entry, " ");
