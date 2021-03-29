@@ -62,7 +62,9 @@ struct intersection_data{
 //global variable used for entry completion to work properly
 struct entry_completion{
     GtkEntryCompletion* completion;
+    GtkEntryCompletion* reveal_completion;
     GtkTreeModel* completion_model;
+    GtkTreeModel* reveal_completion_model;
 };
 
 //holds all the street segments and its respective data
@@ -1283,15 +1285,9 @@ void initial_setup(ezgl::application *application, bool){
     //connect search bar entry as signal
     GtkEntry* entry = (GtkEntry*) application->get_object("SearchEntry");
     //callback for typing into search entry
-    g_signal_connect(entry, 
-                     "search-changed", 
-                     G_CALLBACK(search_entry), 
-                     entry);
+    g_signal_connect(entry, "search-changed", G_CALLBACK(search_entry), entry);
     //callback for pressing enter in search entry
-    g_signal_connect(entry, 
-                     "activate", 
-                     G_CALLBACK(search_entry_activate),  
-                     entry);
+    g_signal_connect(entry, "activate", G_CALLBACK(search_entry_activate), entry);
 
     
     
@@ -1303,10 +1299,22 @@ void initial_setup(ezgl::application *application, bool){
     GtkListBox* mapList = (GtkListBox*) application->get_object("MapList");
     g_signal_connect(mapList, "row-activated", G_CALLBACK(map_list), mapList);
     
+    //find directions button
+    GtkWidget* directionsButton = (GtkWidget*) application->get_object("DirectionsButton");
+    g_signal_connect(directionsButton, "clicked", G_CALLBACK(reveal_search_bar), NULL);
+    
+   
+    //search entry that reveals once find directions button is clicked
+    GtkEntry* revealerEntry = (GtkEntry*) application->get_object("RevealerSearchEntry");
+    g_signal_connect(revealerEntry, "search-changed", G_CALLBACK(reveal_search_entry), revealerEntry);
+    g_signal_connect(revealerEntry, "activate", G_CALLBACK(reveal_search_activate), revealerEntry);
+    
     
     //for autocomplete
     entryCompletion.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
+    entryCompletion.reveal_completion = (GtkEntryCompletion*) global_app->get_object("RevealEntryCompletion");
     gtk_entry_set_completion(entry, entryCompletion.completion);
+    gtk_entry_set_completion(revealerEntry, entryCompletion.reveal_completion);
     
     //changes label under "choose map" button
     GtkLabel*   mapLoaderLabel = (GtkLabel*) application->get_object("MapLoaderDescription");
@@ -1399,8 +1407,69 @@ void map_list(GtkListBox* box) {
     global_app -> refresh_drawing(); 
 }
 
-//callbak for search entry, runs each time user changes input in search entry
+void reveal_search_bar() {
+    GtkRevealer* revealer = (GtkRevealer*) global_app->get_object("DirectionsRevealer");
+    
+    g_return_if_fail(GTK_IS_REVEALER(revealer));
+    
+    GtkEntry* searchEntry = (GtkEntry*) global_app->get_object("SearchEntry");
+    
+    if (gtk_revealer_get_reveal_child(revealer) == FALSE) {
+        gtk_revealer_set_reveal_child(revealer, TRUE);
+        gtk_entry_set_placeholder_text(searchEntry, "From");
+    } else {
+        gtk_entry_set_placeholder_text(searchEntry, "Search some place here!");
+        gtk_revealer_set_reveal_child(revealer, FALSE);
+    }
+    
+}
+
+void reveal_search_activate(GtkEntry* entry) {
+    std::string text = gtk_entry_get_text(entry);
+    gtk_entry_set_text(entry, " ");
+    
+    std::cout << text << std::endl;
+}
+
+//callback for search entry, runs each time user changes input in search entry
 //shows entry completion under it relating to user input
+void reveal_search_entry(GtkEntry* entry) {
+    
+    //entry completion is stored as a list
+    GtkListStore* store = gtk_list_store_new(1, G_TYPE_STRING);
+    GtkTreeIter iter;
+
+    // Get the text written in the widget
+    std::string text = gtk_entry_get_text(entry);
+    
+    std::vector<StreetIdx> street;
+    
+    if (text.size() > 2) {
+        //find street ids from partialStreetName
+        street = findStreetIdsFromPartialStreetName(text);
+        
+        if (street.size() > 0) {
+            for (int i = 0; i < street.size(); i++) {
+                std::string name = getStreetName(street[i]);
+                
+                //insert street names into gtk List, to be shown with entry completion
+                gtk_list_store_append (store, &iter);
+                gtk_list_store_set (store, &iter, 0, name.c_str(), -1);
+
+            }
+            
+        }
+    } 
+    
+    //set entry completion model and which column to show
+    entryCompletion.reveal_completion_model = GTK_TREE_MODEL(store);
+    gtk_entry_completion_set_model (entryCompletion.reveal_completion, entryCompletion.reveal_completion_model);
+    gtk_entry_completion_set_text_column(entryCompletion.reveal_completion, 0);
+
+    //after that clear the entry and vector
+    street.clear();
+}
+
 void search_entry(GtkEntry* entry) {
     
     //entry completion is stored as a list

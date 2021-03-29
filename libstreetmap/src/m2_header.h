@@ -113,6 +113,12 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
 
 void map_list(GtkListBox* box);
 
+void reveal_search_bar();
+
+void reveal_search_activate(GtkEntry* entry);
+
+void reveal_search_entry(GtkEntry* entry);
+
 
 
 

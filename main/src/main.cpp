@@ -63,6 +63,7 @@ int main(int argc, char** argv) {
             load_success = loadMap(map_path);
         }while(!load_success);
     }
+    
 
     std::cout << "Successfully loaded map '" << map_path << "'\n";
 
