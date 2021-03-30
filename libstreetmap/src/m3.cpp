@@ -109,19 +109,17 @@ bool path(Node* source_node, IntersectionIdx destination){
         if(wave.traveltime < currNode -> time){
             currNode -> leading = wave.edgeID;
             currNode -> time = wave.traveltime;
-        
             if(currNode -> ID == destination){
                 return true;
             }
 
             for(int i = 0; i < currNode -> outgoing.size(); i++){
                 auto it = adjacent[currNode -> ID].find(currNode -> outgoing[i]);
-                while(it != adjacent[currNode -> ID].end()){
+                if(it != adjacent[currNode -> ID].end()){
                     Node* toNode = Graph[it->second];
-                    toNode -> prev = currNode;
-                    waveElement elem(toNode,it->first,findStreetSegmentTravelTime(it -> first));
-                    wavefront.push(elem);
-                    it++; 
+                    if(toNode -> prev != currNode) toNode -> prev = currNode;
+                    waveElement elem(toNode,it->first,findStreetSegmentTravelTime(it -> first)+currNode -> time);
+                    wavefront.push(elem); 
                 } 
             }
         } 
@@ -132,11 +130,11 @@ bool path(Node* source_node, IntersectionIdx destination){
 std::vector<StreetSegmentIdx> traceBack(int destination){
     std::vector<StreetSegmentIdx> finalpath;
     Node *currNode = Graph[destination];
-    int prev = currNode -> leading;
-    while(prev != -1){
-        finalpath.push_back(prev);
+    int reachingEdge = currNode -> leading;
+    while(reachingEdge != -1){
+        finalpath.push_back(reachingEdge);
         currNode = currNode -> prev;
-        prev = currNode -> leading;
+        reachingEdge = currNode -> leading;
     }
     std::reverse(finalpath.begin(),finalpath.end());
     return finalpath;
@@ -149,8 +147,9 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     Node *start = Graph[intersect_id_start];
     bool found = path(start,intersect_id_destination);
     if(found){
-        return traceBack(intersect_id_destination);
+        fpath = traceBack(intersect_id_destination);
     }
+    Graph.clear();
     return fpath;
     
     
