@@ -16,10 +16,7 @@
 #include <point.hpp>
 #include <unordered_set>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> commit to pull
 
 
 struct boundingBox{

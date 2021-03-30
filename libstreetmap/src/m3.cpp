@@ -50,7 +50,9 @@ struct waveElement{
 
 };
 
+
 std::vector<Node*> Graph;
+
 
 
 bool operator<(const waveElement& lhs,const waveElement& rhs){
@@ -106,13 +108,8 @@ void loadGraph(){
  */
 
 
-<<<<<<< HEAD
 bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
 
-
-
-=======
->>>>>>> commit to checkout
     std::priority_queue<waveElement> wavefront;
 
     waveElement source(source_node,-1, 0);
@@ -125,11 +122,13 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
         if(wave.traveltime < currNode -> time){
             currNode -> leading = wave.edgeID;
             currNode -> time = wave.traveltime;
+
             if(currNode -> ID == destination){
                 return true;
             }
 
             for(int i = 0; i < currNode -> outgoing.size(); i++){
+
                 auto it = adjacent[currNode -> ID].find(currNode -> outgoing[i]);
                 if(it != adjacent[currNode -> ID].end()){
                     double travelTime;
@@ -143,6 +142,7 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
                     Node* toNode = Graph[it->second];
                     waveElement elem(toNode,it->first,travelTime);
                     wavefront.push(elem); 
+
                 } 
             }
         } 
@@ -153,6 +153,7 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
 std::vector<StreetSegmentIdx> traceBack(int destination){
     std::vector<StreetSegmentIdx> finalpath;
     Node *currNode = Graph[destination];
+
     int reachingEdge = currNode -> leading;
     while(reachingEdge != -1){
         finalpath.push_back(reachingEdge);
@@ -160,6 +161,7 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
         if(info.from == currNode->ID) currNode = Graph[info.to];
         else currNode = Graph[info.from];
         reachingEdge = currNode -> leading;
+
     }
     std::reverse(finalpath.begin(),finalpath.end());
     return finalpath;
@@ -172,15 +174,14 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     Node *start = Graph[intersect_id_start];
     bool found = path(start,intersect_id_destination,0);
     if(found){
+
         fpath = traceBack(intersect_id_destination);
     }
     Graph.clear();
-    return fpath;
-<<<<<<< HEAD
 
-}
-=======
+    return fpath;
+
     
 }
 
->>>>>>> commit to pull
+
