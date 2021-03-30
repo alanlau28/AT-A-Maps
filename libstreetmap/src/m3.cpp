@@ -5,7 +5,6 @@
  */
 #include "m3.h"
 #include "m3_header.h"
-#include "m2_header.h"
 #include "m1.h"
 #include <iostream>
 #include <climits>
@@ -13,21 +12,20 @@
 #include <queue>
 #include <algorithm>
 
-std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
-
 class Node{
 public:
     IntersectionIdx ID;
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
+
     Node(int id,double t, std::vector<StreetSegmentIdx> out);      
     
 };
 
 Node::Node(int id, double t, std::vector<StreetSegmentIdx> out){
     ID = id;
-    leading = -1;
+    leading = 0;
     time = t;
     outgoing = out;
 }
@@ -42,10 +40,15 @@ struct waveElement{
         edgeID = id;
         traveltime = time;
     }
-
+    
+    bool operator<(waveElement& rhs){
+        if(traveltime >= rhs.traveltime) return true;
+        else return false;
+    }
 };
 
 std::vector<Node*> Graph;
+
 
 bool operator<(const waveElement& lhs,const waveElement& rhs){
     if(lhs.traveltime >= rhs.traveltime) return true;
@@ -68,9 +71,9 @@ void loadGraph(){
                 adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.from));
             }
         }
+
     }
 }
-
 
 
 /*for all intersections:
@@ -96,8 +99,14 @@ void loadGraph(){
  *        end.leading = edge
  */
 
+<<<<<<< HEAD
 bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
+=======
+bool path(Node* source_node, IntersectionIdx destination){
+
+>>>>>>> commit to resolve conflict
     std::priority_queue<waveElement> wavefront;
+
     waveElement source(source_node,-1, 0);
     wavefront.push(source);
     while(!wavefront.empty()){
@@ -147,9 +156,11 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
     }
     std::reverse(finalpath.begin(),finalpath.end());
     return finalpath;
+
 }
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
+
     const IntersectionIdx intersect_id_destination, const double turn_penalty){
     loadGraph();
     std::vector<StreetSegmentIdx> fpath;

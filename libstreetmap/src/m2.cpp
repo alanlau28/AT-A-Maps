@@ -18,6 +18,7 @@
 
 
 
+
 struct boundingBox{
     double max_x; // the max and min x,y coordinates of the map
     double max_y;
@@ -207,7 +208,8 @@ void loadFeaturePriority(){
 }
 
 void load_map(){
-  
+    
+    adjacent.resize(getNumStreetSegments());
     
     loadOSMDatabaseBIN(map_paths.find(map_load_path) -> second);
     
@@ -328,6 +330,14 @@ void load_map(){
         
             street_segments[street_segment_id].angle.push_back(theta);
         }
+        if(street_seg_info.oneWay){
+            adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.to));
+        }
+        else{
+            adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.from));
+            adjacent[street_segment_id].insert(std::make_pair(street_segment_id, street_seg_info.to));
+        }
+        
     }
     
     //-------------------------------------------------
@@ -1808,4 +1818,5 @@ void close_map(){
     intersections.clear();
 
     street_types.clear();
+    
 }
