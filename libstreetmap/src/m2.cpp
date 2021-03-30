@@ -134,6 +134,7 @@ ezgl::application* global_app;
 intersection_data path_from;
 intersection_data path_to;
 
+//global vector storing a specified path for testing directions
 std::vector<StreetIdx> global_path = {218238, 186224, 186223, 2582, 2583, 2584, 2585, 
 2586, 2587, 2588, 2589, 2590, 2591,  2592, 17207, 45151, 37364, 37363 ,159898, 159899, 
 159897,  159890, 159891};
@@ -339,7 +340,7 @@ void load_map(){
         
     }
     
-    loadGraph();
+    //loadGraph();
     
     
     //-------------------------------------------------
@@ -1112,24 +1113,24 @@ void draw_street_names (ezgl::renderer *g) {
                          street_segments[i].segment_type == "trunk" 
                          )&& width < 15000 ) {
                         g->set_text_rotation(street_segments[i].angle[0]);
-                        //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                        g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     if (( street_segments[i].segment_type == "secondary" ||
                             street_segments[i].segment_type == "tertiary" ||
                             street_segments[i].segment_type == "residential") && width < 7500) {
                         g->set_text_rotation(street_segments[i].angle[0]);
-                        //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                        g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     }
                     if((street_segments[i].segment_type == "unclassified" || 
                             street_segments[i].segment_type == "living_street"
                             ) && width < 3500){
                         g->set_text_rotation(street_segments[i].angle[0]);
-                        //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                        g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                     } 
                     else if (width < 2500){
                         g->set_text_rotation(street_segments[i].angle[0]);
-                        //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
-                        g->draw_text({x,y}, std::to_string(i), xBound, yBound);
+                        g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                        //g->draw_text({x,y}, std::to_string(i), xBound, yBound);
                     }
                 }
             }
@@ -1161,24 +1162,24 @@ void draw_street_names (ezgl::renderer *g) {
                              street_segments[i].segment_type == "primary"  ||
                               street_segments[i].segment_type == "trunk" ) && width < 15000 ) {
                             g->set_text_rotation(street_segments[i].angle[j]);
-                            //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                         }
                         if ((street_segments[i].segment_type == "secondary" ||
                                 street_segments[i].segment_type == "tertiary" )&& width < 7500) {
                             g->set_text_rotation(street_segments[i].angle[j]);
-                            //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                         }
                         if((street_segments[i].segment_type == "unclassified" || 
                             street_segments[i].segment_type == "living_street" ||
                             street_segments[i].segment_type == "residential") && width < 3500){
                             g->set_text_rotation(street_segments[i].angle[j]);
-                            //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);          
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);          
                         } 
                         else if (width < 2500){
                             g->set_text_rotation(street_segments[i].angle[j]);
-                            //g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
+                            g->draw_text({x, y}, street_segments[i].name, xBound, yBound);
                             
-                            g->draw_text({x,y}, std::to_string(i), xBound, yBound);
+                            //g->draw_text({x,y}, std::to_string(i), xBound, yBound);
                         }
                     }
                 }
@@ -1229,7 +1230,7 @@ void drawHighlights(ezgl::renderer *g){
         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
             if (street_segments[i].highlight) {
                 g->set_line_width(20);
-                g->set_color(ezgl::RED);
+                g->set_color(255,0,0, 127);
                 
                 //highlight street segments
                 for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
@@ -1238,6 +1239,12 @@ void drawHighlights(ezgl::renderer *g){
             } 
         }
     }
+        //for drawing highlights on any highlighted intersection
+//    for (int i = 0; i < intersections.size(); i++) {
+//        if (intersections[i].highlight) {
+//            g -> draw_surface(png_surface,intersections[i].coordinate);
+//        }
+//    }
     ezgl::renderer::free_surface(png_surface);
 }
 
@@ -1288,7 +1295,7 @@ void draw_main_canvas (ezgl::renderer *g){
 
     drawHighlights(g);
 
-    display_path(global_path);
+
     
     //only start to draw POI when zoomed in slightly
     if(zoom>800){
@@ -1338,6 +1345,9 @@ void initial_setup(ezgl::application *application, bool){
     gtk_entry_set_completion(entry, entryCompletion.completion);
     gtk_entry_set_completion(revealerEntry, entryCompletion.reveal_completion);
     
+    
+    
+    
     //changes label under "choose map" button
     GtkLabel*   mapLoaderLabel = (GtkLabel*) application->get_object("MapLoaderDescription");
     gtk_label_set_text(mapLoaderLabel, "Now Showing \nToronto, Canada");
@@ -1346,9 +1356,80 @@ void initial_setup(ezgl::application *application, bool){
 //draws path given vector of street segments, as well as directions
 void display_path(const std::vector<StreetIdx> path) {
     
+    //highlight all the segments on a path
     for (int i = 0; i < path.size(); i++) {
         street_segments[path[i]].highlight = true;
     }
+    
+    //UI stuff
+    GtkOverlay* overlay = (GtkOverlay*) global_app->get_object("MainCanvasOverlay");
+    GtkWidget* listBox = gtk_list_box_new();
+    gtk_overlay_add_overlay(overlay, listBox);
+    g_object_set(listBox, "halign", GTK_ALIGN_START, NULL);
+    g_object_set(listBox, "valign", GTK_ALIGN_END, NULL);
+
+    
+    //write the first intersection where it starts
+    GtkWidget* label = gtk_label_new("");
+    std::string step ("Start at ");
+    step.append(intersections[getStreetSegmentInfo(path[0]).to].name);
+    gtk_label_set_text((GtkLabel*)label, step.c_str());
+    gtk_misc_set_alignment(GTK_MISC(label), 0.0f, 0.0f);
+    //gtk_label_set_justify((GtkLabel*)label, GTK_JUSTIFY_LEFT);
+    gtk_list_box_insert((GtkListBox*) listBox, label, -1);
+    //std::cout << "Start at " +  << std::endl; 
+    
+    //get directions
+    for (int i = 0; i < path.size() - 1; i++) {
+        
+        //if street name changes
+        if (street_segments[path[i]].name != street_segments[path[i + 1]].name) {
+            
+            //find difference in angles between the two street segments
+            double angle_diff = street_segments[path[i]].angle.back() - street_segments[path[i+1]].angle[0];
+            
+            std::string direction;
+            
+            if (angle_diff > 0) direction = "left";
+            if (angle_diff < 0) direction = "right";
+            
+            GtkWidget* label1 = gtk_label_new("");
+            std::string step1 ("Follow ");
+            step1.append(street_segments[path[i]].name);
+            step1.append(" until ");
+            step1.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
+            gtk_label_set_text((GtkLabel*)label1, step1.c_str());
+            gtk_misc_set_alignment(GTK_MISC(label1), 0.0f, 0.0f);
+            //gtk_label_set_justify((GtkLabel*)label1, GTK_JUSTIFY_LEFT);
+            gtk_list_box_insert((GtkListBox*) listBox, label1, -1);
+            
+            GtkWidget* label2 = gtk_label_new("");
+            std::string step2 ("Turn ");
+            step2.append(direction);
+            step2.append(" at ");
+            step2.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
+            gtk_label_set_text((GtkLabel*)label2, step2.c_str());
+            gtk_misc_set_alignment(GTK_MISC(label2), 0.0f, 0.0f);
+            //gtk_label_set_justify((GtkLabel*)label2, GTK_JUSTIFY_LEFT);
+            gtk_list_box_insert((GtkListBox*) listBox, label2, -1);
+            
+
+        }
+    }
+    
+    GtkWidget* label3 = gtk_label_new("");
+    std::string step3 ("End journey at ");
+    step3.append(intersections[getStreetSegmentInfo(path.back()).to].name);
+    
+    gtk_label_set_text((GtkLabel*)label3, step3.c_str());
+    gtk_misc_set_alignment(GTK_MISC(label3), 0.0f, 0.0f);
+    //gtk_label_set_justify((GtkLabel*)label3, GTK_JUSTIFY_LEFT);
+    gtk_list_box_insert((GtkListBox*) listBox, label3, -1);
+    std::cout << "End journey at " + intersections[getStreetSegmentInfo(path.back()).to].name <<std::endl;
+    
+    
+    //show widgets
+    gtk_widget_show_all((GtkWidget*) overlay);
 }
 
 
@@ -1437,6 +1518,8 @@ void map_list(GtkListBox* box) {
 }
 
 void reveal_search_bar() {
+    display_path(global_path);
+    
     GtkRevealer* revealer = (GtkRevealer*) global_app->get_object("DirectionsRevealer");
     
     g_return_if_fail(GTK_IS_REVEALER(revealer));
