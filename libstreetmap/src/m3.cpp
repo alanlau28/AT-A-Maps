@@ -46,31 +46,28 @@ struct waveElement{
 
 };
 
-std::vector<Node> Graph;
-std::priority_queue<waveElement> wavefront;
+std::vector<Node*> Graph;
 
 bool operator<(const waveElement& lhs,const waveElement& rhs){
-        if(lhs.traveltime >= rhs.traveltime) return true;
-        else return false;
+    if(lhs.traveltime >= rhs.traveltime) return true;
+    else return false;
 }
 
 void loadGraph(){
     int num = getNumIntersections();
-    for (int i = 0; i < num; i++){
-        std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
-        Node currNode(i, INT_MAX, outgoing);
-        Graph.push_back(currNode);
-    }
-    num = getNumStreetSegments();
     adjacent.resize(num);
     for (int i = 0; i < num; i++){
-        StreetSegmentInfo street_seg_info = getStreetSegmentInfo(i);
-        if(street_seg_info.oneWay){
-            adjacent[i].insert(std::make_pair(i, street_seg_info.to));
+        std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
+        //Node* currNode = new Node(i, INT_MAX, outgoing);
+        Graph.push_back(new Node(i, INT_MAX, outgoing));
+        for(int j = 0;j < outgoing.size();j++){
+            StreetSegmentInfo street_seg_info = getStreetSegmentInfo(outgoing[j]);
+            if(i != street_seg_info.to){
+                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.to));
             }
-        else{
-            adjacent[i].insert(std::make_pair(i, street_seg_info.from));
-            adjacent[i].insert(std::make_pair(i, street_seg_info.to));
+            else if(!street_seg_info.oneWay){
+                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.from));
+            }
         }
     }
 }
@@ -101,6 +98,7 @@ void loadGraph(){
  */
 
 bool path(Node* source_node, IntersectionIdx destination){
+    std::priority_queue<waveElement> wavefront;
     waveElement source(source_node,-1, 0);
     wavefront.push(source);
     while(!wavefront.empty()){
@@ -117,9 +115,9 @@ bool path(Node* source_node, IntersectionIdx destination){
             }
 
             for(int i = 0; i < currNode -> outgoing.size(); i++){
-                auto it = adjacent[currNode -> outgoing[i]].find(currNode -> outgoing[i]);
-                while(it != adjacent[i].end()){
-                    Node* toNode = &Graph[it -> second];
+                auto it = adjacent[currNode -> ID].find(currNode -> outgoing[i]);
+                while(it != adjacent[currNode -> ID].end()){
+                    Node* toNode = Graph[it->second];
                     toNode -> prev = currNode;
                     waveElement elem(toNode,it->first,findStreetSegmentTravelTime(it -> first));
                     wavefront.push(elem);
@@ -133,7 +131,7 @@ bool path(Node* source_node, IntersectionIdx destination){
 
 std::vector<StreetSegmentIdx> traceBack(int destination){
     std::vector<StreetSegmentIdx> finalpath;
-    Node *currNode = &Graph[destination];
+    Node *currNode = Graph[destination];
     int prev = currNode -> leading;
     while(prev != -1){
         finalpath.push_back(prev);
@@ -148,12 +146,11 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     const IntersectionIdx intersect_id_destination, const double turn_penalty){
     loadGraph();
     std::vector<StreetSegmentIdx> fpath;
-    Node *start = &Graph[intersect_id_start];
+    Node *start = Graph[intersect_id_start];
     bool found = path(start,intersect_id_destination);
     if(found){
-        return traceBack(intersect_id_destination);
+        return fpath;//traceBack(intersect_id_destination);
     }
-    //c
     return fpath;
     
     

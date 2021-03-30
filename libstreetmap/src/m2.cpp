@@ -17,7 +17,7 @@
 #include <unordered_set>
 
 
-ds
+
 struct boundingBox{
     double max_x; // the max and min x,y coordinates of the map
     double max_y;
@@ -329,9 +329,6 @@ void load_map(){
             street_segments[street_segment_id].angle.push_back(theta);
         }
     }
-    
-    //loadGraph();
-    
     
     //-------------------------------------------------
     
