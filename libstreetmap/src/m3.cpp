@@ -149,7 +149,7 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     Node *start = Graph[intersect_id_start];
     bool found = path(start,intersect_id_destination);
     if(found){
-        return fpath;//traceBack(intersect_id_destination);
+        return traceBack(intersect_id_destination);
     }
     return fpath;
     
