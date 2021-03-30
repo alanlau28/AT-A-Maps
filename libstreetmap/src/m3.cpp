@@ -99,12 +99,11 @@ void loadGraph(){
  *        end.leading = edge
  */
 
-<<<<<<< HEAD
-bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
-=======
-bool path(Node* source_node, IntersectionIdx destination){
 
->>>>>>> commit to resolve conflict
+bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
+
+
+
     std::priority_queue<waveElement> wavefront;
 
     waveElement source(source_node,-1, 0);
