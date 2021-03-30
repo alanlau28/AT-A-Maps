@@ -5,6 +5,7 @@
  */
 #include "m3.h"
 #include "m3_header.h"
+#include "m2_header.h"
 #include "m1.h"
 #include <iostream>
 #include <climits>
@@ -12,12 +13,17 @@
 #include <queue>
 #include <algorithm>
 
+
+std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
+
+
 class Node{
 public:
     IntersectionIdx ID;
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
+    Node* prev = nullptr;
 
     Node(int id,double t, std::vector<StreetSegmentIdx> out);      
     
@@ -25,7 +31,7 @@ public:
 
 Node::Node(int id, double t, std::vector<StreetSegmentIdx> out){
     ID = id;
-    leading = 0;
+    leading = -1;
     time = t;
     outgoing = out;
 }
@@ -40,11 +46,7 @@ struct waveElement{
         edgeID = id;
         traveltime = time;
     }
-    
-    bool operator<(waveElement& rhs){
-        if(traveltime >= rhs.traveltime) return true;
-        else return false;
-    }
+
 };
 
 std::vector<Node*> Graph;
@@ -54,6 +56,7 @@ bool operator<(const waveElement& lhs,const waveElement& rhs){
     if(lhs.traveltime >= rhs.traveltime) return true;
     else return false;
 }
+
 
 void loadGraph(){
     int num = getNumIntersections();
@@ -73,7 +76,9 @@ void loadGraph(){
         }
 
     }
+   
 }
+
 
 
 /*for all intersections:
@@ -100,10 +105,13 @@ void loadGraph(){
  */
 
 
+<<<<<<< HEAD
 bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
 
 
 
+=======
+>>>>>>> commit to checkout
     std::priority_queue<waveElement> wavefront;
 
     waveElement source(source_node,-1, 0);
@@ -114,7 +122,6 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
         Node *currNode = wave.node;
         
         if(wave.traveltime < currNode -> time){
-            //std::cout<<"if traveltime\n";
             currNode -> leading = wave.edgeID;
             currNode -> time = wave.traveltime;
             if(currNode -> ID == destination){
@@ -155,11 +162,9 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
     }
     std::reverse(finalpath.begin(),finalpath.end());
     return finalpath;
-
 }
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
-
     const IntersectionIdx intersect_id_destination, const double turn_penalty){
     loadGraph();
     std::vector<StreetSegmentIdx> fpath;
@@ -170,4 +175,5 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     }
     Graph.clear();
     return fpath;
+
 }
