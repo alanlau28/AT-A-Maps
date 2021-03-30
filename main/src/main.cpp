@@ -24,6 +24,9 @@
 #include "m1.h"
 #include "m2.h"
 #include "m3.h"
+
+#include <vector>
+
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everything went OK
 constexpr int ERROR_EXIT_CODE = 1;          //An error occurred
@@ -73,10 +76,17 @@ int main(int argc, char** argv) {
     //do something in between
     
     //drawMap();
+
     std::vector<StreetSegmentIdx> path;
+<<<<<<< HEAD
     //path = findPathBetweenIntersections(7832, 19097, 0.00000000000000000);
     //path = findPathBetweenIntersections(13, 184, 0.00000000000000000);
     path = findPathBetweenIntersections(13, 51601, 0.00000000000000000);
+=======
+    path = findPathBetweenIntersections(7832, 19097, 0.00000000000000000);
+
+
+>>>>>>> commit to pull
     //Clean-up the map data and related data structures
     std::cout << "Closing map\n";
     closeMap(); 

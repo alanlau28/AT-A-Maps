@@ -16,6 +16,7 @@
 
 std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
 
+
 //ewf
 class Node{
 public:
@@ -175,5 +176,11 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     }
     Graph.clear();
     return fpath;
+<<<<<<< HEAD
 
 }
+=======
+    
+}
+
+>>>>>>> commit to pull
