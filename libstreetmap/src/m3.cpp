@@ -106,6 +106,7 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
         Node *currNode = wave.node;
         
         if(wave.traveltime < currNode -> time){
+            std::cout<<"if traveltime\n";
             currNode -> leading = wave.edgeID;
             currNode -> time = wave.traveltime;
             if(currNode -> ID == destination){
