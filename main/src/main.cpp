@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
   
     //do something in between
     
-    //drawMap();
+    drawMap();
 
     std::vector<StreetSegmentIdx> path;
 

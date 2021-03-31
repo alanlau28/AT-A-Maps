@@ -18,7 +18,6 @@
 
 
 
-
 struct boundingBox{
     double max_x; // the max and min x,y coordinates of the map
     double max_y;
@@ -64,11 +63,15 @@ struct intersection_data{
 };
 
 //global variable used for entry completion to work properly
-struct entry_completion{
+struct global_widgets{
     GtkEntryCompletion* completion;
     GtkEntryCompletion* reveal_completion;
     GtkTreeModel* completion_model;
     GtkTreeModel* reveal_completion_model;
+    
+    GtkWidget* overlay;
+    GtkWidget* scrolledBox;
+    GtkWidget* listBox;
 };
 
 //holds all the street segments and its respective data
@@ -126,7 +129,7 @@ struct boundingBox bounds;
 //global variable used to set entryCompletion
 //used so that the same entry completion can be used 
 //for every instance the search entry is changed
-struct entry_completion entryCompletion;
+struct global_widgets globalWidgets;
 
 //pointer to application when application.run is run
 ezgl::application* global_app;
@@ -135,9 +138,13 @@ intersection_data path_from;
 intersection_data path_to;
 
 //global vector storing a specified path for testing directions
-std::vector<StreetIdx> global_path = {218238, 186224, 186223, 2582, 2583, 2584, 2585, 
-2586, 2587, 2588, 2589, 2590, 2591,  2592, 17207, 45151, 37364, 37363 ,159898, 159899, 
-159897,  159890, 159891};
+std::vector<StreetIdx> global_path = {144, 15146, 6, 102106, 15, 110366, 110368, 
+141125, 123475, 15150, 110374, 15151, 15152, 15153, 99836, 99837, 138461, 138462, 
+142246, 142247, 82737, 59938, 59935, 60810, 60809, 60808, 60800, 60801, 60802, 
+60803, 60804, 60824, 60823, 60822, 60816, 60815, 150320, 13780, 13779, 123, 124, 
+113901, 110454, 10572, 135096, 135103, 116392, 116403, 116399, 126700, 116406, 116407, 
+114546, 114547, 114505, 114538, 114539, 114540, 9054, 35288, 116206, 116207, 179447, 
+116194, 116195, 116196, 116205, 109562, 109540, 47897, 49422, 47226, 51391, 50093};
 
 bool operator< (feature_data& first, feature_data& second){
     auto begin = feature_priority.begin();
@@ -1229,11 +1236,11 @@ void drawHighlights(ezgl::renderer *g){
         }
     }
         //for drawing highlights on any highlighted intersection
-//    for (int i = 0; i < intersections.size(); i++) {
-//        if (intersections[i].highlight) {
-//            g -> draw_surface(png_surface,intersections[i].coordinate);
-//        }
-//    }
+    for (int i = 0; i < intersections.size(); i++) {
+        if (intersections[i].highlight) {
+            g -> draw_surface(png_surface,intersections[i].coordinate);
+        }
+    }
     ezgl::renderer::free_surface(png_surface);
 }
 
@@ -1284,7 +1291,9 @@ void draw_main_canvas (ezgl::renderer *g){
 
     drawHighlights(g);
 
-
+    //intersections[13].highlight = true;
+    //intersections[184].highlight = true;
+    //street_segments[137].highlight = true;
     
     //only start to draw POI when zoomed in slightly
     if(zoom>800){
@@ -1329,10 +1338,10 @@ void initial_setup(ezgl::application *application, bool){
     
     
     //for autocomplete
-    entryCompletion.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
-    entryCompletion.reveal_completion = (GtkEntryCompletion*) global_app->get_object("RevealEntryCompletion");
-    gtk_entry_set_completion(entry, entryCompletion.completion);
-    gtk_entry_set_completion(revealerEntry, entryCompletion.reveal_completion);
+    globalWidgets.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
+    globalWidgets.reveal_completion = (GtkEntryCompletion*) global_app->get_object("RevealEntryCompletion");
+    gtk_entry_set_completion(entry, globalWidgets.completion);
+    gtk_entry_set_completion(revealerEntry, globalWidgets.reveal_completion);
     
     
     
@@ -1351,21 +1360,40 @@ void display_path(const std::vector<StreetIdx> path) {
     }
     
     //UI stuff
-    GtkOverlay* overlay = (GtkOverlay*) global_app->get_object("MainCanvasOverlay");
-    GtkWidget* listBox = gtk_list_box_new();
-    gtk_overlay_add_overlay(overlay, listBox);
-    g_object_set(listBox, "halign", GTK_ALIGN_START, NULL);
-    g_object_set(listBox, "valign", GTK_ALIGN_END, NULL);
-
+    globalWidgets.overlay = (GtkWidget*) global_app->get_object("MainCanvasOverlay");
+    globalWidgets.scrolledBox = gtk_scrolled_window_new(NULL, NULL);
     
+    gtk_overlay_add_overlay((GtkOverlay*)globalWidgets.overlay, globalWidgets.scrolledBox);
+    //gtk_container_set_border_width (GTK_CONTAINER (globalWidgets.scrolledBox), 20);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(globalWidgets.scrolledBox), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    //gtk_scrolled_window_set_max_content_height ((GtkScrolledWindow*)globalWidgets.scrolledBox, 200);
+    //gtk_scrolled_window_set_min_content_width ((GtkScrolledWindow*)globalWidgets.scrolledBox, 600);
+    gtk_scrolled_window_set_min_content_height((GtkScrolledWindow*)globalWidgets.scrolledBox, 600);
+    gtk_scrolled_window_set_propagate_natural_width ((GtkScrolledWindow*)globalWidgets.scrolledBox, TRUE);
+    
+     globalWidgets.listBox = gtk_list_box_new();
+    gtk_container_add(GTK_CONTAINER(globalWidgets.scrolledBox), globalWidgets.listBox );
+    
+    
+    g_object_set(globalWidgets.scrolledBox , "halign", GTK_ALIGN_START, NULL);
+    g_object_set(globalWidgets.scrolledBox , "valign", GTK_ALIGN_END, NULL);
+    
+    //header
+    GtkWidget* label0 = gtk_label_new("Directions");
+    gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label0, -1);
+
+    int number = 1;
     //write the first intersection where it starts
     GtkWidget* label = gtk_label_new("");
-    std::string step ("Start at ");
+    std::string step (std::to_string(number));
+    step.append(". ");
+    number++;
+    step.append ("Start at ");
     step.append(intersections[getStreetSegmentInfo(path[0]).to].name);
     gtk_label_set_text((GtkLabel*)label, step.c_str());
     gtk_misc_set_alignment(GTK_MISC(label), 0.0f, 0.0f);
     //gtk_label_set_justify((GtkLabel*)label, GTK_JUSTIFY_LEFT);
-    gtk_list_box_insert((GtkListBox*) listBox, label, -1);
+    gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label, -1);
     //std::cout << "Start at " +  << std::endl; 
     
     //get directions
@@ -1375,50 +1403,86 @@ void display_path(const std::vector<StreetIdx> path) {
         if (street_segments[path[i]].name != street_segments[path[i + 1]].name) {
             
             //find difference in angles between the two street segments
-            double angle_diff = street_segments[path[i]].angle.back() - street_segments[path[i+1]].angle[0];
+            double angle_from = street_segments[path[i]].angle.back();
+            double angle_to = street_segments[path[i+1]].angle[0];
+            double angle_diff = angle_from - angle_to;
             
             std::string direction;
             
-            if (angle_diff > 0) direction = "left";
-            if (angle_diff < 0) direction = "right";
+            //for figuring out direction
+            if (angle_from >= 0) {
+                if (angle_to >= 0) {
+                    if (angle_diff >= 0) {
+                        direction = "left";
+                    } else if (angle_diff <= 0) {
+                        direction = "right";
+                    }
+                } else if (angle_to <= 0) {
+                    if (angle_diff >= 0) {
+                        direction = "right";
+                    } else if (angle_diff <= 0) {
+                        direction = "right";
+                    }
+                }
+            } else if (angle_from <= 0) {
+                if (angle_to >= 0) {
+                    if (angle_diff >= 0) {
+                        direction = "left";
+                    } else if (angle_diff <= 0) {
+                        direction = "left";
+                    }
+                } else if (angle_to <= 0) {
+                    if (angle_diff >= 0) {
+                        direction = "right";
+                    } else if (angle_diff <= 0) {
+                        direction = "left";
+                    }
+                }
+            }
             
             GtkWidget* label1 = gtk_label_new("");
-            std::string step1 ("Follow ");
+            std::string step1 (std::to_string(number));
+            step1.append(". ");
+            number++;
+            step1.append ("Follow ");
             step1.append(street_segments[path[i]].name);
             step1.append(" until ");
             step1.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
             gtk_label_set_text((GtkLabel*)label1, step1.c_str());
             gtk_misc_set_alignment(GTK_MISC(label1), 0.0f, 0.0f);
             //gtk_label_set_justify((GtkLabel*)label1, GTK_JUSTIFY_LEFT);
-            gtk_list_box_insert((GtkListBox*) listBox, label1, -1);
+            gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label1, -1);
             
             GtkWidget* label2 = gtk_label_new("");
-            std::string step2 ("Turn ");
+            std::string step2 (std::to_string(number));
+            step2.append(". ");
+            number++;
+            step2.append ("Turn ");
             step2.append(direction);
             step2.append(" at ");
             step2.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
             gtk_label_set_text((GtkLabel*)label2, step2.c_str());
             gtk_misc_set_alignment(GTK_MISC(label2), 0.0f, 0.0f);
             //gtk_label_set_justify((GtkLabel*)label2, GTK_JUSTIFY_LEFT);
-            gtk_list_box_insert((GtkListBox*) listBox, label2, -1);
+            gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label2, -1);
             
 
         }
     }
     
+    
     GtkWidget* label3 = gtk_label_new("");
-    std::string step3 ("End journey at ");
+    std::string step3 (std::to_string(number));
+    step3.append(". ");
+    number++;
+    step3.append ("End journey at ");
     step3.append(intersections[getStreetSegmentInfo(path.back()).to].name);
     
     gtk_label_set_text((GtkLabel*)label3, step3.c_str());
     gtk_misc_set_alignment(GTK_MISC(label3), 0.0f, 0.0f);
     //gtk_label_set_justify((GtkLabel*)label3, GTK_JUSTIFY_LEFT);
-    gtk_list_box_insert((GtkListBox*) listBox, label3, -1);
-    std::cout << "End journey at " + intersections[getStreetSegmentInfo(path.back()).to].name <<std::endl;
-    
-    
-    //show widgets
-    gtk_widget_show_all((GtkWidget*) overlay);
+    gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label3, -1);
+   
 }
 
 
@@ -1507,7 +1571,7 @@ void map_list(GtkListBox* box) {
 }
 
 void reveal_search_bar() {
-    display_path(global_path);
+    
     
     GtkRevealer* revealer = (GtkRevealer*) global_app->get_object("DirectionsRevealer");
     
@@ -1518,9 +1582,17 @@ void reveal_search_bar() {
     if (gtk_revealer_get_reveal_child(revealer) == FALSE) {
         gtk_revealer_set_reveal_child(revealer, TRUE);
         gtk_entry_set_placeholder_text(searchEntry, "From");
+        
+        display_path(global_path);
+        
+        //show widgets
+        gtk_widget_show_all(globalWidgets.scrolledBox );
     } else {
         gtk_entry_set_placeholder_text(searchEntry, "Search some place here!");
         gtk_revealer_set_reveal_child(revealer, FALSE);
+        
+
+        gtk_widget_hide((GtkWidget*) globalWidgets.scrolledBox);
     }
     
 }
@@ -1563,9 +1635,9 @@ void reveal_search_entry(GtkEntry* entry) {
     } 
     
     //set entry completion model and which column to show
-    entryCompletion.reveal_completion_model = GTK_TREE_MODEL(store);
-    gtk_entry_completion_set_model (entryCompletion.reveal_completion, entryCompletion.reveal_completion_model);
-    gtk_entry_completion_set_text_column(entryCompletion.reveal_completion, 0);
+    globalWidgets.reveal_completion_model = GTK_TREE_MODEL(store);
+    gtk_entry_completion_set_model (globalWidgets.reveal_completion, globalWidgets.reveal_completion_model);
+    gtk_entry_completion_set_text_column(globalWidgets.reveal_completion, 0);
 
     //after that clear the entry and vector
     street.clear();
@@ -1600,9 +1672,9 @@ void search_entry(GtkEntry* entry) {
     } 
     
     //set entry completion model and which column to show
-    entryCompletion.completion_model = GTK_TREE_MODEL(store);
-    gtk_entry_completion_set_model (entryCompletion.completion, entryCompletion.completion_model);
-    gtk_entry_completion_set_text_column(entryCompletion.completion, 0);
+    globalWidgets.completion_model = GTK_TREE_MODEL(store);
+    gtk_entry_completion_set_model (globalWidgets.completion, globalWidgets.completion_model);
+    gtk_entry_completion_set_text_column(globalWidgets.completion, 0);
 
     //after that clear the entry and vector
     street.clear();
