@@ -188,6 +188,8 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
 
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, 
                                 const double turn_penalty){
+    if(path.size()==0) return 0.0;
+    
     double total_travel_time;
     StreetSegmentIdx next;
     for (int i = 0; i < path.size()-1; i++){
@@ -197,7 +199,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
             total_travel_time += turn_penalty;
         }
     }
-    total_travel_time += findStreetSegmentTravelTime(path.back());
+    total_travel_time += findStreetSegmentTravelTime(*(path.end()-1));
     
     return total_travel_time;
 }
