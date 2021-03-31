@@ -19,7 +19,7 @@
 
 void loadGraph();
 extern std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
-
+extern double max_speed;
 
 
 #endif /* M3_HEADER_H */
