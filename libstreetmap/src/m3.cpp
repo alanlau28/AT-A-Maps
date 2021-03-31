@@ -163,8 +163,6 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
         if(info.from == currNode->ID) currNode = Graph[info.to];
         else currNode = Graph[info.from];
         reachingEdge = currNode -> leading;
-        std::cout << findStreetSegmentTravelTime(reachingEdge) << " ";
-
     }
     std::reverse(finalpath.begin(),finalpath.end());
     return finalpath;
