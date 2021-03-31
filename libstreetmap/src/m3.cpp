@@ -177,7 +177,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
                                 const double turn_penalty){
     if(path.size()==0) return 0.0;
     
-    double total_travel_time;
+    double total_travel_time = 0;
     StreetSegmentIdx next;
     for (int i = 0; i < path.size()-1; i++){
         next = path[i+1];
@@ -186,8 +186,8 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
             total_travel_time += turn_penalty;
         }
     }
-    total_travel_time += findStreetSegmentTravelTime(*(path.end()-1));
-    
+    total_travel_time += findStreetSegmentTravelTime(path.back());
+    //std::cout<<total_travel_time<<std::endl;
     return total_travel_time;
 }
 
