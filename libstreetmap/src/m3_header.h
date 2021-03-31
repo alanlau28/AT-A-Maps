@@ -13,17 +13,14 @@
 
 #ifndef M3_HEADER_H
 #define M3_HEADER_H
+#include <unordered_map>
+#include <vector>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void loadGraph();
+extern std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
 
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* M3_HEADER_H */
 

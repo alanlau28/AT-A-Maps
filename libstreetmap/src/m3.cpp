@@ -66,16 +66,6 @@ void loadGraph(){
         std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
         //Node* currNode = new Node(i, INT_MAX, outgoing);
         Graph.push_back(new Node(i, INT_MAX, outgoing));
-        for(int j = 0;j < outgoing.size();j++){
-            StreetSegmentInfo street_seg_info = getStreetSegmentInfo(outgoing[j]);
-            if(i != street_seg_info.to){
-                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.to));
-            }
-            else if(!street_seg_info.oneWay){
-                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.from));
-            }
-        }
-
     }
    
 }

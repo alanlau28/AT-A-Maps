@@ -27,6 +27,7 @@
 #include "StreetsDatabaseAPI.h"
 #include <unordered_map>
 #include "load_database.h"
+#include "m3_header.h"
 
 struct SegmentData{
     double travel_time;
@@ -203,7 +204,24 @@ bool loadMap(std::string map_streets_database_filename) {
         
         streets_NamesIdx.insert(std::make_pair(streetName,street_id));        
     }
+    
+    
+    int num = getNumIntersections();
+    adjacent.resize(num);
+    for (int i = 0; i < num; i++){
+        std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
+        for(int j = 0;j < outgoing.size();j++){
+            StreetSegmentInfo street_seg_info = getStreetSegmentInfo(outgoing[j]);
+            if(i != street_seg_info.to){
+                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.to));
+            }
+            else if(!street_seg_info.oneWay){
+                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.from));
+            }
+        }
 
+    }
+    
    
     //map loaded successfully
     return true;
