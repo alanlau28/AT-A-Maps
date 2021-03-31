@@ -66,7 +66,7 @@ std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::multimap<std::string, StreetIdx> streets_NamesIdx;
 
 std::string map_load_path;
-double max_speed = getStreetSegmentInfo(0).speedLimit;
+double max_speed;
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
 // data that is higher-level than the raw OSM data). 
@@ -95,6 +95,7 @@ bool loadMap(std::string map_streets_database_filename) {
         return false;
     }
     
+    max_speed = getStreetSegmentInfo(0).speedLimit;
     
     street_data.resize(getNumStreets());
     
