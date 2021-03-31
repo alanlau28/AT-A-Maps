@@ -23,7 +23,6 @@ public:
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
-
     Node(int id,double t, std::vector<StreetSegmentIdx> out);      
     
 };
@@ -39,11 +38,13 @@ struct waveElement{
     Node *node;
     StreetSegmentIdx edgeID;
     double traveltime;
+    double estTime;
     
-    waveElement(Node *n, int id, double time){
+    waveElement(Node *n, int id, double time, double eTime){
         node = n;
         edgeID = id;
         traveltime = time;
+        estTime = eTime;
     }
 
 };
@@ -54,7 +55,7 @@ std::vector<Node*> Graph;
 
 
 bool operator<(const waveElement& lhs,const waveElement& rhs){
-    if(lhs.traveltime >= rhs.traveltime) return true;
+    if((lhs.traveltime + lhs.estTime) >= (rhs.traveltime + lhs.estTime)) return true;
     else return false;
 }
 
@@ -99,7 +100,7 @@ void loadGraph(){
 bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
 
     std::priority_queue<waveElement> wavefront;
-    waveElement source(source_node,-1, 0);
+    waveElement source(source_node,-1, 0,0);
     wavefront.push(source);
     while(!wavefront.empty()){
         waveElement wave = wavefront.top();
@@ -127,8 +128,10 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
                            
                         }
                     }
+                    double estTime = findDistanceBetweenTwoPoints(std::make_pair(getIntersectionPosition(it -> second)
+                    ,getIntersectionPosition(destination)))/max_speed; 
                     Node* toNode = Graph[it->second];
-                    waveElement elem(toNode,it->first,travelTime);
+                    waveElement elem(toNode,it->first,travelTime, estTime);
                     wavefront.push(elem); 
                 } 
             }
