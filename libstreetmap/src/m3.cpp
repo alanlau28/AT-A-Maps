@@ -140,6 +140,7 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
                             travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time + turn_penalty;
                         else travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
                     }
+                    else travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
                     Node* toNode = Graph[it->second];
                     waveElement elem(toNode,it->first,travelTime);
                     wavefront.push(elem); 
@@ -162,6 +163,7 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
         if(info.from == currNode->ID) currNode = Graph[info.to];
         else currNode = Graph[info.from];
         reachingEdge = currNode -> leading;
+        std::cout << findStreetSegmentTravelTime(reachingEdge) << " ";
 
     }
     std::reverse(finalpath.begin(),finalpath.end());

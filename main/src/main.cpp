@@ -80,6 +80,7 @@ int main(int argc, char** argv) {
     std::vector<StreetSegmentIdx> path;
 
     //path = findPathBetweenIntersections(7832, 19097, 0.00000000000000000);
+<<<<<<< HEAD
     //path = findPathBetweenIntersections(13, 184, 0.00000000000000000);
     path = findPathBetweenIntersections(116429, 116436, 0.00000000000000000);
     
@@ -87,6 +88,10 @@ int main(int argc, char** argv) {
 
 
 
+=======
+    path = findPathBetweenIntersections(116429, 116436, 0.00000000000000000);
+    //path = findPathBetweenIntersections(13, 51601, 0.00000000000000000);
+>>>>>>> commit to pull
     //Clean-up the map data and related data structures
     std::cout << "Closing map\n";
     closeMap(); 
