@@ -21,7 +21,6 @@ public:
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
-    Node* prev = nullptr;
     Node(int id,double t, std::vector<StreetSegmentIdx> out);      
     
 };
@@ -117,7 +116,6 @@ bool path(Node* source_node, IntersectionIdx destination){
                 auto it = adjacent[currNode -> ID].find(currNode -> outgoing[i]);
                 if(it != adjacent[currNode -> ID].end()){
                     Node* toNode = Graph[it->second];
-                    if(toNode -> prev != currNode) toNode -> prev = currNode;
                     waveElement elem(toNode,it->first,findStreetSegmentTravelTime(it -> first)+currNode -> time);
                     wavefront.push(elem); 
                 } 
@@ -133,7 +131,9 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
     int reachingEdge = currNode -> leading;
     while(reachingEdge != -1){
         finalpath.push_back(reachingEdge);
-        currNode = currNode -> prev;
+        StreetSegmentInfo info = getStreetSegmentInfo(reachingEdge);
+        if(info.from == currNode->ID) currNode = Graph[info.to];
+        else currNode = Graph[info.from];
         reachingEdge = currNode -> leading;
     }
     std::reverse(finalpath.begin(),finalpath.end());
