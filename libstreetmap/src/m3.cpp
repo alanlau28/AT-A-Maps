@@ -17,15 +17,12 @@
 std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
 
 
-
-//ewf
 class Node{
 public:
     IntersectionIdx ID;
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
-    Node* prev = nullptr;
 
     Node(int id,double t, std::vector<StreetSegmentIdx> out);      
     
@@ -112,7 +109,6 @@ void loadGraph(){
 bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
 
     std::priority_queue<waveElement> wavefront;
-
     waveElement source(source_node,-1, 0);
     wavefront.push(source);
     while(!wavefront.empty()){
@@ -132,19 +128,18 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
 
                 auto it = adjacent[currNode -> ID].find(currNode -> outgoing[i]);
                 if(it != adjacent[currNode -> ID].end()){
-                    double travelTime;
+                    double travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
                     if(currNode -> leading != -1){
                         StreetSegmentInfo infoTo = getStreetSegmentInfo(currNode -> outgoing[i]);
                         StreetSegmentInfo infoFrom = getStreetSegmentInfo(currNode -> leading);
-                        if(infoTo.streetID != infoFrom.streetID) 
-                            travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time + turn_penalty;
-                        else travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
+                        if(infoTo.streetID != infoFrom.streetID){ 
+                            travelTime += turn_penalty;
+                           
+                        }
                     }
-                    else travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
                     Node* toNode = Graph[it->second];
                     waveElement elem(toNode,it->first,travelTime);
                     wavefront.push(elem); 
-
                 } 
             }
         } 
@@ -173,13 +168,15 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     loadGraph();
     std::vector<StreetSegmentIdx> fpath;
     Node *start = Graph[intersect_id_start];
-    bool found = path(start,intersect_id_destination,0);
+    bool found = path(start,intersect_id_destination,turn_penalty);
     if(found){
-
         fpath = traceBack(intersect_id_destination);
     }
-    Graph.clear();
-
+    
+    while(!Graph.empty()){ 
+        delete Graph.back();
+        Graph.pop_back();
+    }
     return fpath;
 
     
