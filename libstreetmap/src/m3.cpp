@@ -17,6 +17,7 @@
 std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
 
 
+
 //ewf
 class Node{
 public:
@@ -184,4 +185,20 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     
 }
 
+
+double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, 
+                                const double turn_penalty){
+    double total_travel_time;
+    StreetSegmentIdx next;
+    for (int i = 0; i < path.size()-1; i++){
+        next = path[i+1];
+        total_travel_time += findStreetSegmentTravelTime(path[i]);
+        if(getStreetSegmentInfo(path[i]).streetID != getStreetSegmentInfo(next).streetID){
+            total_travel_time += turn_penalty;
+        }
+    }
+    total_travel_time += findStreetSegmentTravelTime(path.back());
+    
+    return total_travel_time;
+}
 
