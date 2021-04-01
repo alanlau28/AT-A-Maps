@@ -77,6 +77,8 @@ int main(int argc, char** argv) {
     //do something in between
     
     //drawMap();
+    std::vector<StreetSegmentIdx> path;
+    path = findPathBetweenIntersections(43487, 116429, 15.00000000000000000);
     
     std::cout << "Closing map\n";
     closeMap(); 

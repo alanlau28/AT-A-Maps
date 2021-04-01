@@ -15,12 +15,13 @@
 #define M3_HEADER_H
 #include <unordered_map>
 #include <vector>
+#include "StreetsDatabaseAPI.h"
 
 
 void loadGraph();
 extern std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
 extern double max_speed;
-
+extern std::vector<StreetSegmentInfo> segmentInfo;
 
 #endif /* M3_HEADER_H */
 

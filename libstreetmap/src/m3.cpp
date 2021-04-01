@@ -15,7 +15,7 @@
 
 
 std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
-
+std::vector<StreetSegmentInfo> segmentInfo;
 
 class Node{
 public:
@@ -121,8 +121,8 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
                 if(it != adjacent[currNode -> ID].end()){
                     double travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
                     if(currNode -> leading != -1){
-                        StreetSegmentInfo infoTo = getStreetSegmentInfo(currNode -> outgoing[i]);
-                        StreetSegmentInfo infoFrom = getStreetSegmentInfo(currNode -> leading);
+                        StreetSegmentInfo infoTo = segmentInfo[(currNode -> outgoing[i])];
+                        StreetSegmentInfo infoFrom = segmentInfo[currNode -> leading];
                         if(infoTo.streetID != infoFrom.streetID){ 
                             travelTime += turn_penalty;
                            
@@ -147,7 +147,7 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
     int reachingEdge = currNode -> leading;
     while(reachingEdge != -1){
         finalpath.push_back(reachingEdge);
-        StreetSegmentInfo info = getStreetSegmentInfo(reachingEdge);
+        StreetSegmentInfo info = segmentInfo[reachingEdge];
         if(info.from == currNode->ID) currNode = Graph[info.to];
         else currNode = Graph[info.from];
         reachingEdge = currNode -> leading;
@@ -185,7 +185,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
     for (int i = 0; i < path.size()-1; i++){
         next = path[i+1];
         total_travel_time += findStreetSegmentTravelTime(path[i]);
-        if(getStreetSegmentInfo(path[i]).streetID != getStreetSegmentInfo(next).streetID ){
+        if(segmentInfo[path[i]].streetID != segmentInfo[next].streetID ){
             total_travel_time += turn_penalty;
         }
     }

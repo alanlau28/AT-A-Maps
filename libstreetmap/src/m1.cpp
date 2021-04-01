@@ -98,7 +98,7 @@ bool loadMap(std::string map_streets_database_filename) {
     max_speed = getStreetSegmentInfo(0).speedLimit;
     
     street_data.resize(getNumStreets());
-    
+    segmentInfo.resize(getNumStreetSegments());
     //holds all distances of each street segment with street segments as indices
     //<double distance>
     std::vector<double> segment_distances;
@@ -134,6 +134,7 @@ bool loadMap(std::string map_streets_database_filename) {
         //pushes back street id, distance, and travel time in each respective vector
         segment_distances.push_back(distance);
         street_segment_data.push_back(street_segment_info);
+        segmentInfo[segment] = street_info;
         if(speed_limit > max_speed) max_speed = speed_limit;
     }
     
@@ -568,4 +569,5 @@ void closeMap() {
     streets_NamesIdx.clear();
     closeStreetDatabase();
     street_segment_data.clear();
+    segmentInfo.clear();
 }
