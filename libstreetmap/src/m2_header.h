@@ -122,6 +122,7 @@ void reveal_search_activate(GtkEntry* entry);
 
 void reveal_search_entry(GtkEntry* entry);
 
+std::vector<IntersectionIdx> find_intersections_between_two_streets(std::string input);
 
 void display_path(const std::vector<StreetIdx> path);
 
