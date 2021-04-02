@@ -24,12 +24,11 @@ public:
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
-    Node();
-    Node(int id,double t, std::vector<StreetSegmentIdx> out);      
+    Node(int id,double t, std::vector<StreetSegmentIdx> &out);      
     
 };
 
-Node::Node(int id, double t, std::vector<StreetSegmentIdx> out){
+Node::Node(int id, double t, std::vector<StreetSegmentIdx> &out){
     ID = id;
     leading = -1;
     time = t;
