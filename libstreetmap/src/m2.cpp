@@ -1203,9 +1203,10 @@ void draw_street_names (ezgl::renderer *g) {
 // Available: https://developers.google.com/maps/documentation/javascript/adding-a-google-map.
 void drawHighlights(ezgl::renderer *g){
     //create surface of the pin png
-    ezgl::surface *png_surface;  
+    ezgl::surface *png_surface;
+    ezgl::surface *png_surface1;  
     png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
-    
+    png_surface1 = ezgl::renderer::load_png("libstreetmap/resources/from_pin.png");
     ezgl::rectangle world = g->get_visible_world();
     
     //highlights the start intersection and the end intersection      
@@ -1215,7 +1216,7 @@ void drawHighlights(ezgl::renderer *g){
         //check that intersections are within visible world bounds
         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
             if(path_from.highlight){
-                g -> draw_surface(png_surface,path_from.coordinate);
+                g -> draw_surface(png_surface1,path_from.coordinate);
             }
         }
         
@@ -1224,6 +1225,7 @@ void drawHighlights(ezgl::renderer *g){
     
         if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
             if(path_to.highlight){
+                png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
                 g -> draw_surface(png_surface,path_to.coordinate);
             }
         }
@@ -1247,13 +1249,16 @@ void drawHighlights(ezgl::renderer *g){
             } 
         }
     }
-        //for drawing highlights on any highlighted intersection
+        
+    //for drawing highlights on any highlighted intersection
     for (int i = 0; i < intersections.size(); i++) {
         if (intersections[i].highlight) {
             g -> draw_surface(png_surface,intersections[i].coordinate);
         }
     }
+        
     ezgl::renderer::free_surface(png_surface);
+    ezgl::renderer::free_surface(png_surface1);
 }
 
 //changes the highlight in every intersection and street segment to be false
@@ -1520,6 +1525,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         else {
             path_from = intersections[id];
         }
+        intersections[id].highlight = false;
         app -> refresh_drawing();
         app -> update_message("Pin placed at " + intersections[id].name + " " + std::to_string(id));
     }

@@ -24,11 +24,11 @@ public:
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
-    Node(int id,double t, std::vector<StreetSegmentIdx> &out);      
+    Node(int id,double t,const std::vector<StreetSegmentIdx> &out);      
     
 };
 
-Node::Node(int id, double t, std::vector<StreetSegmentIdx> &out){
+Node::Node(int id, double t, const std::vector<StreetSegmentIdx> &out){
     ID = id;
     leading = -1;
     time = t;
@@ -63,9 +63,8 @@ bool operator<(const waveElement& lhs,const waveElement& rhs){
 
 void loadGraph(){
     int num = getNumIntersections();
-    for (int i = 0; i < num; i++){
-        std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
-        Node currNode(i, INT_MAX, outgoing);
+    for (int i = 0; i < num; i++){   
+        Node currNode(i, INT_MAX, findStreetSegmentsOfIntersection(i));
         Graph.push_back(currNode);
     }
    
