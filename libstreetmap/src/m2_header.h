@@ -29,6 +29,7 @@ LatLon latLonFromWorld(double x, double y);
 
 ezgl::point2d convertCoordinates(double longitude, double latitude);
 
+std::pair<double,double> convertToWorld(LatLon coordinate);
 
 void load_bin();
 

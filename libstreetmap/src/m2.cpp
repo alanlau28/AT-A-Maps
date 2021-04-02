@@ -178,6 +178,15 @@ ezgl::point2d convertCoordinates(double longitude, double latitude){
     return point;
 }
 
+std::pair<double,double> convertToWorld(LatLon coordinate){
+    
+    double x = kEarthRadiusInMeters * coordinate.longitude() * cos(bounds.lat_avg) * kDegreeToRadian;
+    double y = kEarthRadiusInMeters * coordinate.latitude() * kDegreeToRadian;
+    
+    return(std::make_pair(x,y));
+}
+
+
 //loads an unordered map of all the paths to streets.bin and osm.bin
 void load_bin(){
     map_paths.insert(std::make_pair("/cad2/ece297s/public/maps/beijing_china.streets.bin","/cad2/ece297s/public/maps/beijing_china.osm.bin"));

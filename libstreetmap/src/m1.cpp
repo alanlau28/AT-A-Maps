@@ -28,6 +28,7 @@
 #include <unordered_map>
 #include "load_database.h"
 #include "m3_header.h"
+#include "m2_header.h"
 
 struct SegmentData{
     double travel_time;
@@ -212,6 +213,7 @@ bool loadMap(std::string map_streets_database_filename) {
     
     int num = getNumIntersections();
     adjacent.resize(num);
+    intersectionPosition.resize(num);
     for (int i = 0; i < num; i++){
         std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
         for(int j = 0;j < outgoing.size();j++){
@@ -223,6 +225,7 @@ bool loadMap(std::string map_streets_database_filename) {
                 adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.from));
             }
         }
+        intersectionPosition[i] = convertToWorld(getIntersectionPosition(i));
 
     }
     
@@ -237,15 +240,15 @@ bool loadMap(std::string map_streets_database_filename) {
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
     
     //converts latitudes of points into radians and finds the average
-    double lat1 = points.second.latitude() * kDegreeToRadian;
-    double lat2 = points.first.latitude() * kDegreeToRadian;
+    double lat1 = points.first.latitude() * kDegreeToRadian;
+    double lat2 = points.second.latitude() * kDegreeToRadian;
     double lat_avg = (lat1 + lat2) / 2.0;
     
     //finds the x and y coordinates of each point
     double x1 = points.first.longitude() * cos(lat_avg) * kDegreeToRadian;
-    double y1 = points.first.latitude() * kDegreeToRadian;
+    double y1 = lat1;
     double x2 = points.second.longitude() * cos(lat_avg) * kDegreeToRadian;
-    double y2 = points.second.latitude() * kDegreeToRadian;
+    double y2 = lat2;
     
     //finds distance between the two points and returns
     return kEarthRadiusInMeters *  sqrt(pow(y2-y1,2)+ pow(x2-x1,2));
@@ -570,4 +573,5 @@ void closeMap() {
     closeStreetDatabase();
     street_segment_data.clear();
     segmentInfo.clear();
+    intersectionPosition.clear();
 }

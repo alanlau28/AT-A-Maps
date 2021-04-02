@@ -12,10 +12,11 @@
 #include <unordered_map>
 #include <queue>
 #include <algorithm>
-
+#include <math.h>
 
 std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
 std::vector<StreetSegmentInfo> segmentInfo;
+std::vector<std::pair<double,double>> intersectionPosition;
 
 class Node{
 public:
@@ -23,6 +24,7 @@ public:
     StreetSegmentIdx leading;
     double time;
     std::vector<StreetSegmentIdx> outgoing;
+    Node();
     Node(int id,double t, std::vector<StreetSegmentIdx> out);      
     
 };
@@ -50,7 +52,7 @@ struct waveElement{
 };
 
 
-std::vector<Node*> Graph;
+std::vector<Node> Graph;
 
 
 
@@ -62,11 +64,10 @@ bool operator<(const waveElement& lhs,const waveElement& rhs){
 
 void loadGraph(){
     int num = getNumIntersections();
-    adjacent.resize(num);
     for (int i = 0; i < num; i++){
         std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
-        //Node* currNode = new Node(i, INT_MAX, outgoing);
-        Graph.push_back(new Node(i, INT_MAX, outgoing));
+        Node currNode(i, INT_MAX, outgoing);
+        Graph.push_back(currNode);
     }
    
 }
@@ -98,7 +99,6 @@ void loadGraph(){
 
 
 bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
-
     std::priority_queue<waveElement> wavefront;
     waveElement source(source_node,-1, 0,0);
     wavefront.push(source);
@@ -116,7 +116,6 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
             }
 
             for(int i = 0; i < currNode -> outgoing.size(); i++){
-
                 auto it = adjacent[currNode -> ID].find(currNode -> outgoing[i]);
                 if(it != adjacent[currNode -> ID].end()){
                     double travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
@@ -128,9 +127,9 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
                            
                         }
                     }
-                    double estTime = findDistanceBetweenTwoPoints(std::make_pair(getIntersectionPosition(it -> second)
-                    ,getIntersectionPosition(destination)))/max_speed; 
-                    Node* toNode = Graph[it->second];
+                    double estTime = findEuclidianDistance(intersectionPosition[(it -> second)]
+                    ,intersectionPosition[destination])/max_speed; 
+                    Node* toNode = &Graph[it->second];
                     waveElement elem(toNode,it->first,travelTime, estTime);
                     wavefront.push(elem); 
                 } 
@@ -142,14 +141,14 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
 
 std::vector<StreetSegmentIdx> traceBack(int destination){
     std::vector<StreetSegmentIdx> finalpath;
-    Node *currNode = Graph[destination];
+    Node *currNode = &Graph[destination];
 
     int reachingEdge = currNode -> leading;
     while(reachingEdge != -1){
         finalpath.push_back(reachingEdge);
         StreetSegmentInfo info = segmentInfo[reachingEdge];
-        if(info.from == currNode->ID) currNode = Graph[info.to];
-        else currNode = Graph[info.from];
+        if(info.from == currNode->ID) currNode = &Graph[info.to];
+        else currNode = &Graph[info.from];
         reachingEdge = currNode -> leading;
     }
     std::reverse(finalpath.begin(),finalpath.end());
@@ -160,16 +159,13 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     const IntersectionIdx intersect_id_destination, const double turn_penalty){
     loadGraph();
     std::vector<StreetSegmentIdx> fpath;
-    Node *start = Graph[intersect_id_start];
+    Node* start = &Graph[intersect_id_start];
     bool found = path(start,intersect_id_destination,turn_penalty);
     if(found){
         fpath = traceBack(intersect_id_destination);
     }
     
-    while(!Graph.empty()){ 
-        delete Graph.back();
-        Graph.pop_back();
-    }
+    Graph.clear();
     return fpath;
 
     
@@ -192,5 +188,12 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
     total_travel_time += findStreetSegmentTravelTime(path.back());
     //std::cout<<total_travel_time<<std::endl;
     return total_travel_time;
+}
+
+double findEuclidianDistance(std::pair<double,double> positionOne,std::pair<double,double> positionTwo){
+    
+    return sqrt(pow(positionTwo.second-positionOne.second,2)+ pow(positionTwo.first-positionOne.first,2));
+    
+    
 }
 

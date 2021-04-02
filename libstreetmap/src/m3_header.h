@@ -22,6 +22,8 @@ void loadGraph();
 extern std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
 extern double max_speed;
 extern std::vector<StreetSegmentInfo> segmentInfo;
+extern std::vector<std::pair<double,double>> intersectionPosition;
+double findEuclidianDistance(std::pair<double,double> first,std::pair<double,double> second);
 
 #endif /* M3_HEADER_H */
 
