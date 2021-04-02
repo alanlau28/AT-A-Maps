@@ -116,9 +116,9 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
             }
 
             for(int i = 0; i < currNode -> outgoing.size(); i++){
-                auto it = adjacent[currNode -> ID].find(currNode -> outgoing[i]);
-                if(it != adjacent[currNode -> ID].end()){
-                    double travelTime = findStreetSegmentTravelTime(it -> first)+ currNode -> time;
+                IntersectionIdx to = findOtherIntersection(currNode -> ID,currNode -> outgoing[i]);
+                if(to != -1){
+                    double travelTime = findStreetSegmentTravelTime(currNode -> outgoing[i])+ currNode -> time;
                     if(currNode -> leading != -1){
                         StreetSegmentInfo infoTo = segmentInfo[(currNode -> outgoing[i])];
                         StreetSegmentInfo infoFrom = segmentInfo[currNode -> leading];
@@ -127,10 +127,10 @@ bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
                            
                         }
                     }
-                    double estTime = findEuclidianDistance(intersectionPosition[(it -> second)]
-                    ,intersectionPosition[destination])/max_speed; 
-                    Node* toNode = &Graph[it->second];
-                    waveElement elem(toNode,it->first,travelTime, estTime);
+                    double estTime = findEuclidianDistance(intersectionPosition[currNode -> ID]
+                    ,intersectionPosition[to])/max_speed; 
+                    Node* toNode = &Graph[to];
+                    waveElement elem(toNode,currNode -> outgoing[i],travelTime, estTime);
                     wavefront.push(elem); 
                 } 
             }
@@ -193,7 +193,16 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
 double findEuclidianDistance(std::pair<double,double> positionOne,std::pair<double,double> positionTwo){
     
     return sqrt(pow(positionTwo.second-positionOne.second,2)+ pow(positionTwo.first-positionOne.first,2));
-    
-    
+      
 }
 
+IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx outgoing){
+    StreetSegmentInfo info = segmentInfo[outgoing];
+    if(start != info.to){
+        return info.to;
+    }
+    else if(!info.oneWay){
+        return info.from;
+    }
+    return -1;
+}
