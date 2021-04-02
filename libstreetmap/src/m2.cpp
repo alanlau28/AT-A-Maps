@@ -1512,7 +1512,10 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
             path_to = intersections[id];
             std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(path_from.id, 
             path_to.id,15.000000);
-            for(int i = 0;i < path.size();i++) street_segments[path[i]].highlight = true;
+            if(path.size() > 0){
+                display_path(path);
+                gtk_widget_show_all(globalWidgets.scrolledBox );
+            }
         }
         else {
             path_from = intersections[id];
