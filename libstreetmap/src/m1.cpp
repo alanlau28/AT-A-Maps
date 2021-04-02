@@ -212,19 +212,9 @@ bool loadMap(std::string map_streets_database_filename) {
     
     
     int num = getNumIntersections();
-    adjacent.resize(num);
+
     intersectionPosition.resize(num);
     for (int i = 0; i < num; i++){
-        std::vector<StreetSegmentIdx> outgoing = findStreetSegmentsOfIntersection(i);
-        for(int j = 0;j < outgoing.size();j++){
-            StreetSegmentInfo street_seg_info = getStreetSegmentInfo(outgoing[j]);
-            if(i != street_seg_info.to){
-                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.to));
-            }
-            else if(!street_seg_info.oneWay){
-                adjacent[i].insert(std::make_pair(outgoing[j], street_seg_info.from));
-            }
-        }
         intersectionPosition[i] = convertToWorld(getIntersectionPosition(i));
 
     }

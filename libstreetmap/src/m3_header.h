@@ -24,6 +24,7 @@ extern double max_speed;
 extern std::vector<StreetSegmentInfo> segmentInfo;
 extern std::vector<std::pair<double,double>> intersectionPosition;
 double findEuclidianDistance(std::pair<double,double> first,std::pair<double,double> second);
+IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx outgoing);
 
 #endif /* M3_HEADER_H */
 
