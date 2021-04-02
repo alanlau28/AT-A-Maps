@@ -192,11 +192,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
 double findEuclidianDistance(std::pair<double,double> positionOne,std::pair<double,double> positionTwo){
     
     return sqrt(pow(positionTwo.second-positionOne.second,2)+ pow(positionTwo.first-positionOne.first,2));
-<<<<<<< HEAD
-     
-=======
-      
->>>>>>> 2744e24d669565ba19ab0744f78d0a9b15b54064
+    
 }
 
 IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx outgoing){
