@@ -1607,10 +1607,15 @@ void reveal_search_bar() {
 }
 
 void reveal_search_activate(GtkEntry* entry) {
-    std::string text = gtk_entry_get_text(entry);
+    //entry from first search bar
+    GtkEntry* firstEntry = (GtkEntry*) global_app -> get_object("SearchEntry");
+    std::string firstText = gtk_entry_get_text(firstEntry);
+    
+    //entry from second search bar  
+    std::string secondText = gtk_entry_get_text(entry);
     gtk_entry_set_text(entry, " ");
     
-    std::cout << text << std::endl;
+    std::cout << firstText << " " << secondText << std::endl;
 }
 
 //callback for search entry, runs each time user changes input in search entry

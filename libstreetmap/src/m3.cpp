@@ -98,7 +98,7 @@ void loadGraph(){
  */
 
 
-bool path(Node* source_node, IntersectionIdx destination,double turn_penalty){
+bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
     std::priority_queue<waveElement> wavefront;
     waveElement source(source_node,-1, 0,0);
     wavefront.push(source);
@@ -193,7 +193,6 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
 double findEuclidianDistance(std::pair<double,double> positionOne,std::pair<double,double> positionTwo){
     
     return sqrt(pow(positionTwo.second-positionOne.second,2)+ pow(positionTwo.first-positionOne.first,2));
-    
-    
+     
 }
 
