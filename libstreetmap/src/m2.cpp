@@ -16,7 +16,7 @@
 #include <gtk/gtk.h>
 #include <point.hpp>
 #include <unordered_set>
-
+#include "m3.h"
 
 
 struct boundingBox{
@@ -61,6 +61,7 @@ struct intersection_data{
     LatLon position;
     bool highlight;
     std::string name;
+    IntersectionIdx id;
 };
 
 //global variable used for entry completion to work properly
@@ -383,6 +384,7 @@ void load_map(){
         intersections[i].position = point;
         intersections[i].coordinate = coordinate;
         intersections[i].name = getIntersectionName(i);
+        intersections[i].id = i;
     }
     path_from = intersections[0];
     path_to = intersections[0];
@@ -1506,8 +1508,15 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         LatLon position = latLonFromWorld(x,y);
         int id = findClosestIntersection(position);
         intersections[id].highlight = true;
-        if(path_from.highlight) path_to = intersections[id];
-        else path_from = intersections[id]; 
+        if(path_from.highlight) {
+            path_to = intersections[id];
+            std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(path_from.id, 
+            path_to.id,15.000000);
+            for(int i = 0;i < path.size();i++) street_segments[path[i]].highlight = true;
+        }
+        else {
+            path_from = intersections[id];
+        }
         app -> refresh_drawing();
         app -> update_message("Pin placed at " + intersections[id].name + " " + std::to_string(id));
     }
