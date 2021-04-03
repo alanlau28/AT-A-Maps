@@ -1229,19 +1229,16 @@ void drawHighlights(ezgl::renderer *g){
         
          x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
          y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
-        
-        //check if street segment is within visible world bounds
-        if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
+         
             if (street_segments[i].highlight) {
                 g->set_line_width(20);
-                g->set_color(255,0,0, 127);
+                g->set_color(70,145,185, 200);
                 
                 //highlight street segments
                 for (int j = 0; j < street_segments[i].coordinates.size()-1; j++) {
                     g->draw_line(street_segments[i].coordinates[j], street_segments[i].coordinates[j+1]);
                 }
             } 
-        }
     }
         
     //for drawing highlights on any highlighted intersection
@@ -1302,9 +1299,6 @@ void draw_main_canvas (ezgl::renderer *g){
 
     drawHighlights(g);
 
-    //intersections[13].highlight = true;
-    //intersections[184].highlight = true;
-    //street_segments[137].highlight = true;
     
     //only start to draw POI when zoomed in slightly
     if(zoom>800){
@@ -1342,13 +1336,13 @@ void initial_setup(ezgl::application *application, bool){
     g_signal_connect(directionsButton, "clicked", G_CALLBACK(reveal_search_bar), NULL);
     
    
-    //search entry that reveals once find directions button is clicked
+    //search entry that reveals once 'Find directions' button is clicked
     GtkEntry* revealerEntry = (GtkEntry*) application->get_object("RevealerSearchEntry");
     g_signal_connect(revealerEntry, "search-changed", G_CALLBACK(reveal_search_entry), revealerEntry);
     g_signal_connect(revealerEntry, "activate", G_CALLBACK(reveal_search_activate), revealerEntry);
     
     
-    //help button that opens a new dialog box
+    //help button that opens a new popup
     GtkButton* helpButton = (GtkButton*) application -> get_object("HelpButton");
     g_signal_connect(helpButton, "clicked", G_CALLBACK(help_button_callback), NULL);
     
@@ -1367,7 +1361,7 @@ void initial_setup(ezgl::application *application, bool){
     gtk_label_set_text(mapLoaderLabel, "Now Showing \nToronto, Canada");
 }
 
-//
+//initializes the popup when the 'Help' button is clicked and shows the popup
 void help_button_callback() {
     
     GtkPopover* popOver = (GtkPopover*) global_app->get_object("HelpPopOver");
@@ -1408,7 +1402,6 @@ void help_button_callback() {
     "seamless experience using our program :) \n");
     
     gtk_label_set_text(popOverLabel, description.c_str());
-    
     gtk_popover_popup(popOver);
     
 }
@@ -1662,9 +1655,7 @@ void map_list(GtkListBox* box) {
     global_app -> refresh_drawing(); 
 }
 
-void reveal_search_bar() {
-    
-    
+void reveal_search_bar() {    
     GtkRevealer* revealer = (GtkRevealer*) global_app->get_object("DirectionsRevealer");
     
     g_return_if_fail(GTK_IS_REVEALER(revealer));
