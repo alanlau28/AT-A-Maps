@@ -48,6 +48,7 @@ struct feature_data{
     int numFeaturePoints;  //number of feature points (coordinates)
     double area;  //area of feature
 };
+
 bool operator< (feature_data& first, feature_data& second); //checks priority of features
 
 struct POI_data{
@@ -136,8 +137,8 @@ struct global_widgets globalWidgets;
 //pointer to application when application.run is run
 ezgl::application* global_app;
 
-intersection_data path_from;
-intersection_data path_to;
+intersection_data path_from; //starting intersection of path
+intersection_data path_to; //end intersection of path
 
 //global vector storing a specified path for testing directions
 std::vector<StreetIdx> global_path = {144, 15146, 6, 102106, 15, 110366, 110368, 
@@ -180,6 +181,7 @@ ezgl::point2d convertCoordinates(double longitude, double latitude){
     return point;
 }
 
+//converts latlon inot a pair of xy coordinates
 std::pair<double,double> convertToWorld(LatLon coordinate){
     
     double x = kEarthRadiusInMeters * coordinate.longitude() * cos(bounds.lat_avg) * kDegreeToRadian;
@@ -1513,6 +1515,8 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         LatLon position = latLonFromWorld(x,y);
         int id = findClosestIntersection(position);
         intersections[id].highlight = true;
+        
+        //if user has clicked on second point of path, find the path and display
         if(path_from.highlight) {
             path_to = intersections[id];
             std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(path_from.id, 

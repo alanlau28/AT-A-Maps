@@ -68,6 +68,7 @@ std::multimap<std::string, StreetIdx> streets_NamesIdx;
 
 std::string map_load_path;
 double max_speed;
+
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
 // data that is higher-level than the raw OSM data). 
@@ -210,13 +211,11 @@ bool loadMap(std::string map_streets_database_filename) {
         streets_NamesIdx.insert(std::make_pair(streetName,street_id));        
     }
     
-    
+    //loads vector with xy coordinate of each intersection as a pair
     int num = getNumIntersections();
-
     intersectionPosition.resize(num);
     for (int i = 0; i < num; i++){
         intersectionPosition[i] = convertToWorld(getIntersectionPosition(i));
-
     }
     
    
@@ -555,10 +554,7 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 void closeMap() {
     //unloads map / frees memory used by API
     intersection_street_segments.clear();
-
     street_data.clear();
-    
-    
     streets_NamesIdx.clear();
     closeStreetDatabase();
     street_segment_data.clear();

@@ -57,6 +57,8 @@ struct waveElement{
 
 //vector to hold each node
 std::vector<Node> graph;
+bool operator<(const waveElement& lhs,const waveElement& rhs);
+bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
 
 //override for the priority queue to put the smallest element in the front
 bool operator<(const waveElement& lhs,const waveElement& rhs){
@@ -107,7 +109,7 @@ void loadGraph(){
 
 bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
     std::priority_queue<waveElement> wavefront; //priority queue to sort through nodes by travel time
-    waveElement source(source_node,-1, 0,0);
+    waveElement source(source_node,NOEDGE, 0,0);
     wavefront.push(source);
     
     while(!wavefront.empty()){
@@ -186,6 +188,8 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     std::vector<StreetSegmentIdx> finalPath;
     Node* start = &graph[intersect_id_start];
     
+    //found is true if there is a valid path, if true find the path
+    //if no path is valid, found is false
     bool found = path(start,intersect_id_destination,turn_penalty);
     if(found){
         finalPath = traceBack(intersect_id_destination);
