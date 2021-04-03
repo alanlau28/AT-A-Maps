@@ -216,6 +216,7 @@ void loadFeaturePriority(){
     feature_priority.push_back("golfcourse");
     feature_priority.push_back("river");
     feature_priority.push_back("stream");
+    feature_priority.push_back("pond");
     feature_priority.push_back("building");
 }
 
@@ -353,6 +354,9 @@ void load_map(){
         features[featureidx].name = getFeatureName(featureidx);
         features[featureidx].feature_type = asString(getFeatureType(featureidx));
         features[featureidx].area = findFeatureArea(featureidx);
+        if(features[featureidx].area<1000000 && (asString(getFeatureType(featureidx))=="lake")){
+            features[featureidx].feature_type = "pond";
+        }
         features[featureidx].numFeaturePoints = getNumFeaturePoints(featureidx);
         
         //load all points of a feature to vector
@@ -798,7 +802,19 @@ void draw_features(ezgl::renderer *g, double zoom){
                 g->fill_poly(features[i].coordinates);
             }
             
-        } else if (features[i].feature_type == "golfcourse"&& more_than_one){
+        }else if(features[i].feature_type == "pond"&&more_than_one){
+            g ->set_color(170, 218, 255,255);
+            if(features[i].area>200000){
+            g->fill_poly(features[i].coordinates);
+            }
+            else if (features[i].area>10000&&zoom>5){
+                g->fill_poly(features[i].coordinates);
+            }else if (features[i].area<=10000&&zoom>100){
+                g->fill_poly(features[i].coordinates);
+            }
+            
+        } 
+        else if (features[i].feature_type == "golfcourse"&& more_than_one){
             g ->set_color(178, 217, 163,255);            
             g->fill_poly(features[i].coordinates);
             
@@ -818,14 +834,7 @@ void draw_features(ezgl::renderer *g, double zoom){
         //draw lake depending on zoom and size, only draw smaller parks when zoomed in
         else if(features[i].feature_type == "lake" && more_than_one){
             g ->set_color(170, 218, 255,255);
-            if(features[i].area>200000){
             g->fill_poly(features[i].coordinates);
-            }
-            else if (features[i].area>10000&&zoom>5){
-                g->fill_poly(features[i].coordinates);
-            }else if (features[i].area<=10000&&zoom>100){
-                g->fill_poly(features[i].coordinates);
-            }
         }
         
         else if(features[i].feature_type == "island"&& more_than_one){
