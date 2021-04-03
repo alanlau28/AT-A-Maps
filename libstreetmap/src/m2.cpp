@@ -1210,35 +1210,10 @@ void drawHighlights(ezgl::renderer *g){
     ezgl::surface *png_surface1;  
     png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
     png_surface1 = ezgl::renderer::load_png("libstreetmap/resources/from_pin.png");
-    ezgl::rectangle world = g->get_visible_world();
-    
-    //highlights the start intersection and the end intersection      
-        double x = path_from.coordinate.x;
-        double y = path_from.coordinate.y;
-        
-        //check that intersections are within visible world bounds
-        if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
-            if(path_from.highlight){
-                g -> draw_surface(png_surface1,path_from.coordinate);
-            }
-        }
-        
-        x = path_to.coordinate.x;
-        y = path_to.coordinate.y;
-    
-        if (x < world.right() && x > world.left() && y < world.top() && y > world.bottom()) {
-            if(path_to.highlight){
-                png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
-                g -> draw_surface(png_surface,path_to.coordinate);
-            }
-        }
         
     //loops through all street segments and draws the ones that are highlighted
     for (int i = 0; i < street_segments.size(); i++) {
         
-         x = (street_segments[i].coordinates[1].x + street_segments[i].coordinates[0].x)/2;
-         y = (street_segments[i].coordinates[1].y + street_segments[i].coordinates[0].y)/2;
-         
             if (street_segments[i].highlight) {
                 g->set_line_width(20);
                 g->set_color(70,145,185, 200);
@@ -1256,7 +1231,17 @@ void drawHighlights(ezgl::renderer *g){
             g -> draw_surface(png_surface,intersections[i].coordinate);
         }
     }
-        
+    
+    //highlights the start intersection and the end intersection of path find      
+    if(path_from.highlight){
+            g -> draw_surface(png_surface1,path_from.coordinate);
+    }
+    if(path_to.highlight){
+        png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
+        g -> draw_surface(png_surface,path_to.coordinate);
+    }
+    
+    //free surfaces
     ezgl::renderer::free_surface(png_surface);
     ezgl::renderer::free_surface(png_surface1);
 }
@@ -1591,7 +1576,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         }
         intersections[id].highlight = false;
         app -> refresh_drawing();
-        app -> update_message("Pin placed at " + intersections[id].name + " " + std::to_string(id));
+        app -> update_message("Pin placed at " + intersections[id].name);
     }
     //if user right clicks, the highlights are cleared
     else if(event -> button == 3){
