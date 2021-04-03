@@ -424,19 +424,6 @@ Canada</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkDrawingArea" id="MainCanvas">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">1</property>
-            <property name="width">2</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkGrid" id="InnerGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -670,6 +657,28 @@ Canada</property>
               </packing>
             </child>
             <child>
+              <object class="GtkButton" id="HelpButton">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <child>
+                  <object class="GtkLabel" id="HelpButtonLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Help</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans Bold 14"/>
+                    </attributes>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">11</property>
+                <property name="width">3</property>
+              </packing>
+            </child>
+            <child>
               <placeholder/>
             </child>
             <child>
@@ -834,16 +843,38 @@ Canada</property>
             <property name="top_attach">2</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkOverlay" id="MainCanvasOverlay">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkDrawingArea" id="MainCanvas">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+              </object>
+              <packing>
+                <property name="index">-1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">1</property>
+            <property name="width">2</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>
-  <object class="GtkPopover" id="FindPopOver">
+  <object class="GtkPopover" id="HelpPopOver">
     <property name="can_focus">False</property>
-    <property name="relative_to">SearchFindButton</property>
-    <property name="position">bottom</property>
+    <property name="relative_to">HelpButton</property>
+    <property name="position">left</property>
     <property name="transitions_enabled">False</property>
     <child>
-      <object class="GtkLabel" id="FindPopOverLabel">
+      <object class="GtkLabel" id="HelpPopOverLabel">
         <property name="width_request">100</property>
         <property name="height_request">100</property>
         <property name="visible">True</property>
@@ -871,5 +902,6 @@ Canada</property>
       </object>
     </child>
   </object>
+  <object class="GtkEntryCompletion" id="RevealEntryCompletion"/>
   <object class="GtkEntryCompletion" id="SearchEntryCompletion"/>
 </interface>

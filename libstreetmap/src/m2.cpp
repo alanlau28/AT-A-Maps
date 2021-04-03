@@ -140,14 +140,6 @@ ezgl::application* global_app;
 intersection_data path_from; //starting intersection of path
 intersection_data path_to; //end intersection of path
 
-//global vector storing a specified path for testing directions
-std::vector<StreetIdx> global_path = {144, 15146, 6, 102106, 15, 110366, 110368, 
-141125, 123475, 15150, 110374, 15151, 15152, 15153, 99836, 99837, 138461, 138462, 
-142246, 142247, 82737, 59938, 59935, 60810, 60809, 60808, 60800, 60801, 60802, 
-60803, 60804, 60824, 60823, 60822, 60816, 60815, 150320, 13780, 13779, 123, 124, 
-113901, 110454, 10572, 135096, 135103, 116392, 116403, 116399, 126700, 116406, 116407, 
-114546, 114547, 114505, 114538, 114539, 114540, 9054, 35288, 116206, 116207, 179447, 
-116194, 116195, 116196, 116205, 109562, 109540, 47897, 49422, 47226, 51391, 50093};
 
 bool operator< (feature_data& first, feature_data& second){
     auto begin = feature_priority.begin();
@@ -1356,6 +1348,11 @@ void initial_setup(ezgl::application *application, bool){
     g_signal_connect(revealerEntry, "activate", G_CALLBACK(reveal_search_activate), revealerEntry);
     
     
+    //help button that opens a new dialog box
+    GtkButton* helpButton = (GtkButton*) application -> get_object("HelpButton");
+    g_signal_connect(helpButton, "clicked", G_CALLBACK(help_button_callback), NULL);
+    
+    
     //for autocomplete
     globalWidgets.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
     globalWidgets.reveal_completion = (GtkEntryCompletion*) global_app->get_object("RevealEntryCompletion");
@@ -1370,8 +1367,56 @@ void initial_setup(ezgl::application *application, bool){
     gtk_label_set_text(mapLoaderLabel, "Now Showing \nToronto, Canada");
 }
 
+//
+void help_button_callback() {
+    
+    GtkPopover* popOver = (GtkPopover*) global_app->get_object("HelpPopOver");
+    GtkLabel* popOverLabel = (GtkLabel*) global_app->get_object("HelpPopOverLabel");
+    
+    std::string description(
+    "\nHello! Welcome to AT&A Maps. This small guide will\n"
+    "teach you how to best use our program.\n\n\n"
+    
+    "Press Enter in search bar\n"
+    "Search any street name within the search bar and\n"
+    "press enter, the whole street will be highlighted.\n\n"
+    
+    "Click 'Find Intersections of Two Streets'\n"
+    "Search any two street names separated with an\n"
+    "'and' or '&' and the intersection will be highlighted.\n\n"
+    
+    "Click 'Find Directions'\n"
+    "Clicking on 'Find Directions' button will reveal\n"
+    "another search bar, searching two different\n"
+    "intersections in the two search bars will find a\n"
+    "path from one intersections to the other. There\n"
+    "will also be a list of step-by-step directions\n"
+    "written at the top left of the map.\n\n"
+    
+    "Left clicking on the map\n"
+    "You can click on any point on the map, and the closest\n"
+    "intersection will be highlighted, with a small\n"
+    "description at the very bottom bar of the window.\n\n"
+    "If you click on two points, a path between the two\n"
+    "intersections will be drawn with step-by-step\n"
+    "directions.\n\n"
+    
+    "Right clicking on the map\n"
+    "Right clicking on the map will erase any highlights\n"
+    "currently drawn on the map.\n\n\n"
+    "Thank you for reading this guide and we hope you a\n"
+    "seamless experience using our program :) \n");
+    
+    gtk_label_set_text(popOverLabel, description.c_str());
+    
+    gtk_popover_popup(popOver);
+    
+}
+
+
 //draws path given vector of street segments, as well as directions
 void display_path(const std::vector<StreetIdx> path) {
+    
     
     //highlight all the segments on a path
     for (int i = 0; i < path.size(); i++) {
@@ -1416,9 +1461,7 @@ void display_path(const std::vector<StreetIdx> path) {
     gtk_label_set_text((GtkLabel*)label, step.c_str());
     gtk_label_set_line_wrap((GtkLabel*) label, TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    
     gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label, -1);
-    //std::cout << "Start at " +  << std::endl; 
     
     //get directions
     for (int i = 0; i < path.size() - 1; i++) {
@@ -1474,7 +1517,7 @@ void display_path(const std::vector<StreetIdx> path) {
             step1.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
             gtk_label_set_text((GtkLabel*)label1, step1.c_str());
             gtk_label_set_line_wrap((GtkLabel*) label1, TRUE);
-            //gtk_widget_set_halign(label1, GTK_ALIGN_START);
+            gtk_widget_set_halign(label1, GTK_ALIGN_START);
             
             gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label1, -1);
             
@@ -1488,7 +1531,7 @@ void display_path(const std::vector<StreetIdx> path) {
             step2.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
             gtk_label_set_text((GtkLabel*)label2, step2.c_str());
             gtk_label_set_line_wrap((GtkLabel*) label2, TRUE);
-            //gtk_widget_set_halign(label2, GTK_ALIGN_START);
+            gtk_widget_set_halign(label2, GTK_ALIGN_START);
             
             gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label2, -1);
             
@@ -1537,7 +1580,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         else {
             path_from = intersections[id];
             
-            if (globalWidgets.scrolledBox != nullptr) {
+            if (GTK_IS_WIDGET(globalWidgets.scrolledBox )) {
                 gtk_widget_destroy(globalWidgets.scrolledBox );
             }
             
@@ -1550,7 +1593,11 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
     else if(event -> button == 3){
         clearHighlights();
         app -> refresh_drawing();
-        app -> update_message("Pin removed");
+        app -> update_message("Pin(s) removed");
+        
+        if (GTK_IS_WIDGET(globalWidgets.scrolledBox )) {
+            gtk_widget_destroy(globalWidgets.scrolledBox );
+        }
     }
 }
 
@@ -1634,8 +1681,9 @@ void reveal_search_bar() {
         gtk_entry_set_placeholder_text(searchEntry, "Search some place here!");
         gtk_revealer_set_reveal_child(revealer, FALSE);
         
-
-        gtk_widget_hide((GtkWidget*) globalWidgets.scrolledBox);
+        if (GTK_IS_WIDGET(globalWidgets.scrolledBox)) {
+            gtk_widget_hide((GtkWidget*) globalWidgets.scrolledBox);
+        }
     }
     
 }
@@ -1653,8 +1701,6 @@ void reveal_search_activate(GtkEntry* entry) {
     
     std::vector<StreetIdx> streetPath;
     
-    
-        
         std::vector<IntersectionIdx> intersection1 = find_intersections_between_two_streets(firstText);
     
         std::vector<IntersectionIdx> intersection2 = find_intersections_between_two_streets(secondText);
@@ -1662,7 +1708,7 @@ void reveal_search_activate(GtkEntry* entry) {
         if (intersection1.size() > 0 && intersection2.size() > 0) {
             streetPath = findPathBetweenIntersections(intersection1[0], intersection2[0], 15.0);
             
-            if (globalWidgets.scrolledBox != nullptr) {
+            if (GTK_IS_WIDGET(globalWidgets.scrolledBox)) {
                 gtk_widget_destroy(globalWidgets.scrolledBox );
             }
 
@@ -1673,6 +1719,14 @@ void reveal_search_activate(GtkEntry* entry) {
         display_path(streetPath);
 
         gtk_widget_show_all(globalWidgets.scrolledBox );
+    } else {
+        GtkPopover* popOver = (GtkPopover*) global_app->get_object("SearchEntryPopOver");
+        GtkLabel* popOverLabel = (GtkLabel*) global_app->get_object("SearchEntryPopOverLabel");
+        
+        gtk_label_set_text(popOverLabel, "No path found");
+        
+        gtk_popover_popup(popOver);
+        
     }
     
     
@@ -1680,7 +1734,6 @@ void reveal_search_activate(GtkEntry* entry) {
     gtk_entry_set_text(entry, " ");
     gtk_entry_set_text(firstEntry, " ");
     global_app -> refresh_drawing();
-    //std::cout << firstText << " " << secondText << std::endl;
 }
 
 //callback for search entry, runs each time user changes input in search entry
@@ -1846,8 +1899,16 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
 std::vector<IntersectionIdx> find_intersections_between_two_streets(std::string input) {
     
     //popups for error handling
-    GtkPopover* popOver = (GtkPopover*) global_app->get_object("FindPopOver");
-    GtkLabel*   popOverLabel = (GtkLabel*) global_app->get_object("FindPopOverLabel");
+    GtkPopover* popOver = (GtkPopover*) global_app->get_object("SearchEntryPopOver");
+    GtkLabel*   popOverLabel = (GtkLabel*) global_app->get_object("SearchEntryPopOverLabel");
+    
+    GtkEntry* directionsEntry = (GtkEntry*) global_app->get_object("RevealerSearchEntry");
+    std::string entry = gtk_entry_get_text(directionsEntry);
+    
+    if (entry.size() > 0) {
+        gtk_popover_set_relative_to(popOver, 
+                (GtkWidget*) global_app->get_object("RevealerSearchEntry"));
+    }
     
     //delimiters
     std::string delim1 = "and";
@@ -1913,7 +1974,8 @@ std::vector<IntersectionIdx> find_intersections_between_two_streets(std::string 
                 street2.erase(std::remove_if(street2.begin(), street2.end(), ::isspace), street2.end());
                 std::transform(street2.begin(), street2.end(), street2.begin(), ::tolower);
                 
-                if (pair1 == street1 && pair2 == street2) {
+                if (pair1.find(street1) != std::string::npos && 
+                    pair2.find(street2) != std::string::npos) {
                     
                     std::vector<IntersectionIdx> matches = findIntersectionsOfTwoStreets(pair);
             
@@ -1938,6 +2000,8 @@ std::vector<IntersectionIdx> find_intersections_between_two_streets(std::string 
         gtk_label_set_text(popOverLabel, "No suitable streets found");
         return {};
     }
+    
+    gtk_popover_set_relative_to(popOver, (GtkWidget*) global_app->get_object("RevealerSearchEntry"));
     return intersectionResults;    
 }
 
