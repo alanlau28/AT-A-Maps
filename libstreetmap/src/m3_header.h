@@ -19,12 +19,23 @@
 
 
 void loadGraph();
-extern std::vector<std::unordered_map<StreetSegmentIdx,IntersectionIdx>> adjacent;
+
 extern double max_speed;
+
 extern std::vector<StreetSegmentInfo> segmentInfo;
+
 extern std::vector<std::pair<double,double>> intersectionPosition;
+
 double findEuclidianDistance(std::pair<double,double> first,std::pair<double,double> second);
+
 IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx outgoing);
+
+//bool operator<(const waveElement& lhs,const waveElement& rhs);
+
+std::vector<StreetSegmentIdx> traceBack(int destination);
+
+//bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
+
 
 #endif /* M3_HEADER_H */
 
