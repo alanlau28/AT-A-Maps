@@ -17,7 +17,35 @@
 #include <vector>
 #include "StreetsDatabaseAPI.h"
 
+const int NOEDGE = -1; 
 
+//Node is used for the graph, each node represents an intersection
+class Node{
+public:
+    IntersectionIdx ID;
+    StreetSegmentIdx leading; //intersection used to reach this node
+    double time; //total traveltime to node
+    std::vector<StreetSegmentIdx> outgoing; //outgoing street segments of each intersection
+    Node(int id,double t,const std::vector<StreetSegmentIdx> &out); 
+    
+};
+
+
+
+struct waveElement{
+    Node *node;
+    StreetSegmentIdx edgeID;
+    double traveltime;
+    double estTime;
+    
+    waveElement(Node *n, int id, double time, double eTime){
+        node = n;
+        edgeID = id;
+        traveltime = time;
+        estTime = eTime;
+    }
+
+};
 void loadGraph();
 
 extern double max_speed; //max speed of the map
@@ -30,11 +58,11 @@ double findEuclidianDistance(std::pair<double,double> first,std::pair<double,dou
 
 IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx outgoing);
 
-//bool operator<(const waveElement& lhs,const waveElement& rhs);
+bool operator<(const waveElement& lhs,const waveElement& rhs);
 
 std::vector<StreetSegmentIdx> traceBack(int destination);
 
-//bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
+bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
 
 
 #endif /* M3_HEADER_H */

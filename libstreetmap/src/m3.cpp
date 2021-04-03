@@ -14,24 +14,6 @@
 #include <algorithm>
 #include <math.h>
 
-const int NOEDGE = -1; 
-
-//vector that holds the StreetSegmentInfo for each street segment
-std::vector<StreetSegmentInfo> segmentInfo;
-
-//vector that holds the x,y coordinate of each intersection
-std::vector<std::pair<double,double>> intersectionPosition;
-
-//Node is used for the graph, each node represents an intersection
-class Node{
-public:
-    IntersectionIdx ID;
-    StreetSegmentIdx leading; //intersection used to reach this node
-    double time; //total traveltime to node
-    std::vector<StreetSegmentIdx> outgoing; //outgoing street segments of each intersection
-    Node(int id,double t,const std::vector<StreetSegmentIdx> &out); 
-    
-};
 
 Node::Node(int id, double t, const std::vector<StreetSegmentIdx> &out){
     ID = id;
@@ -40,25 +22,19 @@ Node::Node(int id, double t, const std::vector<StreetSegmentIdx> &out){
     outgoing = out;
 }
 
-struct waveElement{
-    Node *node;
-    StreetSegmentIdx edgeID;
-    double traveltime;
-    double estTime;
-    
-    waveElement(Node *n, int id, double time, double eTime){
-        node = n;
-        edgeID = id;
-        traveltime = time;
-        estTime = eTime;
-    }
+//vector that holds the StreetSegmentInfo for each street segment
+std::vector<StreetSegmentInfo> segmentInfo;
 
-};
+//vector that holds the x,y coordinate of each intersection
+std::vector<std::pair<double,double>> intersectionPosition;
+
+
+
+
 
 //vector to hold each node
 std::vector<Node> graph;
-bool operator<(const waveElement& lhs,const waveElement& rhs);
-bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
+
 
 //override for the priority queue to put the smallest element in the front
 bool operator<(const waveElement& lhs,const waveElement& rhs){
@@ -203,8 +179,11 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
 
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, 
                                 const double turn_penalty){
-    if(path.size()==0) return 0.0;
+    //handles error when no path is found
+    if(path.size()==0) return 0.0; 
     
+    //for every segment in vector, find the next path and check if streetid changes
+    //adds a turn penalty if it does
     double total_travel_time = 0;
     StreetSegmentIdx next;
     for (int i = 0; i < path.size()-1; i++){
@@ -214,6 +193,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
             total_travel_time += turn_penalty;
         }
     }
+    //add the last segment
     total_travel_time += findStreetSegmentTravelTime(path.back());
     return total_travel_time;
 }
