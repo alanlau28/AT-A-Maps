@@ -28,13 +28,8 @@ std::vector<StreetSegmentInfo> segmentInfo;
 //vector that holds the x,y coordinate of each intersection
 std::vector<std::pair<double,double>> intersectionPosition;
 
-
-
-
-
 //vector to hold each node
 std::vector<Node> graph;
-
 
 //override for the priority queue to put the smallest element in the front
 bool operator<(const waveElement& lhs,const waveElement& rhs){
@@ -175,7 +170,6 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
     return finalPath;
    
 }
-
 
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, 
                                 const double turn_penalty){
