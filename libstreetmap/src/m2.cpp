@@ -1383,9 +1383,10 @@ void display_path(const std::vector<StreetIdx> path) {
     globalWidgets.scrolledBox = gtk_scrolled_window_new(NULL, NULL);
     
     gtk_overlay_add_overlay((GtkOverlay*)globalWidgets.overlay, globalWidgets.scrolledBox);
-    //gtk_container_set_border_width (GTK_CONTAINER (globalWidgets.scrolledBox), 20);
+    gtk_container_set_border_width (GTK_CONTAINER (globalWidgets.scrolledBox), 20);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(globalWidgets.scrolledBox), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_min_content_height((GtkScrolledWindow*)globalWidgets.scrolledBox, 50);
+    gtk_scrolled_window_set_min_content_height((GtkScrolledWindow*)globalWidgets.scrolledBox, 100);
+    gtk_scrolled_window_set_max_content_height((GtkScrolledWindow*)globalWidgets.scrolledBox, 1200);
     gtk_scrolled_window_set_max_content_width((GtkScrolledWindow*)globalWidgets.scrolledBox, 400);
     gtk_scrolled_window_set_propagate_natural_width ((GtkScrolledWindow*)globalWidgets.scrolledBox, TRUE);
     gtk_scrolled_window_set_propagate_natural_height ((GtkScrolledWindow*)globalWidgets.scrolledBox, TRUE);
@@ -1395,7 +1396,10 @@ void display_path(const std::vector<StreetIdx> path) {
     
     
     g_object_set(globalWidgets.scrolledBox , "halign", GTK_ALIGN_START, NULL);
-    g_object_set(globalWidgets.scrolledBox , "valign", GTK_ALIGN_END, NULL);
+    g_object_set(globalWidgets.scrolledBox , "valign", GTK_ALIGN_START, NULL);
+    
+    gtk_widget_set_halign(globalWidgets.listBox, GTK_ALIGN_START);
+    
     
     //header
     GtkWidget* label0 = gtk_label_new("Directions");
@@ -1410,8 +1414,9 @@ void display_path(const std::vector<StreetIdx> path) {
     step.append ("Start at ");
     step.append(intersections[getStreetSegmentInfo(path[0]).to].name);
     gtk_label_set_text((GtkLabel*)label, step.c_str());
-    gtk_misc_set_alignment(GTK_MISC(label), 0.0f, 0.0f);
-    //gtk_label_set_justify((GtkLabel*)label, GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap((GtkLabel*) label, TRUE);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    
     gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label, -1);
     //std::cout << "Start at " +  << std::endl; 
     
@@ -1468,8 +1473,9 @@ void display_path(const std::vector<StreetIdx> path) {
             step1.append(" until ");
             step1.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
             gtk_label_set_text((GtkLabel*)label1, step1.c_str());
-            gtk_misc_set_alignment(GTK_MISC(label1), 0.0f, 0.0f);
-            //gtk_label_set_justify((GtkLabel*)label1, GTK_JUSTIFY_LEFT);
+            gtk_label_set_line_wrap((GtkLabel*) label1, TRUE);
+            //gtk_widget_set_halign(label1, GTK_ALIGN_START);
+            
             gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label1, -1);
             
             GtkWidget* label2 = gtk_label_new("");
@@ -1481,8 +1487,9 @@ void display_path(const std::vector<StreetIdx> path) {
             step2.append(" at ");
             step2.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
             gtk_label_set_text((GtkLabel*)label2, step2.c_str());
-            gtk_misc_set_alignment(GTK_MISC(label2), 0.0f, 0.0f);
-            //gtk_label_set_justify((GtkLabel*)label2, GTK_JUSTIFY_LEFT);
+            gtk_label_set_line_wrap((GtkLabel*) label2, TRUE);
+            //gtk_widget_set_halign(label2, GTK_ALIGN_START);
+            
             gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label2, -1);
             
 
@@ -1498,8 +1505,9 @@ void display_path(const std::vector<StreetIdx> path) {
     step3.append(intersections[getStreetSegmentInfo(path.back()).to].name);
     
     gtk_label_set_text((GtkLabel*)label3, step3.c_str());
-    gtk_misc_set_alignment(GTK_MISC(label3), 0.0f, 0.0f);
-    //gtk_label_set_justify((GtkLabel*)label3, GTK_JUSTIFY_LEFT);
+    gtk_label_set_line_wrap((GtkLabel*) label3, TRUE);
+    gtk_widget_set_halign(label3, GTK_ALIGN_START);
+    
     gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label3, -1);
    
 }
@@ -1520,14 +1528,19 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         if(path_from.highlight) {
             path_to = intersections[id];
             std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(path_from.id, 
-            path_to.id,15.000000);
-            if(path.size() > 0){
+            path_to.id,15.000000);          
+            if (path.size() > 0) {
                 display_path(path);
                 gtk_widget_show_all(globalWidgets.scrolledBox );
             }
         }
         else {
             path_from = intersections[id];
+            
+            if (globalWidgets.scrolledBox != nullptr) {
+                gtk_widget_destroy(globalWidgets.scrolledBox );
+            }
+            
         }
         intersections[id].highlight = false;
         app -> refresh_drawing();
@@ -1638,20 +1651,28 @@ void reveal_search_activate(GtkEntry* entry) {
     
     clearHighlights();
     
-    std::vector<IntersectionIdx> intersection1 = find_intersections_between_two_streets(firstText);
+    std::vector<StreetIdx> streetPath;
     
-    std::vector<IntersectionIdx> intersection2 = find_intersections_between_two_streets(secondText);
     
-    if (intersection1.size() > 0 && intersection2.size() > 0) {
-        std::vector<StreetIdx> streetPath = findPathBetweenIntersections(intersection1[0], intersection2[0], 15.0);
         
-        if (streetPath.size() > 0) {
-            display_path(streetPath);
+        std::vector<IntersectionIdx> intersection1 = find_intersections_between_two_streets(firstText);
+    
+        std::vector<IntersectionIdx> intersection2 = find_intersections_between_two_streets(secondText);
+    
+        if (intersection1.size() > 0 && intersection2.size() > 0) {
+            streetPath = findPathBetweenIntersections(intersection1[0], intersection2[0], 15.0);
             
-            gtk_widget_show_all(globalWidgets.scrolledBox );
+            if (globalWidgets.scrolledBox != nullptr) {
+                gtk_widget_destroy(globalWidgets.scrolledBox );
+            }
+
         }
-        
-        
+    
+    
+    if (streetPath.size() > 0) {
+        display_path(streetPath);
+
+        gtk_widget_show_all(globalWidgets.scrolledBox );
     }
     
     
@@ -1809,7 +1830,10 @@ void find_button(GtkWidget * /*widget*/, ezgl::application *app) {
     
     for (int i = 0; i < results.size(); i++) {
             std::cout << results[i] << std::endl;
+            intersections[results[i]].highlight = true;
+                    
         }
+    
     
     //clear entry
     gtk_entry_set_text(entry, " ");
@@ -1898,16 +1922,10 @@ std::vector<IntersectionIdx> find_intersections_between_two_streets(std::string 
                 
             }
             
-        }
-              
+        }     
         
         //set highlights
-        if (intersectionResults.size() > 0) {
-            for (int i = 0; i < intersectionResults.size(); i++) {
-                intersections[intersectionResults[i]].highlight = true;
-            }
-
-        } else {
+        if (intersectionResults.size() == 0) {
             //otherwise show error message
             gtk_popover_popup(popOver);    
             gtk_label_set_text(popOverLabel, "No intersections found");
