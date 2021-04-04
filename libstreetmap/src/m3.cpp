@@ -47,31 +47,6 @@ void loadGraph(){
    
 }
 
-
-
-/*for all intersections:
- *    for i in findStreetSegmentsOfIntersection(intersection)
- *    
- */
-
-
-/*
- initialize(graph, source)
- *   source.time = 0
- *   source.leading= null
- *   for otherNodes in Graph:
- *        otherNodes.time = INT_MAX;
- *        otherNodes.leading = null;
- 
- */
-
-/*
- * relax(start, end, edge)
- *    if (end.time) > (start.time) + edge
- *        end.time = (start.time) + edge
- *        end.leading = edge
- */
-
 /*Uses A* algorithm
 *given a starting node and the end destination intersection id, the function will return true
 *or false if there is a path
