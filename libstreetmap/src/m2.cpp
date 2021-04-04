@@ -1513,15 +1513,66 @@ void display_path(const std::vector<StreetIdx> path) {
             //calculate cross product 
             double directionNumber = dir(p1, p2, p3);
             
-           
-            //make a label for this step
+            IntersectionIdx intersection1 = getStreetSegmentInfo(path[i]).from;
+            IntersectionIdx intersection2 = getStreetSegmentInfo(path[i]).to;
+            IntersectionIdx intersection3 = getStreetSegmentInfo(path[i+1]).from;
+            IntersectionIdx intersection4 = getStreetSegmentInfo(path[i+1]).to;
+            
+            ezgl::point2d inter1(0,0);
+            ezgl::point2d inter2(0,0);
+            std::string compass;
+            
+            if(intersection1 == intersection3){
+                inter1 = intersections[getStreetSegmentInfo(path[i]).to].coordinate;
+                inter2 = intersections[getStreetSegmentInfo(path[i]).from].coordinate;
+            }
+            else if(intersection1 == intersection4){
+                inter1 = intersections[getStreetSegmentInfo(path[i]).to].coordinate;
+                inter2 = intersections[getStreetSegmentInfo(path[i]).from].coordinate;
+            }
+            else if(intersection2 == intersection3){
+                inter1 = intersections[getStreetSegmentInfo(path[i]).from].coordinate;
+                inter2 = intersections[getStreetSegmentInfo(path[i]).to].coordinate;
+            }
+            else{
+                inter1 = intersections[getStreetSegmentInfo(path[i]).from].coordinate;
+                inter2 = intersections[getStreetSegmentInfo(path[i]).to].coordinate;
+            }
+            if(inter2.x - inter1.x == 0 && inter2.y - inter1.y > 0){
+                compass = "North";
+            }
+            else if(inter2.x - inter1.x > 0 && inter2.y - inter1.y > 0){
+                compass = "NorthEast";
+            }
+            else if(inter2.x - inter1.x < 0 && inter2.y - inter1.y > 0){
+                compass = "NorthWest";
+            }
+            else if(inter2.x - inter1.x < 0 && inter2.y - inter1.y == 0){
+                compass = "West";
+            }
+            else if(inter2.x - inter1.x < 0 && inter2.y - inter1.y < 0){
+                compass = "SouthWest";
+            }
+            else if(inter2.x - inter1.x > 0 && inter2.y - inter1.y < 0){
+                compass = "SouthEast";
+            }
+            else if(inter2.x - inter1.x == 0 && inter2.y - inter1.y < 0){
+                compass = "South";
+            }
+            else if(inter2.x - inter1.x > 0 && inter2.y - inter1.y == 0){
+                compass = "East";
+            }
+
+            
             GtkWidget* label1 = gtk_label_new("");
             std::string step1 (std::to_string(number));
             //add the necessary strings to write out the step-by-step direction
             step1.append(". ");
             number++;
-            step1.append ("Follow ");
-            step1.append(start);
+            step1.append ("Travel ");
+            step1.append (compass);
+            step1.append (" on ");
+            step1.append(street_segments[path[i]].name);
             step1.append(" until ");
             step1.append(middle);
             gtk_label_set_text((GtkLabel*)label1, step1.c_str());
