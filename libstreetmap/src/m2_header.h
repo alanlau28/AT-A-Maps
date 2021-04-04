@@ -128,6 +128,11 @@ void help_button_callback();
 
 void display_path(const std::vector<StreetIdx> path);
 
+double cross_product(ezgl::point2d p1, ezgl::point2d p2);
+
+double dir(ezgl::point2d p1, ezgl::point2d p2, ezgl::point2d p3);
+
+
 
 
 

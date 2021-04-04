@@ -1464,35 +1464,48 @@ void display_path(const std::vector<StreetIdx> path) {
         if (street_segments[path[i]].name != street_segments[path[i + 1]].name) {
             
             
-            //find difference in angles between the two street segments
-            ezgl::point2d from_start = street_segments[path[i]].coordinates.end()[-2];
-            ezgl::point2d from_end = street_segments[path[i]].coordinates.end()[-1];
-            ezgl::point2d to_start = street_segments[path[i+1]].coordinates[0];
-            ezgl::point2d to_end = street_segments[path[i+1]].coordinates[1];
+            //find coordinates of all 4 intersections of the two segments
+            ezgl::point2d from_start = intersections[getStreetSegmentInfo(path[i]).from].coordinate;
+            ezgl::point2d from_end = intersections[getStreetSegmentInfo(path[i]).to].coordinate;
+            ezgl::point2d to_start = intersections[getStreetSegmentInfo(path[i+1]).from].coordinate;
+            ezgl::point2d to_end = intersections[getStreetSegmentInfo(path[i+1]).to].coordinate;
             
-            //if their common intersection isn't at the same point, swap 
-            if (from_end != to_start) {
-                ezgl::point2d tmp = from_start;
-                from_start = from_end;
-                from_end = tmp;
-            }
-//            //check again, then swap other two elements
-//            if (from_end != to_start) {
-//                ezgl::point2d tmp = to_start;
-//                to_end = to_start;
-//                to_start = tmp;
-//            }
+            ezgl::point2d p1 (0,0), p2(0,0), p3 (0, 0);
             
-            ezgl::point2d vector1 = from_end - from_start;
-            ezgl::point2d vector2 = to_end - from_start;
+            //depending on which of the intersection coordinates match
+            //assign that as the middle and the other two as point 1 and point 3
+            if (from_start == to_start) {
+                p2 = from_start;
+                p1 = from_end;
+                p3 = to_end;
+            } else if (from_start == to_end) {
+                p2 = from_start;
+                p1 = from_end;
+                p3 = to_start;
+            } else if (from_end == to_start ) {
+                p2 = from_end;
+                p1 = from_start;
+                p3 = to_end;
+            } else if (from_end == to_end) {
+                p2 = from_end;
+                p1 = from_start;
+                p3 = to_start;
+            } 
+           
             
+
             std::string direction;
             
-            if (vector1.x*vector2.y - vector2.x*vector1.y > 0) {
+            double directionNumber = dir(p1, p2, p3);
+            std::cout << directionNumber << std::endl;
+            
+            if (directionNumber < 0) {
                 direction = "left";
-            } else if (vector1.x*vector2.y - vector2.x*vector1.y < 0) {
+            } else if (directionNumber > 0) {
                 direction = "right";
             }
+            
+           
             
 
             GtkWidget* label1 = gtk_label_new("");
@@ -1991,6 +2004,15 @@ std::vector<IntersectionIdx> find_intersections_between_two_streets(std::string 
     return intersectionResults;    
 }
 
+double cross_product(ezgl::point2d p1, ezgl::point2d p2) {
+    return p1.x*p2.y - p2.x*p1.y;
+}
+
+
+double dir(ezgl::point2d p1, ezgl::point2d p2, ezgl::point2d p3) {
+    
+    return  cross_product(p3 - p1, p2 - p1);
+}
 //clears data structures
 void close_map(){
     closeOSMDatabase();
