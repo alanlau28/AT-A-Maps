@@ -1756,6 +1756,7 @@ void reveal_search_bar() {
     
 }
 
+//callback for when the 2nd search bar has been activated (i.e. enter was pressed)
 void reveal_search_activate(GtkEntry* entry) {
     //entry from first search bar
     GtkEntry* firstEntry = (GtkEntry*) global_app -> get_object("SearchEntry");
@@ -1765,33 +1766,40 @@ void reveal_search_activate(GtkEntry* entry) {
     std::string secondText = gtk_entry_get_text(entry);
     gtk_entry_set_text(entry, " ");
     
+    //clear all highlights
     clearHighlights();
     
     int res1, res2;
     
     std::vector<StreetIdx> streetPath;
     
-        std::vector<IntersectionIdx> intersection1 = find_intersections_between_two_streets(firstText);
+    //get intersections between the two search bars
+    std::vector<IntersectionIdx> intersection1 = find_intersections_between_two_streets(firstText);
     
-        std::vector<IntersectionIdx> intersection2 = find_intersections_between_two_streets(secondText);
+    std::vector<IntersectionIdx> intersection2 = find_intersections_between_two_streets(secondText);
     
-        if (intersection1.size() > 0 && intersection2.size() > 0) {
-            streetPath = findPathBetweenIntersections(intersection1[0], intersection2[0], 15.0);
-            res1 = intersection1[0];
-            res2 = intersection2[0];
-            
-            if (GTK_IS_WIDGET(globalWidgets.scrolledBox)) {
-                gtk_widget_destroy(globalWidgets.scrolledBox );
+    //if there's a match find path
+    if (intersection1.size() > 0 && intersection2.size() > 0) {
+        streetPath = findPathBetweenIntersections(intersection1[0], intersection2[0], 15.0);
+        res1 = intersection1[0];
+        res2 = intersection2[0];
+        
+        //if the scrolled box has previous stuff destroy it
+        if (GTK_IS_WIDGET(globalWidgets.scrolledBox)) {
+            gtk_widget_destroy(globalWidgets.scrolledBox );
             }
 
         }
     
-    
+    //if there's a path display path and steps
     if (streetPath.size() > 0) {
         display_path(streetPath, res1, res2);
 
         gtk_widget_show_all(globalWidgets.scrolledBox );
-    } else {
+        
+    } 
+    //otherwise throw error popup message
+    else {
         GtkPopover* popOver = (GtkPopover*) global_app->get_object("SearchEntryPopOver");
         GtkLabel* popOverLabel = (GtkLabel*) global_app->get_object("SearchEntryPopOverLabel");
         
