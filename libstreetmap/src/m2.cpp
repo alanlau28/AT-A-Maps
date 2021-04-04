@@ -141,6 +141,8 @@ intersection_data path_from; //starting intersection of path
 intersection_data path_to; //end intersection of path
 
 
+//mapbox::geometry::polygon<double> polygon
+
 bool operator< (feature_data& first, feature_data& second){
     auto begin = feature_priority.begin();
     auto end = feature_priority.end();

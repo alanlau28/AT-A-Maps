@@ -46,6 +46,8 @@ struct waveElement{
     }
 
 };
+
+
 void loadGraph();
 
 extern double max_speed; //max speed of the map
