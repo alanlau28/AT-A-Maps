@@ -1463,6 +1463,7 @@ void display_path(const std::vector<StreetIdx> path) {
         //if street name changes
         if (street_segments[path[i]].name != street_segments[path[i + 1]].name) {
             
+            std::string start, middle, end;
             
             //find coordinates of all 4 intersections of the two segments
             ezgl::point2d from_start = intersections[getStreetSegmentInfo(path[i]).from].coordinate;
@@ -1478,58 +1479,71 @@ void display_path(const std::vector<StreetIdx> path) {
                 p2 = from_start;
                 p1 = from_end;
                 p3 = to_end;
+                
+                start = intersections[getStreetSegmentInfo(path[i]).to].name;
+                middle = intersections[getStreetSegmentInfo(path[i]).from].name;
+                end = intersections[getStreetSegmentInfo(path[i+1]).to].name;
+            
             } else if (from_start == to_end) {
                 p2 = from_start;
                 p1 = from_end;
                 p3 = to_start;
+                
+                start = intersections[getStreetSegmentInfo(path[i]).to].name;
+                middle = intersections[getStreetSegmentInfo(path[i]).from].name;
+                end = intersections[getStreetSegmentInfo(path[i+1]).from].name;
             } else if (from_end == to_start ) {
                 p2 = from_end;
                 p1 = from_start;
                 p3 = to_end;
+                
+                start = intersections[getStreetSegmentInfo(path[i]).from].name;
+                middle = intersections[getStreetSegmentInfo(path[i]).to].name;
+                end = intersections[getStreetSegmentInfo(path[i+1]).to].name;
             } else if (from_end == to_end) {
                 p2 = from_end;
                 p1 = from_start;
                 p3 = to_start;
+                
+                start = intersections[getStreetSegmentInfo(path[i]).from].name;
+                middle = intersections[getStreetSegmentInfo(path[i]).to].name;
+                end = intersections[getStreetSegmentInfo(path[i+1]).from].name;
             } 
            
-            
-
-            std::string direction;
-            
+            //calculate cross product 
             double directionNumber = dir(p1, p2, p3);
-            std::cout << directionNumber << std::endl;
-            
-            if (directionNumber < 0) {
-                direction = "left";
-            } else if (directionNumber > 0) {
-                direction = "right";
-            }
             
            
-            
-
+            //make a label for this step
             GtkWidget* label1 = gtk_label_new("");
             std::string step1 (std::to_string(number));
+            //add the necessary strings to write out the step-by-step direction
             step1.append(". ");
             number++;
             step1.append ("Follow ");
-            step1.append(street_segments[path[i]].name);
+            step1.append(start);
             step1.append(" until ");
-            step1.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
+            step1.append(middle);
             gtk_label_set_text((GtkLabel*)label1, step1.c_str());
             gtk_label_set_line_wrap((GtkLabel*) label1, TRUE);
             gtk_widget_set_halign(label1, GTK_ALIGN_START);
-            
+            //insert label in listbox
             gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label1, -1);
             
+            //make a label for any turns
             GtkWidget* label2 = gtk_label_new("");
             std::string step2 (std::to_string(number));
             step2.append(". ");
             number++;
-            step2.append ("Turn ");
-            step2.append(direction);
+             if (directionNumber < -100) {
+                 step2.append("Turn left");
+            } else if (directionNumber > 100) {
+                step2.append("Turn right");
+            } else {
+                step2.append("Go straight");
+            }
             step2.append(" at ");
-            step2.append(intersections[getStreetSegmentInfo(path[i + 1]).from].name);
+            step2.append(middle);
             gtk_label_set_text((GtkLabel*)label2, step2.c_str());
             gtk_label_set_line_wrap((GtkLabel*) label2, TRUE);
             gtk_widget_set_halign(label2, GTK_ALIGN_START);
