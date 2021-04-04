@@ -29,7 +29,7 @@ struct boundingBox{
 };
 
 struct street_segment_data{
-    std::vector<ezgl::point2d> coordinates;         //x,y coordinate of every point on the street segment in point2d
+    std::vector<ezgl::point2d> coordinates;  //x,y coordinate of every point on the street segment in point2d
     std::string name;           //name of the street
     std::vector <double> angle;       //angle of the segment with respect to the x-axis
     float speed_limit;      //speed limit of the street segment
@@ -1412,10 +1412,11 @@ void display_path(const std::vector<StreetIdx> path) {
         street_segments[path[i]].highlight = true;
     }
     
-    //UI stuff
+    //get UI gtk objects, create a scrolled window to put directions in
     globalWidgets.overlay = (GtkWidget*) global_app->get_object("MainCanvasOverlay");
     globalWidgets.scrolledBox = gtk_scrolled_window_new(NULL, NULL);
     
+    //Gtk scrolled window adjustments
     gtk_overlay_add_overlay((GtkOverlay*)globalWidgets.overlay, globalWidgets.scrolledBox);
     gtk_container_set_border_width (GTK_CONTAINER (globalWidgets.scrolledBox), 20);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(globalWidgets.scrolledBox), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -1425,77 +1426,75 @@ void display_path(const std::vector<StreetIdx> path) {
     gtk_scrolled_window_set_propagate_natural_width ((GtkScrolledWindow*)globalWidgets.scrolledBox, TRUE);
     gtk_scrolled_window_set_propagate_natural_height ((GtkScrolledWindow*)globalWidgets.scrolledBox, TRUE);
     
+    //create a listbox inside the scrolled window and add it to the scrolled window
     globalWidgets.listBox = gtk_list_box_new();
     gtk_container_add(GTK_CONTAINER(globalWidgets.scrolledBox), globalWidgets.listBox );
     
-    
+    //set listbox position at top left of screen
     g_object_set(globalWidgets.scrolledBox , "halign", GTK_ALIGN_START, NULL);
     g_object_set(globalWidgets.scrolledBox , "valign", GTK_ALIGN_START, NULL);
+    g_object_set(globalWidgets.listBox, "halign", GTK_ALIGN_START, NULL);
     
-    gtk_widget_set_halign(globalWidgets.listBox, GTK_ALIGN_START);
     
-    
-    //header
+    //the first line is called Directions
     GtkWidget* label0 = gtk_label_new("Directions");
     gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label0, -1);
-
-    int number = 1;
+    
+    
+    int number = 1; //for figuring out step number
+    
     //write the first intersection where it starts
     GtkWidget* label = gtk_label_new("");
+    //text to be put in label
     std::string step (std::to_string(number));
     step.append(". ");
     number++;
     step.append ("Start at ");
     step.append(intersections[getStreetSegmentInfo(path[0]).to].name);
+    //gtk label adjustments 
     gtk_label_set_text((GtkLabel*)label, step.c_str());
     gtk_label_set_line_wrap((GtkLabel*) label, TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label, -1);
     
-    //get directions
+    //iterate through each segment in the path
     for (int i = 0; i < path.size() - 1; i++) {
         
         //if street name changes
         if (street_segments[path[i]].name != street_segments[path[i + 1]].name) {
             
+            
             //find difference in angles between the two street segments
-            double angle_from = street_segments[path[i]].angle.back();
-            double angle_to = street_segments[path[i+1]].angle[0];
-            double angle_diff = angle_from - angle_to;
+            ezgl::point2d from_start = street_segments[path[i]].coordinates.end()[-2];
+            ezgl::point2d from_end = street_segments[path[i]].coordinates.end()[-1];
+            ezgl::point2d to_start = street_segments[path[i+1]].coordinates[0];
+            ezgl::point2d to_end = street_segments[path[i+1]].coordinates[1];
+            
+            //if their common intersection isn't at the same point, swap 
+            if (from_end != to_start) {
+                ezgl::point2d tmp = from_start;
+                from_start = from_end;
+                from_end = tmp;
+            }
+//            //check again, then swap other two elements
+//            if (from_end != to_start) {
+//                ezgl::point2d tmp = to_start;
+//                to_end = to_start;
+//                to_start = tmp;
+//            }
+            
+            ezgl::point2d vector1 = from_end - from_start;
+            ezgl::point2d vector2 = to_end - from_start;
             
             std::string direction;
             
-            //for figuring out direction
-            if (angle_from >= 0) {
-                if (angle_to >= 0) {
-                    if (angle_diff >= 0) {
-                        direction = "left";
-                    } else if (angle_diff <= 0) {
-                        direction = "right";
-                    }
-                } else if (angle_to <= 0) {
-                    if (angle_diff >= 0) {
-                        direction = "right";
-                    } else if (angle_diff <= 0) {
-                        direction = "right";
-                    }
-                }
-            } else if (angle_from <= 0) {
-                if (angle_to >= 0) {
-                    if (angle_diff >= 0) {
-                        direction = "left";
-                    } else if (angle_diff <= 0) {
-                        direction = "left";
-                    }
-                } else if (angle_to <= 0) {
-                    if (angle_diff >= 0) {
-                        direction = "right";
-                    } else if (angle_diff <= 0) {
-                        direction = "left";
-                    }
-                }
+            if (vector1.x*vector2.y - vector2.x*vector1.y > 0) {
+                direction = "left";
+            } else if (vector1.x*vector2.y - vector2.x*vector1.y < 0) {
+                direction = "right";
             }
             
+
             GtkWidget* label1 = gtk_label_new("");
             std::string step1 (std::to_string(number));
             step1.append(". ");
@@ -1526,8 +1525,8 @@ void display_path(const std::vector<StreetIdx> path) {
             
 
         }
+        
     }
-    
     
     GtkWidget* label3 = gtk_label_new("");
     std::string step3 (std::to_string(number));
