@@ -1585,7 +1585,8 @@ void display_path(const std::vector<StreetIdx> path) {
             GtkWidget* label2 = gtk_label_new("");
             std::string step2 (std::to_string(number));
             step2.append(". ");
-            number++;
+            number++; //increment step number
+            //depending on how much of a turn, turn right/left/go straight
              if (directionNumber < -100) {
                  step2.append("Turn left");
             } else if (directionNumber > 100) {
@@ -1599,6 +1600,7 @@ void display_path(const std::vector<StreetIdx> path) {
             gtk_label_set_line_wrap((GtkLabel*) label2, TRUE);
             gtk_widget_set_halign(label2, GTK_ALIGN_START);
             
+            //add label to listbox
             gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label2, -1);
             
 
@@ -1606,13 +1608,13 @@ void display_path(const std::vector<StreetIdx> path) {
         
     }
     
+    //make label for last instruction
     GtkWidget* label3 = gtk_label_new("");
     std::string step3 (std::to_string(number));
     step3.append(". ");
     number++;
     step3.append ("End journey at ");
     step3.append(intersections[getStreetSegmentInfo(path.back()).to].name);
-    
     gtk_label_set_text((GtkLabel*)label3, step3.c_str());
     gtk_label_set_line_wrap((GtkLabel*) label3, TRUE);
     gtk_widget_set_halign(label3, GTK_ALIGN_START);
@@ -1637,7 +1639,8 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         if(path_from.highlight) {
             path_to = intersections[id];
             std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(path_from.id, 
-            path_to.id,15.000000);          
+            path_to.id,15.000000);  
+            //show path between two intersections
             if (path.size() > 0) {
                 display_path(path);
                 gtk_widget_show_all(globalWidgets.scrolledBox );
