@@ -24,7 +24,7 @@
 #include "m1.h"
 #include "m2.h"
 #include "m3.h"
-
+#include "m4.h"
 
 #include <vector>
 
@@ -76,10 +76,17 @@ int main(int argc, char** argv) {
   
     //do something in between
     
-    drawMap();
-    std::vector<StreetSegmentIdx> path;
-    path = findPathBetweenIntersections(43487, 116429, 15.00000000000000000);
-    
+    //drawMap();
+        std::vector<DeliveryInf> deliveries;
+        std::vector<IntersectionIdx> depots;
+        float turn_penalty;
+        std::vector<CourierSubPath> result_path;
+
+        deliveries = {DeliveryInf(134204, 32615)};
+        depots = {10, 38701};
+        turn_penalty = 15.000000000;
+        result_path = travelingCourier(deliveries,depots,turn_penalty);
+        
     std::cout << "Closing map\n";
     closeMap(); 
 
