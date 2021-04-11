@@ -33,7 +33,7 @@ std::vector<Node> graph;
 
 //override for the priority queue to put the smallest element in the front
 bool operator<(const waveElement& lhs,const waveElement& rhs){
-    if((lhs.traveltime + lhs.estTime) >= (rhs.traveltime + lhs.estTime)) return true;
+    if((lhs.traveltime + lhs.estTime) >= (rhs.traveltime + rhs.estTime)) return true;
     else return false;
 }
 
