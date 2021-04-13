@@ -26,12 +26,12 @@ std::vector<CourierSubPath> travelingCourier(
 		            const std::vector<DeliveryInf>& deliveries,
                             const std::vector<int>& depots, 
 		            const float turn_penalty){
-    
+    const int numDeliveries = deliveries.size();
     std::vector<IntersectionIdx> intersections_dest;
     std::vector<std::vector<std::vector<StreetSegmentIdx>>> all_paths;
     std::vector<CourierSubPath> subPath;
             
-    for(int i = 0; i < deliveries.size();i++){
+    for(int i = 0; i < numDeliveries;i++){
         intersections_dest.push_back(deliveries[i].pickUp);
         intersections_dest.push_back(deliveries[i].dropOff);
     }
@@ -46,11 +46,12 @@ std::vector<CourierSubPath> travelingCourier(
     //std::cout << time.count();
     
      //std::vector<std::vector<std::vector<StreetSegmentIdx>>> intersections_dest;
-    std::vector<std::vector<StreetSegmentIdx>> answer;
+    //std::vector<std::vector<StreetSegmentIdx>> answer;
+    std::vector<StreetSegmentIdx> currPath;
     std::vector<double> travel_time_of_paths;
     std::vector<bool> legal;
     std::vector<bool> notVisited;
-    for (int i = 0; i < deliveries.size(); i++){
+    for (int i = 0; i < numDeliveries; i++){
         legal.push_back(false);
         notVisited.push_back(true);
         notVisited.push_back(true);
@@ -61,10 +62,11 @@ std::vector<CourierSubPath> travelingCourier(
     int next;
     double pathTime;
     for(int i = 0; i<depots.size();i++){
-        int depot_index = (deliveries.size()*2)+i;
+        int depot_index = (numDeliveries*2)+i;
         for(int j = 0; j< all_paths[depot_index].size()-depots.size(); j+=2){
+            
             pathTime = computePathTravelTime(all_paths[depot_index][j],turn_penalty);
-            //std::cout<<pathTime<<std::endl;
+            
             if(pathTime<currMin&& pathTime!=0){
                 currMin = pathTime;
                 depot_start = depot_index;
@@ -72,11 +74,11 @@ std::vector<CourierSubPath> travelingCourier(
             }
         }     
     }
-    answer.push_back(all_paths[depot_start][next]);
+    //answer.push_back(all_paths[depot_start][next]);
     travel_time_of_paths.push_back(currMin);
     
     CourierSubPath path;
-    path.start_intersection = depots[depot_start-2*deliveries.size()];
+    path.start_intersection = depots[depot_start-2*numDeliveries];
     
     path.end_intersection = deliveries[next/2].pickUp;
     path.subpath = all_paths[depot_start][next];
@@ -87,7 +89,7 @@ std::vector<CourierSubPath> travelingCourier(
     
     prev = next;
     
-    for(int iteration = 0; iteration < 2*deliveries.size()-1; iteration++){
+    for(int iteration = 0; iteration < 2*numDeliveries-1; iteration++){
         currMin=INT_MAX;
         if(prev%2==0){
             path.start_intersection= deliveries[prev/2].pickUp;
@@ -114,7 +116,7 @@ std::vector<CourierSubPath> travelingCourier(
         }
         notVisited[next]=false;
         travel_time_of_paths.push_back(currMin);
-        answer.push_back(all_paths[prev][next]);
+        //answer.push_back(all_paths[prev][next]);
         path.subpath=all_paths[prev][next];
         prev= next;
         subPath.push_back(path);        
@@ -125,16 +127,16 @@ std::vector<CourierSubPath> travelingCourier(
     currMin = INT_MAX;
    
     path.start_intersection= deliveries[next/2].dropOff; 
-    for(int i = 2*deliveries.size(); i < all_paths.size(); i++){
+    for(int i = 2*numDeliveries; i < all_paths.size(); i++){
         pathTime = computePathTravelTime(all_paths[next][i],turn_penalty);
         if(pathTime< currMin){
             currMin = pathTime;
             depot_end = i;
         }
     }
-    answer.push_back(all_paths[next][depot_end]);
+    //answer.push_back(all_paths[next][depot_end]);
     travel_time_of_paths.push_back(currMin);
-    path.end_intersection = depots[depot_end-2*deliveries.size()];
+    path.end_intersection = depots[depot_end-2*numDeliveries];
     path.subpath = all_paths[next][depot_end];
     subPath.push_back(path);
     
