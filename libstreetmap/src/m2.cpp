@@ -178,7 +178,7 @@ ezgl::point2d convertCoordinates(double longitude, double latitude){
 //converts latlon inot a pair of xy coordinates
 std::pair<double,double> convertToWorld(LatLon coordinate){
     
-    double x = kEarthRadiusInMeters * coordinate.longitude() * cos(bounds.lat_avg) * kDegreeToRadian;
+    double x = kEarthRadiusInMeters * coordinate.longitude() * cos(map_lat_avg) * kDegreeToRadian;
     double y = kEarthRadiusInMeters * coordinate.latitude() * kDegreeToRadian;
     
     return(std::make_pair(x,y));

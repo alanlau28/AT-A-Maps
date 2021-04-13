@@ -203,7 +203,6 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
 
 std::vector<std::vector<std::vector<StreetSegmentIdx>>> findAllPaths(std::vector<IntersectionIdx>& intersections_dest,const double turn_penalty){
     std::vector<std::vector<std::vector<StreetSegmentIdx>>> all_paths;
-    
     for(int i = 0; i < intersections_dest.size();i++){
         loadGraph();
         Node* start = &graph[intersections_dest[i]];

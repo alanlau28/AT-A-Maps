@@ -54,6 +54,8 @@ extern std::vector<StreetSegmentInfo> segmentInfo;
 
 extern std::vector<std::pair<double,double>> intersectionPosition;
 
+extern double map_lat_avg;
+
 double findEuclidianDistance(std::pair<double,double> first,std::pair<double,double> second);
 
 IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx outgoing);

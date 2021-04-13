@@ -68,6 +68,7 @@ std::multimap<std::string, StreetIdx> streets_NamesIdx;
 
 std::string map_load_path;
 double max_speed;
+double map_lat_avg;
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -210,6 +211,20 @@ bool loadMap(std::string map_streets_database_filename) {
         
         streets_NamesIdx.insert(std::make_pair(streetName,street_id));        
     }
+    double max_lon = getIntersectionPosition(0).longitude();
+    double min_lon = max_lon;
+    double max_lat = getIntersectionPosition(0).latitude();
+    double min_lat = max_lat;
+    
+    for(int i = 0; i < getNumIntersections(); i++){
+        max_lon = std::max(max_lon, getIntersectionPosition(i).longitude());
+        min_lon = std::min(min_lon, getIntersectionPosition(i).longitude());
+        max_lat = std::max(max_lat, getIntersectionPosition(i).latitude());
+        min_lat = std::min(min_lat, getIntersectionPosition(i).latitude());
+    }
+    
+    map_lat_avg = ((max_lat + min_lat)/2) * kDegreeToRadian;
+    
     
     //loads vector with xy coordinate of each intersection as a pair
     int num = getNumIntersections();
