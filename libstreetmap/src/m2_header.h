@@ -126,7 +126,7 @@ std::vector<IntersectionIdx> find_intersections_between_two_streets(std::string 
 
 void help_button_callback();
 
-void display_path(const std::vector<StreetIdx> path);
+void display_path(const std::vector<StreetIdx> path, IntersectionIdx startIntersection, IntersectionIdx endIntersection);
 
 double cross_product(ezgl::point2d p1, ezgl::point2d p2);
 

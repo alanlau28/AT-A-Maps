@@ -1406,7 +1406,7 @@ void help_button_callback() {
 
 
 //draws path given vector of street segments, as well as directions
-void display_path(const std::vector<StreetIdx> path) {
+void display_path(const std::vector<StreetIdx> path, IntersectionIdx startIntersection, IntersectionIdx endIntersection) {
     
     
     //highlight all the segments on a path
@@ -1452,7 +1452,7 @@ void display_path(const std::vector<StreetIdx> path) {
     step.append(". ");
     number++;
     step.append ("Start at ");
-    step.append(intersections[getStreetSegmentInfo(path[0]).to].name);
+    step.append(intersections[startIntersection].name);
     //gtk label adjustments 
     gtk_label_set_text((GtkLabel*)label, step.c_str());
     gtk_label_set_line_wrap((GtkLabel*) label, TRUE);
@@ -1515,6 +1515,7 @@ void display_path(const std::vector<StreetIdx> path) {
             //calculate cross product 
             double directionNumber = dir(p1, p2, p3);
             
+            //for directions
             IntersectionIdx intersection1 = getStreetSegmentInfo(path[i]).from;
             IntersectionIdx intersection2 = getStreetSegmentInfo(path[i]).to;
             IntersectionIdx intersection3 = getStreetSegmentInfo(path[i+1]).from;
@@ -1574,7 +1575,7 @@ void display_path(const std::vector<StreetIdx> path) {
             step1.append ("Travel ");
             step1.append (compass);
             step1.append (" on ");
-            step1.append(street_segments[path[i]].name);
+            step1.append(start);
             step1.append(" until ");
             step1.append(middle);
             gtk_label_set_text((GtkLabel*)label1, step1.c_str());
@@ -1587,7 +1588,8 @@ void display_path(const std::vector<StreetIdx> path) {
             GtkWidget* label2 = gtk_label_new("");
             std::string step2 (std::to_string(number));
             step2.append(". ");
-            number++;
+            number++; //increment step number
+            //depending on how much of a turn, turn right/left/go straight
              if (directionNumber < -100) {
                  step2.append("Turn left");
             } else if (directionNumber > 100) {
@@ -1601,6 +1603,7 @@ void display_path(const std::vector<StreetIdx> path) {
             gtk_label_set_line_wrap((GtkLabel*) label2, TRUE);
             gtk_widget_set_halign(label2, GTK_ALIGN_START);
             
+            //add label to listbox
             gtk_list_box_insert((GtkListBox*) globalWidgets.listBox , label2, -1);
             
 
@@ -1608,13 +1611,13 @@ void display_path(const std::vector<StreetIdx> path) {
         
     }
     
+    //make label for last instruction
     GtkWidget* label3 = gtk_label_new("");
     std::string step3 (std::to_string(number));
     step3.append(". ");
     number++;
     step3.append ("End journey at ");
-    step3.append(intersections[getStreetSegmentInfo(path.back()).to].name);
-    
+    step3.append(intersections[endIntersection].name);
     gtk_label_set_text((GtkLabel*)label3, step3.c_str());
     gtk_label_set_line_wrap((GtkLabel*) label3, TRUE);
     gtk_widget_set_halign(label3, GTK_ALIGN_START);
@@ -1639,9 +1642,10 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event,double x, 
         if(path_from.highlight) {
             path_to = intersections[id];
             std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(path_from.id, 
-            path_to.id,15.000000);          
+            path_to.id,15.000000);  
+            //show path between two intersections
             if (path.size() > 0) {
-                display_path(path);
+                display_path(path, path_from.id, path_to.id);
                 gtk_widget_show_all(globalWidgets.scrolledBox );
             }
         }
@@ -1754,6 +1758,7 @@ void reveal_search_bar() {
     
 }
 
+//callback for when the 2nd search bar has been activated (i.e. enter was pressed)
 void reveal_search_activate(GtkEntry* entry) {
     //entry from first search bar
     GtkEntry* firstEntry = (GtkEntry*) global_app -> get_object("SearchEntry");
@@ -1763,29 +1768,40 @@ void reveal_search_activate(GtkEntry* entry) {
     std::string secondText = gtk_entry_get_text(entry);
     gtk_entry_set_text(entry, " ");
     
+    //clear all highlights
     clearHighlights();
+    
+    int res1, res2;
     
     std::vector<StreetIdx> streetPath;
     
-        std::vector<IntersectionIdx> intersection1 = find_intersections_between_two_streets(firstText);
+    //get intersections between the two search bars
+    std::vector<IntersectionIdx> intersection1 = find_intersections_between_two_streets(firstText);
     
-        std::vector<IntersectionIdx> intersection2 = find_intersections_between_two_streets(secondText);
+    std::vector<IntersectionIdx> intersection2 = find_intersections_between_two_streets(secondText);
     
-        if (intersection1.size() > 0 && intersection2.size() > 0) {
-            streetPath = findPathBetweenIntersections(intersection1[0], intersection2[0], 15.0);
-            
-            if (GTK_IS_WIDGET(globalWidgets.scrolledBox)) {
-                gtk_widget_destroy(globalWidgets.scrolledBox );
+    //if there's a match find path
+    if (intersection1.size() > 0 && intersection2.size() > 0) {
+        streetPath = findPathBetweenIntersections(intersection1[0], intersection2[0], 15.0);
+        res1 = intersection1[0];
+        res2 = intersection2[0];
+        
+        //if the scrolled box has previous stuff destroy it
+        if (GTK_IS_WIDGET(globalWidgets.scrolledBox)) {
+            gtk_widget_destroy(globalWidgets.scrolledBox );
             }
 
         }
     
-    
+    //if there's a path display path and steps
     if (streetPath.size() > 0) {
-        display_path(streetPath);
+        display_path(streetPath, res1, res2);
 
         gtk_widget_show_all(globalWidgets.scrolledBox );
-    } else {
+        
+    } 
+    //otherwise throw error popup message
+    else {
         GtkPopover* popOver = (GtkPopover*) global_app->get_object("SearchEntryPopOver");
         GtkLabel* popOverLabel = (GtkLabel*) global_app->get_object("SearchEntryPopOverLabel");
         

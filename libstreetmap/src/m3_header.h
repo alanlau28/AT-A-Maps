@@ -36,13 +36,11 @@ struct waveElement{
     Node *node;
     StreetSegmentIdx edgeID;
     double traveltime;
-    double estTime;
     
-    waveElement(Node *n, int id, double time, double eTime){
+    waveElement(Node *n, int id, double time){
         node = n;
         edgeID = id;
         traveltime = time;
-        estTime = eTime;
     }
 
 };
@@ -66,6 +64,8 @@ std::vector<StreetSegmentIdx> traceBack(int destination);
 
 bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
 
+std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vector<IntersectionIdx>& intersections_dest, double turn_penalty);
 
+std::vector<std::vector<std::vector<StreetSegmentIdx>>> findAllPaths(std::vector<IntersectionIdx>& intersections_dest,const double turn_penalty);
 #endif /* M3_HEADER_H */
 
