@@ -82,8 +82,8 @@ int main(int argc, char** argv) {
         float turn_penalty;
         std::vector<CourierSubPath> result_path;
 
-        deliveries = {DeliveryInf(134204, 32615)};
-        depots = {10, 38701};
+        deliveries = {DeliveryInf(33543, 131865), DeliveryInf(96806, 131865), DeliveryInf(33543, 59623), DeliveryInf(96806, 42871), DeliveryInf(91583, 59623), DeliveryInf(96806, 101696), DeliveryInf(96806, 131865), DeliveryInf(91724, 59623), DeliveryInf(51383, 123952)};
+        depots = {14091, 78131, 81358};
         turn_penalty = 15.000000000;
         result_path = travelingCourier(deliveries,depots,turn_penalty);
         
