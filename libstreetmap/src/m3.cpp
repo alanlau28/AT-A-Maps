@@ -55,7 +55,7 @@ void loadGraph(){
 */
 
 bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
-    /*
+    
     std::priority_queue<waveElement> wavefront; //priority queue to sort through nodes by travel time
     waveElement source(source_node,NOEDGE, 0,0);
     wavefront.push(source);
@@ -93,8 +93,8 @@ bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
                     }
                     
                     double estTime = findEuclidianDistance(intersectionPosition[currNode -> ID]
-                    ,intersectionPosition[to])/max_speed; //the estimated time from the next node to the end destination 
-                    
+                    ,intersectionPosition[to]); //the estimated time from the next node to the end destination
+                 
                     //push node at the opposite end of the edge into the wavefront
                     Node* toNode = &graph[to];
                     waveElement elem(toNode,currNode -> outgoing[i],travelTime, estTime);
@@ -102,7 +102,7 @@ bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
                 } 
             }
         } 
-    }*/
+    }
     return false;
 }
 

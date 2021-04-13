@@ -36,11 +36,17 @@ struct waveElement{
     Node *node;
     StreetSegmentIdx edgeID;
     double traveltime;
-    
+    double estTime = 0.0;
     waveElement(Node *n, int id, double time){
         node = n;
         edgeID = id;
         traveltime = time;
+    }
+    waveElement(Node *n, int id, double time,double etime){
+        node = n;
+        edgeID = id;
+        traveltime = time;
+        estTime = etime;
     }
 
 };
