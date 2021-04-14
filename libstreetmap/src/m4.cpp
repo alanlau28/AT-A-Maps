@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <math.h>
 #include "m4.h"
-
+#include <chrono>
 
 std::vector<CourierSubPath> travelingCourier(
 		            const std::vector<DeliveryInf>& deliveries,
@@ -39,9 +39,11 @@ std::vector<CourierSubPath> travelingCourier(
     for(int i = 0;i < depots.size();i++){
         intersections_dest.push_back(depots[i]);
     }
-    
+    //auto startTime = std::chrono::high_resolution_clock::now();
     all_paths = findAllPaths(intersections_dest,turn_penalty);
-
+    //auto endTime = std::chrono::high_resolution_clock::now();
+    //auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
+    //std::cout << time.count();
     
      //std::vector<std::vector<std::vector<StreetSegmentIdx>>> intersections_dest;
     std::vector<std::vector<StreetSegmentIdx>> answer;
@@ -135,7 +137,6 @@ std::vector<CourierSubPath> travelingCourier(
     path.end_intersection = depots[depot_end-2*deliveries.size()];
     path.subpath = all_paths[next][depot_end];
     subPath.push_back(path);
-    
     
     return subPath;
     

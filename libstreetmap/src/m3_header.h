@@ -52,7 +52,7 @@ struct waveElement{
 };
 
 
-void loadGraph();
+void loadGraph(std::vector<Node> &graph);
 
 extern double max_speed; //max speed of the map
 
@@ -68,11 +68,11 @@ IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx ou
 
 bool operator<(const waveElement& lhs,const waveElement& rhs);
 
-std::vector<StreetSegmentIdx> traceBack(int destination);
+std::vector<StreetSegmentIdx> traceBack(int destination,std::vector<Node> &graph);
 
-bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
+bool path(Node* source_node, IntersectionIdx destination, double turn_penalty,std::vector<Node> &graph);
 
-std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vector<IntersectionIdx>& intersections_dest, double turn_penalty);
+std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vector<IntersectionIdx>& intersections_dest, double turn_penalty,std::vector<Node> &graph);
 
 std::vector<std::vector<std::vector<StreetSegmentIdx>>> findAllPaths(std::vector<IntersectionIdx>& intersections_dest,const double turn_penalty);
 #endif /* M3_HEADER_H */
