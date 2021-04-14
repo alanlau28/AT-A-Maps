@@ -63,9 +63,10 @@ std::vector<CourierSubPath> travelingCourier(
        double currMin = INT_MAX;
        double totalMin = INT_MAX;
 
-       int depot_start, depot_end;
+       int depot_start = (numDeliveries*2);
+       int depot_end = (numDeliveries*2);
        int prev;
-       int next;
+       int next = 0;
        double pathTime, pathDistance;
 
        //for(int i = 0; i<depots.size();i++){
