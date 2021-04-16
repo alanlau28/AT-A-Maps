@@ -23,6 +23,7 @@
 #include "m4_header.h"
 #include <chrono>
 #include <random>
+#include <algorithm>
 
 
 
@@ -260,19 +261,39 @@ std::vector<CourierSubPath> travelingCourier(
     bool test = order_is_legal(bestRandomOrder, intersections_dest);
     std::cout<<test<<std::endl;
     
+<<<<<<< HEAD
+=======
+    /*std::vector<IntersectionIdx> order = generate_intersection_order(bestRandomPath);
+    std::vector<CourierSubPath> two_opt;
+    two_opt.resize(bestRandomPath.size());
+    two_opt = two_opt_algorithm_order(bestRandomPath, order, deliveries, all_paths, intersections_dest);
+    
+    //auto startTime = std::chrono::high_resolution_clock::now();
+     auto endTime = std::chrono::high_resolution_clock::now();
+     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
+     //std::cout << time.count() << std::endl;
+    */
+     std::vector<PD> testVec = generate_intersection_order(bestRandomPath, intersections_dest);
+     bool test = order_is_legal(testVec,intersections_dest);
+     std::cout<<test<<std::endl;
+>>>>>>> commit to merge
      return bestRandomPath;
 
 }
 
-//generates two opt swap of a given intersection order
-//make sure index1 is less than index 2
-std::vector<IntersectionIdx> two_opt_swap_order (std::vector<IntersectionIdx>& order,
-                                                 int index1, int index2) {
-    std::vector<IntersectionIdx> new_order(order);
-    std::reverse(new_order.begin() + index1, new_order.begin() + index2);
+//generates the three subpaths that result from deleting two connections
+//make sure index1 is smaller than index2
+std::vector<std::vector<PD>> swap_subpaths (std::vector<PD> order, int index1, int index2) {
     
-    return new_order;
+    std::vector<PD> first = {order.begin(), order.begin() + index1};
+    std::vector<PD> second = {order.begin() + index1, order.begin() + index2};
+    std::vector<PD> third = {order.begin() + index2, order.end() };
+    
+    std::vector<std::vector<PD>> result = {first, second, third};
+    
+    return result;
 }
+
 
 std::vector<CourierSubPath> generate_new_courier (std::vector<IntersectionIdx>& order,
                                                   std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
@@ -348,8 +369,8 @@ bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& inter
 
 }
 
-/*std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>& path,
-                                                    std::vector<IntersectionIdx>& order,
+std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<PD> delivery_order,
+                                                    std::vector<CourierSubPath>& path,
                                                     std::vector<DeliveryInf> deliveries,
                                                     std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
                                                     std::vector<IntersectionIdx>& intersections_dest) {
@@ -371,38 +392,61 @@ bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& inter
     std::vector<CourierSubPath> final_path;
     final_path.resize(path.size());
     
-    for (int i = 1; i < order.size() - 1; i++) {
-        for (int j = i + 1; j < order.size() - 1; j++) {
+    for (int i = 1; i < path.size() - 1; i++) {
+        for (int j = i + 1; j < path.size() - 1; j++) {
             if (j > i && j - i > 1) {
-                std::vector<PD> two_opt_order = two_opt_swap_order(order, i, j);
-
-                if (!two_opt_order.empty() && order_is_legal(two_opt_order, intersections_dest)) {
-
-                    std::vector<CourierSubPath> two_opt_path = generate_new_courier (two_opt_order, all_paths, intersections_dest);
-                    double new_time = 0;
-                    for (int l = 0; l < path.size(); l++) {
-                        new_time += computePathTravelTime(two_opt_path[l].subpath, 15.00);
+                
+                
+                //get the three subpaths
+                std::vector<std::vector<PD>> subpaths = swap_subpaths(delivery_order, i, j);
+                
+                int list[] = {0,1,2};
+                
+                std::sort(list, list+3);
+                
+                //get all permutations of list
+                //build new vector according to permutation
+                do {
+                    std::vector<PD> new_order;
+            
+                    //get the list that's arranged in the new permutation
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 0; j < subpaths[list[i]].size(); j++) {
+                            new_order.push_back(subpaths[list[i]][j]);
+                        }
                     }
                     
-                    if (new_time < initial_time && !two_opt_path.empty()) {
-                        
-                        initial_time = new_time;
-
-                        final_path = two_opt_path;
-                        
-                    }
-                } 
+                    //check that path is legal
+                    //if legal break
+                    
+                    //reverse first subpath
+                    std::reverse(new_order.begin(), new_order.begin() + i);
+                    //check path is legal
+                    std::reverse(new_order.begin(), new_order.begin() + i); //undo reverse
+                    
+                    //reverse middle subpath
+                    std::reverse(new_order.begin() + i, new_order.begin() + j);
+                    //check path is legal
+                    std::reverse(new_order.begin() + i, new_order.begin() + j); //to undo reverse
+                    
+                    
+                    //reverse last subpath
+                    std::reverse(new_order.begin() + j, new_order.end());
+                    //check path is legal
+                    std::reverse(new_order.begin() + j, new_order.end()); //undo reverse
+                    
+                    
+                } while (std::next_permutation(list, list+3));
+  
             }
-           
         }
     }
-    
-    
-    
+
     if (!final_path.empty() && initial_time < old_time) {
         return final_path;
     } else return path;
-}*/
+}
+
 
 std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initial){
     double bestCost = 0.0;

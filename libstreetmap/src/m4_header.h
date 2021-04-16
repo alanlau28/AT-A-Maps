@@ -29,8 +29,7 @@ struct PD{
 
 std::vector<PD> generate_intersection_order (std::vector<CourierSubPath>& path, std::vector<IntersectionIdx> destination);
 
-std::vector<IntersectionIdx> two_opt_swap_order (std::vector<IntersectionIdx>& order,
-                                                 int index1, int index2);
+std::vector<std::vector<PD>> swap_subpaths (std::vector<PD> order, int index1, int index2);
 
 std::vector<CourierSubPath> generate_new_courier (std::vector<IntersectionIdx>& order,
                                                   std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
@@ -39,8 +38,8 @@ std::vector<CourierSubPath> generate_new_courier (std::vector<IntersectionIdx>& 
 bool order_is_legal (std::vector<PD>& path, std::vector<IntersectionIdx>&  intersections_dest);
 
 
-std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>& path,
-                                                    std::vector<IntersectionIdx>& order,
+std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<PD> delivery_order,
+                                                    std::vector<CourierSubPath>& path,
                                                     std::vector<DeliveryInf> deliveries,
                                                     std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
                                                     std::vector<IntersectionIdx>& intersections_dest);
