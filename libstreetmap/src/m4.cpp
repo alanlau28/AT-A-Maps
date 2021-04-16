@@ -51,11 +51,14 @@ std::vector<CourierSubPath> travelingCourier(
     all_paths = findAllPaths(intersections_dest,turn_penalty);
     
     double bestMinRandom = INT_MAX;
-
+    
     std::vector<CourierSubPath> bestRandomPath;
-   
-    for(int runNum = 0; runNum < 1; ++runNum){
+
+    //auto startTime = std::chrono::high_resolution_clock::now();
+    for(int runNum = 0; runNum < 8; ++runNum){
+
     int depotit = 0;
+    
     std::vector<CourierSubPath> bestPath;
     double totalMin = INT_MAX;
     while(depotit<depots.size()){
@@ -83,13 +86,17 @@ std::vector<CourierSubPath> travelingCourier(
        //while(depotit<depots.size()){
            double total = 0;
            int depot_index = (numDeliveries*2)+depotit;
-           
+           double currSecondMin = INT_MAX;
+           int secondNext;
            for(int j = 0; j< all_paths[depot_index].size()-depots.size(); j+=2){
                //pathTime = findEuclidianDistance(intersectionPosition[depots[i]],intersectionPosition[deliveries[j/2].pickUp]);
                pathTime = computePathTravelTime(all_paths[depot_index][j],turn_penalty);
-               //std::cout<<pathTime<<std::endl;
 
                if(pathTime<currMin&& pathTime!=0){
+                   if(j!=0){
+                   currSecondMin = currMin;
+                       secondNext = next;
+                   }
                    currMin = pathTime;
                    depot_start = depot_index;
                    
@@ -100,6 +107,12 @@ std::vector<CourierSubPath> travelingCourier(
                 //std::cout<<"ewfwefewefwfewfewfwf"<<std::endl;
                depotit+=1;
                continue;
+           }
+           
+           if(currSecondMin!= INT_MAX && (runNum ==1 || runNum %4 ==0)){
+               next = secondNext;
+               currMin = currSecondMin;
+               //neverRanSecond = false;
            }
        //}
        //answer.push_back(all_paths[depot_start][next]);
@@ -116,8 +129,7 @@ std::vector<CourierSubPath> travelingCourier(
        legal[next/2]= true; 
 
        prev = next;
-       double currSecondMin;
-       int secondNext;
+       
        for(int iteration = 0; iteration < 2*numDeliveries-1; iteration++){
            currMin=INT_MAX;
            currSecondMin = INT_MAX;
@@ -154,10 +166,10 @@ std::vector<CourierSubPath> travelingCourier(
                }       
 
            }
-           /*if(distr(eng)<0.1 && iteration!= 2*numDeliveries-2 && currSecondMin != INT_MAX){
+           if(distr(eng)<0.1 && iteration!= 2*numDeliveries-2 && runNum > 1&& currSecondMin != INT_MAX){
                next = secondNext;
                currMin = currSecondMin;
-           }*/
+           }
            if(next%2==0){
                legal[next/2]=true;
                path.end_intersection = deliveries[next/2].pickUp;
@@ -209,8 +221,11 @@ std::vector<CourierSubPath> travelingCourier(
          }
     
     }
+    if(totalMin<bestMinRandom){
+        bestRandomPath = bestPath;
+        bestMinRandom = totalMin;
+    }
     
-    bestRandomPath = bestPath;
     
     }
     
