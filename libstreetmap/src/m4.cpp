@@ -55,7 +55,7 @@ std::vector<CourierSubPath> travelingCourier(
     std::vector<CourierSubPath> bestRandomPath;
 
     //auto startTime = std::chrono::high_resolution_clock::now();
-    for(int runNum = 0; runNum < 8; ++runNum){
+    for(int runNum = 0; runNum < 40; ++runNum){
 
     int depotit = 0;
     
@@ -94,7 +94,7 @@ std::vector<CourierSubPath> travelingCourier(
 
                if(pathTime<currMin&& pathTime!=0){
                    if(j!=0){
-                   currSecondMin = currMin;
+                       currSecondMin = currMin;
                        secondNext = next;
                    }
                    currMin = pathTime;
@@ -232,7 +232,7 @@ std::vector<CourierSubPath> travelingCourier(
      auto startTime = std::chrono::high_resolution_clock::now();
 
     
-    std::vector<IntersectionIdx> order = generate_intersection_order(bestRandomPath);
+    /*std::vector<IntersectionIdx> order = generate_intersection_order(bestRandomPath);
     std::vector<CourierSubPath> two_opt;
     two_opt.resize(bestRandomPath.size());
     two_opt = two_opt_algorithm_order(bestRandomPath, order, deliveries, all_paths, intersections_dest);
@@ -240,10 +240,10 @@ std::vector<CourierSubPath> travelingCourier(
      auto endTime = std::chrono::high_resolution_clock::now();
      
      auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
-     std::cout << time.count() << std::endl;
+     //std::cout << time.count() << std::endl;
+    */
     
-    
-    return two_opt;
+    return bestRandomPath;
 
 }
 
