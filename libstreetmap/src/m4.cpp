@@ -318,6 +318,7 @@ bool order_is_legal (std::vector<IntersectionIdx>& order, std::vector<DeliveryIn
     dropoffs.resize(deliveries.size());
     delivered.resize(deliveries.size());
     
+
     for (int i = 0; i < deliveries.size(); i++) {
         dropoffs[i] = deliveries[i].dropOff;
         pickups[i] = deliveries[i].pickUp;
@@ -353,6 +354,7 @@ bool order_is_legal (std::vector<IntersectionIdx>& order, std::vector<DeliveryIn
     }
 
     return true;
+
 }
 
 std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>& path,
