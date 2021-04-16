@@ -33,7 +33,7 @@ std::vector<std::pair<double,double>> intersectionPosition;
 
 //override for the priority queue to put the smallest element in the front
 bool operator<(const waveElement& lhs,const waveElement& rhs){
-    if(lhs.traveltime >= rhs.traveltime) return true;
+    if(lhs.traveltime  >= rhs.traveltime) return true;
 
     else return false;
 }
@@ -93,7 +93,7 @@ bool path(Node* source_node, IntersectionIdx destination, double turn_penalty,
                     }
                     
                     double estTime = findEuclidianDistance(intersectionPosition[currNode -> ID]
-                    ,intersectionPosition[to]); //the estimated time from the next node to the end destination
+                    ,intersectionPosition[destination])/max_speed; //the estimated time from the next node to the end destination
                  
                     //push node at the opposite end of the edge into the wavefront
                     Node* toNode = &graph[to];
@@ -208,20 +208,20 @@ std::vector<std::vector<std::vector<StreetSegmentIdx>>> findAllPaths(std::vector
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
     const IntersectionIdx intersect_id_destination, const double turn_penalty){
-    
-    //loadGraph();
+    std::vector<Node> graph;
+    loadGraph(graph);
     
     std::vector<StreetSegmentIdx> finalPath;
-    /*Node* start = &graph[intersect_id_start];
+    Node* start = &graph[intersect_id_start];
     
     //found is true if there is a valid path, if true find the path
     //if no path is valid, found is false
-    bool found = path(start,intersect_id_destination,turn_penalty);
+    bool found = path(start,intersect_id_destination,turn_penalty,graph);
     if(found){
-        finalPath = traceBack(intersect_id_destination);
+        finalPath = traceBack(intersect_id_destination,graph);
     }
     
-    graph.clear();*/
+    graph.clear();
     return finalPath;
    
 }
