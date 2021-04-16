@@ -36,15 +36,23 @@ struct waveElement{
     Node *node;
     StreetSegmentIdx edgeID;
     double traveltime;
-    
+    double estTime = 0.0;
     waveElement(Node *n, int id, double time){
         node = n;
         edgeID = id;
         traveltime = time;
     }
+    waveElement(Node *n, int id, double time,double etime){
+        node = n;
+        edgeID = id;
+        traveltime = time;
+        estTime = etime;
+    }
 
 };
-void loadGraph();
+
+
+void loadGraph(std::vector<Node> &graph);
 
 extern double max_speed; //max speed of the map
 
@@ -52,17 +60,19 @@ extern std::vector<StreetSegmentInfo> segmentInfo;
 
 extern std::vector<std::pair<double,double>> intersectionPosition;
 
+extern double map_lat_avg;
+
 double findEuclidianDistance(std::pair<double,double> first,std::pair<double,double> second);
 
 IntersectionIdx findOtherIntersection(IntersectionIdx start, StreetSegmentIdx outgoing);
 
 bool operator<(const waveElement& lhs,const waveElement& rhs);
 
-std::vector<StreetSegmentIdx> traceBack(int destination);
+std::vector<StreetSegmentIdx> traceBack(int destination,std::vector<Node> &graph);
 
-bool path(Node* source_node, IntersectionIdx destination, double turn_penalty);
+bool path(Node* source_node, IntersectionIdx destination, double turn_penalty,std::vector<Node> &graph);
 
-std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vector<IntersectionIdx>& intersections_dest, double turn_penalty);
+std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vector<IntersectionIdx>& intersections_dest, double turn_penalty,std::vector<Node> &graph);
 
 std::vector<std::vector<std::vector<StreetSegmentIdx>>> findAllPaths(std::vector<IntersectionIdx>& intersections_dest,const double turn_penalty);
 #endif /* M3_HEADER_H */

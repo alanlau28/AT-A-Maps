@@ -20,7 +20,6 @@
 
 
 
-
 void close_map();
 
 

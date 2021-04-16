@@ -18,23 +18,6 @@
 extern "C" {
 #endif
 
- struct PickOrDrop;
-    
-std::vector<CourierSubPath> two_opt_swap (const std::vector<CourierSubPath>& path, 
-                                          const int index1,
-                                          const int index2,
-                                          std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
-                                          std::vector<IntersectionIdx>& intersections_dest);
-
-std::vector<CourierSubPath> two_opt_algorithm (const std::vector<CourierSubPath>& path,
-                                               const std::vector<DeliveryInf>& info,
-                                               std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
-                                               std::vector<IntersectionIdx>& intersections_dest);
-
-std::vector<PickOrDrop> generate_delivery_order(std::vector<CourierSubPath> path, 
-                                                std::vector<DeliveryInf> deliveries);
-
-bool path_is_legal (std::vector<PickOrDrop>& deliveryOrder);
 
 std::vector<IntersectionIdx> generate_intersection_order (std::vector<CourierSubPath>& path);
 

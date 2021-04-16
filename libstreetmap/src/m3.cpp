@@ -13,7 +13,8 @@
 #include <queue>
 #include <algorithm>
 #include <math.h>
-
+#include <chrono>
+#include <unordered_set>
 
 Node::Node(int id, double t, const std::vector<StreetSegmentIdx> &out){
     ID = id;
@@ -29,16 +30,16 @@ std::vector<StreetSegmentInfo> segmentInfo;
 std::vector<std::pair<double,double>> intersectionPosition;
 
 //vector to hold each node
-std::vector<Node> graph;
 
 //override for the priority queue to put the smallest element in the front
 bool operator<(const waveElement& lhs,const waveElement& rhs){
     if(lhs.traveltime >= rhs.traveltime) return true;
+
     else return false;
 }
 
 //initializes each node and loads vector of nodes
-void loadGraph(){
+void loadGraph(std::vector<Node> &graph){
     int num = getNumIntersections();
     for (int i = 0; i < num; i++){   
         Node currNode(i, INT_MAX, findStreetSegmentsOfIntersection(i)); //each node is initialized with "infinite" travel time
@@ -53,8 +54,8 @@ void loadGraph(){
 * If a path is found, every node is updated with the total travel time and its reaching edge
 */
 
-bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
-    /*
+bool path(Node* source_node, IntersectionIdx destination, double turn_penalty,
+        std::vector<Node> &graph){
     std::priority_queue<waveElement> wavefront; //priority queue to sort through nodes by travel time
     waveElement source(source_node,NOEDGE, 0,0);
     wavefront.push(source);
@@ -92,8 +93,8 @@ bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
                     }
                     
                     double estTime = findEuclidianDistance(intersectionPosition[currNode -> ID]
-                    ,intersectionPosition[to])/max_speed; //the estimated time from the next node to the end destination 
-                    
+                    ,intersectionPosition[to]); //the estimated time from the next node to the end destination
+                 
                     //push node at the opposite end of the edge into the wavefront
                     Node* toNode = &graph[to];
                     waveElement elem(toNode,currNode -> outgoing[i],travelTime, estTime);
@@ -101,28 +102,20 @@ bool path(Node* source_node, IntersectionIdx destination, double turn_penalty){
                 } 
             }
         } 
-    }*/
+    }
     return false;
 }
 
-std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vector<IntersectionIdx>& intersections_dest, double turn_penalty){
+std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vector<IntersectionIdx>& intersections_dest, double turn_penalty,
+        std::vector<Node> &graph){
+    
     std::priority_queue<waveElement> wavefront; //priority queue to sort through nodes by travel time
-    std::vector<bool> intersection_found(intersections_dest.size());
-    bool foundAll = true;
     std::vector<std::vector<StreetSegmentIdx>> paths;
     paths.resize(intersections_dest.size());
+    int count = 0;
     waveElement source(source_node,NOEDGE, 0);
     wavefront.push(source);
-    
-    for(int i = 0; i < intersection_found.size();i++){
-        if(intersections_dest[i] == source_node -> ID){
-            intersection_found[i] = true;
-        }
-        else{
-            intersection_found[i] = false;
-        } 
-    }
-    
+
     while(!wavefront.empty()){
         waveElement wave = wavefront.top();
         wavefront.pop();
@@ -134,22 +127,13 @@ std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vect
             currNode -> time = wave.traveltime;
             
             //if the current node is the destination a path is found
-            for(int i = 0; i < intersection_found.size();i++){
+            for(int i = 0; i < intersections_dest.size();i++){
                 if(intersections_dest[i] == currNode -> ID){
-                    intersection_found[i] = true;
-                    paths[i] = (traceBack(intersections_dest[i]));
-                    foundAll = true;
+                    paths[i] = (traceBack(intersections_dest[i],graph));
+                    count++;
                 }
             }
-            for(int i = 0; i < intersection_found.size();i++){
-                if(!intersection_found[i]){
-                    foundAll = false;
-                    break;
-                }
-            }
-            if(foundAll){
-                return paths;
-            }
+            if(count == intersections_dest.size()) return paths;
             //for each reaching edge of node
             for(int i = 0; i < currNode -> outgoing.size(); i++){
                 IntersectionIdx to = findOtherIntersection(currNode -> ID,currNode -> outgoing[i]);
@@ -179,7 +163,7 @@ std::vector<std::vector<StreetSegmentIdx>> findPath(Node* source_node, std::vect
 }
 
 //Goes through the end node and traverses all the street segments until the starting intersection and returns the path
-std::vector<StreetSegmentIdx> traceBack(int destination){
+std::vector<StreetSegmentIdx> traceBack(int destination, std::vector<Node> &graph){
     std::vector<StreetSegmentIdx> finalPath;
     Node *currNode = &graph[destination];
     int reachingEdge = currNode -> leading;
@@ -201,24 +185,34 @@ std::vector<StreetSegmentIdx> traceBack(int destination){
 }
 
 std::vector<std::vector<std::vector<StreetSegmentIdx>>> findAllPaths(std::vector<IntersectionIdx>& intersections_dest,const double turn_penalty){
+    //auto startTime = std::chrono::high_resolution_clock::now();
     std::vector<std::vector<std::vector<StreetSegmentIdx>>> all_paths;
     for(int i = 0; i < intersections_dest.size();i++){
-        loadGraph();
-        Node* start = &graph[intersections_dest[i]];
-        all_paths.push_back(findPath(start,intersections_dest,turn_penalty));
-        graph.clear();
+        std::vector<std::vector<StreetSegmentIdx>> temp;
+        all_paths.push_back(temp);
     }
     
+    #pragma omp parallel for
+    for(int i = 0; i < intersections_dest.size();i++){
+        std::vector<Node> graph;
+        loadGraph(graph);
+        Node* start = &graph[intersections_dest[i]];
+        all_paths[i] = (findPath(start,intersections_dest,turn_penalty,graph));
+        graph.clear();
+    }
+   // auto endTime = std::chrono::high_resolution_clock::now();
+    //auto time = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime);
+    //std::cout << time.count() << std::endl;
     return all_paths;
 }
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
     const IntersectionIdx intersect_id_destination, const double turn_penalty){
     
-    loadGraph();
+    //loadGraph();
     
     std::vector<StreetSegmentIdx> finalPath;
-    Node* start = &graph[intersect_id_start];
+    /*Node* start = &graph[intersect_id_start];
     
     //found is true if there is a valid path, if true find the path
     //if no path is valid, found is false
@@ -227,7 +221,7 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
         finalPath = traceBack(intersect_id_destination);
     }
     
-    graph.clear();
+    graph.clear();*/
     return finalPath;
    
 }
@@ -241,6 +235,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
     //adds a turn penalty if it does
     double total_travel_time = 0;
     StreetSegmentIdx next;
+     
     for (int i = 0; i < path.size()-1; i++){
         next = path[i+1];
         total_travel_time += findStreetSegmentTravelTime(path[i]);
