@@ -247,34 +247,6 @@ std::vector<CourierSubPath> travelingCourier(
 
 }
 
-std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initial){
-    double bestCost = 0.0;
-    double newCost = 0.0;
-    int temperature = 50;
-    std::vector<CourierSubPath> bestPath;
-    std::vector<CourierSubPath> newPath = initial;
-    for(int i = 0;i < initial.size();i++){
-        bestCost += computePathTravelTime(initial[i].subpath,15.00000);
-    }
-    while(bestCost != newCost){
-        newCost = 0.0;
-        //newPath = perturb(newPath)
-        for(int i = 0;i < initial.size();i++){
-            newCost += computePathTravelTime(newPath[i].subpath,15.00000);
-        }
-        double deltaCost = newCost - bestCost;
-        if(newCost < bestCost){
-            bestPath = newPath;
-            bestCost = newCost;
-        }
-        temperature -= 2;
-    }
-    
-}
-
-
-
-
 //generates two opt swap of a given intersection order
 //make sure index1 is less than index 2
 std::vector<IntersectionIdx> two_opt_swap_order (std::vector<IntersectionIdx>& order,
@@ -434,5 +406,30 @@ std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>
     if (!final_path.empty() && initial_time < old_time) {
         return final_path;
     } else return path;
+}
+
+std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initial){
+    double bestCost = 0.0;
+    double newCost = 0.0;
+    int temperature = 50;
+    std::vector<CourierSubPath> bestPath;
+    std::vector<CourierSubPath> newPath = initial;
+    for(int i = 0;i < initial.size();i++){
+        bestCost += computePathTravelTime(initial[i].subpath,15.00000);
+    }
+    while(bestCost != newCost){
+        newCost = 0.0;
+        //newPath = perturb(newPath)
+        for(int i = 0;i < initial.size();i++){
+            newCost += computePathTravelTime(newPath[i].subpath,15.00000);
+        }
+        double deltaCost = newCost - bestCost;
+        if(newCost < bestCost){
+            bestPath = newPath;
+            bestCost = newCost;
+        }
+        temperature -= 2;
+    }
+    
 }
 
