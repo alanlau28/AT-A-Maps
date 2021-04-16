@@ -247,7 +247,30 @@ std::vector<CourierSubPath> travelingCourier(
 
 }
 
-
+std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initial){
+    double bestCost = 0.0;
+    double newCost = 0.0;
+    int temperature = 50;
+    std::vector<CourierSubPath> bestPath;
+    std::vector<CourierSubPath> newPath = initial;
+    for(int i = 0;i < initial.size();i++){
+        bestCost += computePathTravelTime(initial[i].subpath,15.00000);
+    }
+    while(bestCost != newCost){
+        newCost = 0.0;
+        //newPath = perturb(newPath)
+        for(int i = 0;i < initial.size();i++){
+            newCost += computePathTravelTime(newPath[i].subpath,15.00000);
+        }
+        double deltaCost = newCost - bestCost;
+        if(newCost < bestCost){
+            bestPath = newPath;
+            bestCost = newCost;
+        }
+        temperature -= 2;
+    }
+    
+}
 
 
 
