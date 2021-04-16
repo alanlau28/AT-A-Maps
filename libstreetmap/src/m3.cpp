@@ -235,6 +235,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path,
     //adds a turn penalty if it does
     double total_travel_time = 0;
     StreetSegmentIdx next;
+     
     for (int i = 0; i < path.size()-1; i++){
         next = path[i+1];
         total_travel_time += findStreetSegmentTravelTime(path[i]);

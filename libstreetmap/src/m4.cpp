@@ -21,16 +21,21 @@
 #include <math.h>
 #include "m4.h"
 #include <chrono>
+#include <random>
 
 std::vector<CourierSubPath> travelingCourier(
 		            const std::vector<DeliveryInf>& deliveries,
                             const std::vector<int>& depots, 
 		            const float turn_penalty){
     const int numDeliveries = deliveries.size();
+    std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_real_distribution<float> distr(0.0, 1.0);
+    
     std::vector<IntersectionIdx> intersections_dest;
     std::vector<std::vector<std::vector<StreetSegmentIdx>>> all_paths;
     std::vector<CourierSubPath> subPath;
-    std::vector<CourierSubPath> bestPath;
+   
             
     for(int i = 0; i < numDeliveries;i++){
         intersections_dest.push_back(deliveries[i].pickUp);
@@ -40,16 +45,19 @@ std::vector<CourierSubPath> travelingCourier(
     for(int i = 0;i < depots.size();i++){
         intersections_dest.push_back(depots[i]);
     }
-    //auto startTime = std::chrono::high_resolution_clock::now();
+    
     all_paths = findAllPaths(intersections_dest,turn_penalty);
+    
+    double bestMinRandom = INT_MAX;
 
-    //auto endTime = std::chrono::high_resolution_clock::now();
-    //auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
-    //std::cout << time.count();
-
+    std::vector<CourierSubPath> bestRandomPath;
+    //auto startTime = std::chrono::high_resolution_clock::now();
+    for(int runNum = 0; runNum < 1; ++runNum){
     int depotit = 0;
+    std::vector<CourierSubPath> bestPath;
+    double totalMin = INT_MAX;
     while(depotit<depots.size()){
-        //std::vector<std::vector<std::vector<StreetSegmentIdx>>> intersections_dest;
+        
        //std::vector<std::vector<StreetSegmentIdx>> answer;
        std::vector<CourierSubPath> currPath;
        //std::vector<double> travel_time_of_paths;
@@ -61,7 +69,7 @@ std::vector<CourierSubPath> travelingCourier(
            notVisited.push_back(true);
        }
        double currMin = INT_MAX;
-       double totalMin = INT_MAX;
+       
 
        int depot_start = (numDeliveries*2);
        int depot_end = (numDeliveries*2);
@@ -106,9 +114,12 @@ std::vector<CourierSubPath> travelingCourier(
        legal[next/2]= true; 
 
        prev = next;
-
+       double currSecondMin;
+       int secondNext;
        for(int iteration = 0; iteration < 2*numDeliveries-1; iteration++){
            currMin=INT_MAX;
+           currSecondMin = INT_MAX;
+           
            if(prev%2==0){
                path.start_intersection= deliveries[prev/2].pickUp;
            }else if (prev%2!=0){
@@ -131,14 +142,20 @@ std::vector<CourierSubPath> travelingCourier(
                            pathDistance = findEuclidianDistance(intersectionPosition[deliveries[prev/2].dropOff], intersectionPosition[deliveries[i/2].dropOff]);
                        }
                    }
-
+                   
                    if((pathTime<currMin && pathTime!=0) ||(pathTime==0 && pathDistance == 0)){
+                       currSecondMin = currMin;
+                       secondNext = next;
                         currMin = pathTime;
                         next = i;             
                    }
-               }        
+               }       
 
            }
+           /*if(distr(eng)<0.1 && iteration!= 2*numDeliveries-2 && currSecondMin != INT_MAX){
+               next = secondNext;
+               currMin = currSecondMin;
+           }*/
            if(next%2==0){
                legal[next/2]=true;
                path.end_intersection = deliveries[next/2].pickUp;
@@ -176,18 +193,31 @@ std::vector<CourierSubPath> travelingCourier(
        currPath.push_back(path);
        if(total<totalMin){
            totalMin = total;
-           bestPath = currPath;
-           
+           bestPath = currPath;  
+           //return bestPath;
        }
        
        currPath.clear();
        depotit+=1;
-
+       
+       for(int i = 0; i<notVisited.size();++i){
+            if(notVisited[i]){
+                bestPath.clear();
+                return bestPath;
+            }
+         }
     
     }
-
     
-    return bestPath;
+    bestRandomPath = bestPath;
+    
+    }
+    
+
+    //auto endTime = std::chrono::high_resolution_clock::now();
+    //auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
+    //std::cout << time.count();
+    return bestRandomPath;
     
     
 }

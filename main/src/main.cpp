@@ -81,11 +81,12 @@ int main(int argc, char** argv) {
         float turn_penalty;
         std::vector<CourierSubPath> result_path;
 
-
-       deliveries = {DeliveryInf(40220, 37954), DeliveryInf(90705, 82446), DeliveryInf(29107, 44932), DeliveryInf(28232, 60062), DeliveryInf(28232, 82070), DeliveryInf(45899, 26959), DeliveryInf(28232, 120267), DeliveryInf(90705, 120353)};
+        deliveries = {DeliveryInf(40220, 37954), DeliveryInf(90705, 82446), DeliveryInf(29107, 44932), DeliveryInf(28232, 60062), DeliveryInf(28232, 82070), DeliveryInf(45899, 26959), DeliveryInf(28232, 120267), DeliveryInf(90705, 120353)};
         depots = {26612, 45787, 77377};
         turn_penalty = 15.000000000;
         result_path = travelingCourier(deliveries, depots, turn_penalty);
+        
+        
         
     std::cout << "Closing map\n";
     closeMap(); 
