@@ -25,8 +25,11 @@
 #include "m2.h"
 #include "m3.h"
 #include "m4.h"
+#include "m4_header.h"
 
 #include <vector>
+
+
 
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everything went OK
@@ -77,15 +80,18 @@ int main(int argc, char** argv) {
     //do something in between
     
     //drawMap();
-        std::vector<DeliveryInf> deliveries;
-        std::vector<IntersectionIdx> depots;
-        float turn_penalty;
-        std::vector<CourierSubPath> result_path;
-
-        deliveries = {DeliveryInf(134204, 32615)};
-        depots = {10, 38701};
-        turn_penalty = 15.000000000;
-        result_path = travelingCourier(deliveries,depots,turn_penalty);
+        std::vector<DeliveryInf>deliveries = {DeliveryInf(133155, 125006), DeliveryInf(124066, 149377)};
+        std::vector<IntersectionIdx>depots = {72612, 95315};
+        double turn_penalty = 15.000000000;
+        std::vector<CourierSubPath> result_path = travelingCourier(deliveries, depots, turn_penalty);
+        
+        //std::vector<IntersectionIdx> generated = generate_intersection_order(result_path);
+        
+        //std::vector<IntersectionIdx> swapped = two_opt_swap_order(generated, 1, 5);
+        //std::vector<CourierSubPath> after_two_opt = two_opt_swap(result_path, 1, 5);
+        //CHECK(courier_path_is_legal(deliveries, depots, result_path));
+        
+        
         
     std::cout << "Closing map\n";
     closeMap(); 

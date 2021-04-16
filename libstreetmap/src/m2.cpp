@@ -141,6 +141,19 @@ intersection_data path_from; //starting intersection of path
 intersection_data path_to; //end intersection of path
 
 
+std::vector<StreetIdx> vector = {36718 ,218628 ,182618 ,182617 ,112656 ,112657 ,
+112658 ,112659 ,205759 ,205760 ,205761 ,205762 ,205763 ,205764 ,172703 ,52149 
+,52145 ,52146 ,185899 ,151762 ,28430 ,127321 ,408 ,409 ,127325 ,207611 ,207612 
+,127318 ,28286 ,28287 ,28305 ,28306 ,419 ,28621 ,28622 ,28623 ,122321 ,122322 
+,113820 ,113819 ,24563 ,24565 ,24566 ,113991 ,558 ,559 ,214170 ,5475 ,5474 ,122301 
+,135009 ,135008 ,26921 ,26922 ,26925 ,26926 ,133261 ,555 ,556 ,565 ,110540 ,82967 
+,82955 ,110543 ,110539 ,110525 ,110528 ,82950 ,82946 ,110526 ,110527 ,26840 ,26841 
+,110522 ,26830 ,26831 ,26826 ,26827 ,144229 ,144230 ,100107 ,110510 ,22210 ,22211 
+,110512 ,110511 ,6022 ,126074 ,126075 ,110518 ,110519 ,22193 ,22194 ,110504 ,100108 
+,113340 ,8748 ,110491 ,110490 ,110492 ,100127 ,110493 ,27175 ,27176 ,27188 ,27189 ,6037 
+,6038 ,138725 ,138730 ,6036 ,551 ,80872 ,80886 ,80885 ,80884 ,80900 ,80901 ,37370 ,37371 
+,37372 ,15139 ,15138 ,9042 ,9043 ,1 ,7811};
+
 bool operator< (feature_data& first, feature_data& second){
     auto begin = feature_priority.begin();
     auto end = feature_priority.end();
@@ -1340,6 +1353,13 @@ void initial_setup(ezgl::application *application, bool){
     GtkButton* helpButton = (GtkButton*) application -> get_object("HelpButton");
     g_signal_connect(helpButton, "clicked", G_CALLBACK(help_button_callback), NULL);
     
+    
+//    for (int i = 0; i < vector.size(); i++) {
+//        street_segments[vector[i]].highlight = true;
+//    }
+//    
+//    intersections[38701].highlight = true;
+//    intersections[10].highlight = true;
     
     //for autocomplete
     globalWidgets.completion = (GtkEntryCompletion*) global_app->get_object("SearchEntryCompletion");
