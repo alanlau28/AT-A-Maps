@@ -469,14 +469,13 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     double prevCost = 0.0;
     double newCost = 0.0;
     double temperature = 100;
-    
     std::vector<CourierSubPath> bestPath;
     std::vector<CourierSubPath> newPath = initial;
     std::vector <PD> order = current;
     for(int i = 0;i < initial.size();i++){
         bestCost += computePathTravelTime(initial[i].subpath,15.00000);
     }
-    
+    double greedyCost = bestCost;
     while(prevCost != bestCost){
         for(int i = 0;i < initial.size();i++){
             newCost = 0.0;
@@ -497,7 +496,9 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
         }
         //std::cout << temperature << std::endl;
     }
-    std::cout << bestCost;
+    if(greedyCost < bestCost){
+        bestPath = initial;
+    }
     return bestPath;
 }
 
