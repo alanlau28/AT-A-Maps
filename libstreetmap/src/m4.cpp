@@ -259,40 +259,16 @@ std::vector<CourierSubPath> travelingCourier(
 
 
     }
-<<<<<<< HEAD
+
     bool test = order_is_legal(bestRandomOrder, intersections_dest);
     std::cout<<test<<std::endl;
-=======
-        if(totalMin<bestMinRandom){
-            bestRandomPath = bestPath;
-            bestMinRandom = totalMin;
-        }
-    
-    
-    }
-    
-     auto startTime = std::chrono::high_resolution_clock::now();
 
->>>>>>> two opt now generates 48 permutations
     
-<<<<<<< HEAD
-=======
-    /*std::vector<IntersectionIdx> order = generate_intersection_order(bestRandomPath);
-    std::vector<CourierSubPath> two_opt;
-    two_opt.resize(bestRandomPath.size());
-    std::vector<PD> pd = {PD(100), PD(200), PD(300)};
-    //two_opt = two_opt_algorithm_order(pd, bestRandomPath, deliveries, all_paths, intersections_dest);
-    
-    //auto startTime = std::chrono::high_resolution_clock::now();
-     auto endTime = std::chrono::high_resolution_clock::now();
-     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
-     //std::cout << time.count() << std::endl;
-    */
-     std::vector<PD> testVec = generate_intersection_order(bestRandomPath, intersections_dest);
-     bool test = order_is_legal(testVec,intersections_dest);
-     std::cout<<test<<std::endl;
->>>>>>> commit to merge
+     //auto startTime = std::chrono::high_resolution_clock::now();
+
+
      return bestRandomPath;
+
 
 }
 
@@ -422,8 +398,8 @@ std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<PD> delivery_or
     std::vector<CourierSubPath> final_path;
     final_path.resize(path.size());
     
-    for (int i = 1; i < path.size() - 1; i++) {
-        for (int j = i + 1; j < path.size() - 1; j++) {
+    for (int i = 1; i < delivery_order.size() - 1; i++) {
+        for (int j = i + 1; j < delivery_order.size() - 1; j++) {
             if (j > i && j - i > 1) {
                 
                 
@@ -446,35 +422,120 @@ std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<PD> delivery_or
                         }
                     }
                     
+                    
+                    
+                    if (order_is_legal(new_order, intersections_dest)){std::cout << "none"  << " "; }
+                    
+                    
+                    
                     //check that path is legal
                     //if legal break
+                    std::vector<PD> new_order1 (new_order);
+                    std::vector<PD> new_order2 (new_order);
+                    std::vector<PD> new_order3 (new_order);
+                    std::vector<PD> new_order4 (new_order);
+                    std::vector<PD> new_order5 (new_order);
+                    std::vector<PD> new_order6 (new_order);
+                    std::vector<PD> new_order7 (new_order);
                     
                     //reverse first subpath
-                    std::reverse(new_order.begin(), new_order.begin() + i);
-                    //check path is legal
-                    std::reverse(new_order.begin(), new_order.begin() + i); //undo reverse
+                    std::reverse(new_order1.begin(), new_order1.begin() + i);
+                    if (order_is_legal(new_order1, intersections_dest)) std::cout << "first" << " ";
+                    
+                    //std::cout << "hello";
                     
                     //reverse middle subpath
-                    std::reverse(new_order.begin() + i, new_order.begin() + j);
-                    //check path is legal
-                    std::reverse(new_order.begin() + i, new_order.begin() + j); //to undo reverse
+                    std::reverse(new_order2.begin() + i, new_order2.begin() + j);
+                    if (order_is_legal(new_order2, intersections_dest))std::cout << "middle" << " ";
+                    
                     
                     
                     //reverse last subpath
-                    std::reverse(new_order.begin() + j, new_order.end());
-                    //check path is legal
-                    std::reverse(new_order.begin() + j, new_order.end()); //undo reverse
+                    std::reverse(new_order3.begin() + j, new_order3.end());
+                    if (order_is_legal(new_order3, intersections_dest))std::cout << "last" << " ";
                     
                     
-                } while (std::next_permutation(list, list+3));
+                    //reverse second and third 
+                    std::reverse(new_order4.begin() + i, new_order4.begin());
+                    if (order_is_legal(new_order4, intersections_dest))std::cout << "2nd3rd" << " ";
+                   
+                    
+                    
+                    //reverse first and second
+                    std::reverse(new_order5.begin(), new_order5.begin() + j);
+                    if (order_is_legal(new_order5, intersections_dest))std::cout << "1st2nd" << " ";
+                    
+                    
+                    
+                    //reverse first and third
+                    std::reverse(new_order6.begin(), new_order6.begin() + i);
+                    std::reverse(new_order6.begin() + j, new_order6.end());
+                    if (order_is_legal(new_order6, intersections_dest))std::cout << "1st3rd" << " ";
   
+                    
+                    
+                    //reverse all
+                    std::reverse(new_order7.begin(), new_order7.end());
+                    if (order_is_legal(new_order7, intersections_dest))std::cout << "all" << " ";
+
+                    
+                    
+                    for(int i = 0; i < new_order.size(); i++) {
+                        std::cout << new_order[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                    for(int i = 0; i < new_order1.size(); i++) {
+                        std::cout << new_order1[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                    for(int i = 0; i < new_order2.size(); i++) {
+                        std::cout << new_order2[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                    for(int i = 0; i < new_order3.size(); i++) {
+                        std::cout << new_order3[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                    for(int i = 0; i < new_order4.size(); i++) {
+                        std::cout << new_order4[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                    for(int i = 0; i < new_order5.size(); i++) {
+                        std::cout << new_order5[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                    for(int i = 0; i < new_order6.size(); i++) {
+                        std::cout << new_order6[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                    for(int i = 0; i < new_order7.size(); i++) {
+                        std::cout << new_order7[i].index << ",";
+                    }
+                    std::cout << std::endl;
+                    
+                   
+                    new_order.clear();
+                    new_order1.clear();
+                    new_order2.clear();
+                    new_order3.clear();
+                    new_order4.clear();
+                    new_order5.clear();
+                    new_order6.clear();
+                    new_order7.clear();
+                } while (std::next_permutation(list, list+3));
+                std::cout << std::endl;
             }
         }
     }
 
-    if (!final_path.empty() && initial_time < old_time) {
-        return final_path;
-    } else return path;
+    return path;
 }
 
 

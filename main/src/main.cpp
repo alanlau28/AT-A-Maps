@@ -81,8 +81,10 @@ int main(int argc, char** argv) {
     std::vector<DeliveryInf>deliveries;
     std::vector<IntersectionIdx>depots;
     //drawMap();
+
         deliveries = {DeliveryInf(68520, 96047), DeliveryInf(36149, 18461), DeliveryInf(36121, 146650), DeliveryInf(20823, 146187), DeliveryInf(93239, 18461), DeliveryInf(145396, 18461), DeliveryInf(94555, 146187), DeliveryInf(123302, 109833)};
         depots = {15009, 115194, 22009};
+
         double turn_penalty = 15.000000000;
         std::vector<CourierSubPath> result_path = travelingCourier(deliveries, depots, turn_penalty);
         
