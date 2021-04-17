@@ -422,7 +422,7 @@ bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& inter
 }
 
 
-std::vector<PD> swap_nodes (std::vector<PD> order, std::vector<IntersectionIdx>&  intersections_dest,
+std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>&  intersections_dest,
                                                   std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
                                                   const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, double turn_penalty,
                                                   double bestCost) {
@@ -468,7 +468,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     double bestCost = 0.0;
     double prevCost = 0.0;
     double newCost = 0.0;
-    double temperature = 50.0;
+    double temperature = 100;
     
     std::vector<CourierSubPath> bestPath;
     std::vector<CourierSubPath> newPath = initial;
@@ -478,7 +478,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     }
     
     while(prevCost != bestCost){
-        for(int i = 0;i < 3000;i++){
+        for(int i = 0;i < initial.size();i++){
             newCost = 0.0;
             current = swap_nodes(order,intersections_dest,all_paths,deliveries,depots,turn_penalty,bestCost);
             newPath = generate_new_courier(current,all_paths,intersections_dest, deliveries, depots, turn_penalty);
@@ -487,15 +487,15 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
                 newCost += computePathTravelTime(newPath[i].subpath,turn_penalty);
             }
             double deltaCost = newCost - bestCost;
-            if(newCost < bestCost || distr(eng) < exp(-1.0*deltaCost/temperature)){
+            if(newCost < bestCost || distr(eng) < exp(-1.0*deltaCost/((i+1)/initial.size()))){
+                std::cout << deltaCost << std::endl;
                 prevCost = bestCost;
                 order = current; 
                 bestPath = newPath;
                 bestCost = newCost;
             }
         }
-        std::cout << temperature << std::endl;
-        temperature -= 0.01;
+        //std::cout << temperature << std::endl;
     }
     std::cout << bestCost;
     return bestPath;
