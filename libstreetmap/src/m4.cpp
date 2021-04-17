@@ -25,6 +25,8 @@
 #include <random>
 
 
+
+
 std::vector<CourierSubPath> travelingCourier(
 		            const std::vector<DeliveryInf>& deliveries,
                             const std::vector<int>& depots, 
@@ -55,7 +57,7 @@ std::vector<CourierSubPath> travelingCourier(
     std::vector<CourierSubPath> bestRandomPath;
 
     //auto startTime = std::chrono::high_resolution_clock::now();
-    for(int runNum = 0; runNum < 40; ++runNum){
+    for(int runNum = 0; runNum < 10; ++runNum){
 
     int depotit = 0;
     
@@ -79,7 +81,7 @@ std::vector<CourierSubPath> travelingCourier(
        int depot_start = (numDeliveries*2);
        int depot_end = (numDeliveries*2);
        int prev;
-       int next = 0;
+       int next;
        double pathTime, pathDistance;
 
        //for(int i = 0; i<depots.size();i++){
@@ -242,8 +244,10 @@ std::vector<CourierSubPath> travelingCourier(
      auto time = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
      //std::cout << time.count() << std::endl;
     */
-    
-    return bestRandomPath;
+     std::vector<PD> testVec = generate_intersection_order(bestRandomPath, intersections_dest);
+     bool test = order_is_legal(testVec,intersections_dest);
+     std::cout<<test<<std::endl;
+     return bestRandomPath;
 
 }
 
@@ -287,15 +291,18 @@ std::vector<CourierSubPath> generate_new_courier (std::vector<IntersectionIdx>& 
 }
 
 //generates a vector of intersection ids from a legal path, 
-std::vector<IntersectionIdx> generate_intersection_order (std::vector<CourierSubPath>& path) {
+std::vector<PD> generate_intersection_order (std::vector<CourierSubPath>& path, std::vector<IntersectionIdx> destination) {
     
-    std::vector<IntersectionIdx> result;
+    std::vector<PD> result;
     
-    for (int i = 0; i < path.size(); i++) {
-        result.push_back(path[i].start_intersection);
-    }
+    for (int i = 1; i < path.size(); i++) {
+        auto it = std::find(destination.begin(), destination.end(), path[i].start_intersection);
+        *it = INT_MAX;
+        PD temp(it-destination.begin());
+        result.push_back(temp);
+    }   
     
-    result.push_back(path.back().end_intersection);
+    //result.push_back(path.back().end_intersection);
     
     //std::cout << result.back() << " " << path[path.size()].end_intersection << std::endl;
     
@@ -303,56 +310,32 @@ std::vector<IntersectionIdx> generate_intersection_order (std::vector<CourierSub
 }
 
 //check that a given intersection order is legal
-bool order_is_legal (std::vector<IntersectionIdx>& order, std::vector<DeliveryInf> deliveries) {
-    
-    std::vector<IntersectionIdx> pickups;
-    std::vector<IntersectionIdx> dropoffs;
-    std::vector<bool> delivered;
-    
-    pickups.resize(deliveries.size());
-    dropoffs.resize(deliveries.size());
-    delivered.resize(deliveries.size());
-    
-
-    for (int i = 0; i < deliveries.size(); i++) {
-        dropoffs[i] = deliveries[i].dropOff;
-        pickups[i] = deliveries[i].pickUp;
-        delivered[i] = false;
+bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& intersections_dest) {
+    //std::cout<<intersections_dest[154]<<std::endl;
+    std::vector<bool> legality;
+    for(int i = 0; i< intersections_dest.size(); i++){
+        legality.push_back(false);
     }
     
-    
-    for (int i = 0; i < order.size(); i++) {
-        
-        for (int j = 0; j < deliveries.size(); j++) {
-            //if a package is picked up, set value to 0
-            if (order[i] == pickups[j]) {
-                pickups[j] = 0;
+    for (int i = 0; i < order.size(); i++){
+       // std::cout<<order[i].index<<std::endl;
+        if(order[i].index%2==1){
+            if(!legality[order[i].index-1]){
+                return false;
             }
-            
+        }else if (order[i].index%2==0){
+            legality[order[i].index] = true;
         }
-        
-        for (int j = 0; j < deliveries.size(); j++) {
-            if (order[i] == dropoffs[j]) {
-                if (pickups[j] == 0) {
-                    dropoffs[j] = 0;
-                    delivered[j] = true;
-                } else if (pickups[j] == 0 && dropoffs[j] != 0) {
-                    return false;
-                }
-            }
-        }
-        
     }
     
-    for (int i = 0; i < delivered.size(); i++) {
-        if (!delivered[i]) return false;
-    }
-
-    return true;
+    
+    //legality.clear();
+    return true;    
+    
 
 }
 
-std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>& path,
+/*std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>& path,
                                                     std::vector<IntersectionIdx>& order,
                                                     std::vector<DeliveryInf> deliveries,
                                                     std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
@@ -378,9 +361,9 @@ std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>
     for (int i = 1; i < order.size() - 1; i++) {
         for (int j = i + 1; j < order.size() - 1; j++) {
             if (j > i && j - i > 1) {
-                std::vector<IntersectionIdx> two_opt_order = two_opt_swap_order(order, i, j);
+                std::vector<PD> two_opt_order = two_opt_swap_order(order, i, j);
 
-                if (!two_opt_order.empty() && order_is_legal(two_opt_order, deliveries)) {
+                if (!two_opt_order.empty() && order_is_legal(two_opt_order, intersections_dest)) {
 
                     std::vector<CourierSubPath> two_opt_path = generate_new_courier (two_opt_order, all_paths, intersections_dest);
                     double new_time = 0;
@@ -406,7 +389,7 @@ std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<CourierSubPath>
     if (!final_path.empty() && initial_time < old_time) {
         return final_path;
     } else return path;
-}
+}*/
 
 std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initial){
     double bestCost = 0.0;
@@ -420,6 +403,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initi
     while(bestCost != newCost){
         newCost = 0.0;
         //newPath = perturb(newPath)
+        
         for(int i = 0;i < initial.size();i++){
             newCost += computePathTravelTime(newPath[i].subpath,15.00000);
         }
