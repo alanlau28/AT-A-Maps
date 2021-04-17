@@ -27,6 +27,7 @@
 #include "m4.h"
 #include "m4_header.h"
 #include <vector>
+#include <algorithm>
 
 
 
@@ -90,7 +91,8 @@ int main(int argc, char** argv) {
         //std::vector<IntersectionIdx> swapped = two_opt_swap_order(generated, 1, 5);
         //std::vector<CourierSubPath> after_two_opt = two_opt_swap(result_path, 1, 5);
         //CHECK(courier_path_is_legal(deliveries, depots, result_path));
-
+        
+        
         
         
         

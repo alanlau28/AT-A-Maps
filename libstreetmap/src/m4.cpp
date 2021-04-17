@@ -28,6 +28,8 @@
 
 
 
+
+
 std::vector<CourierSubPath> travelingCourier(
 		            const std::vector<DeliveryInf>& deliveries,
                             const std::vector<int>& depots, 
@@ -109,7 +111,6 @@ std::vector<CourierSubPath> travelingCourier(
                }
            }
            if(currMin==INT_MAX){
-                //std::cout<<"ewfwefewefwfewfewfwf"<<std::endl;
                depotit+=1;
                continue;
            }
@@ -258,15 +259,29 @@ std::vector<CourierSubPath> travelingCourier(
 
 
     }
+<<<<<<< HEAD
     bool test = order_is_legal(bestRandomOrder, intersections_dest);
     std::cout<<test<<std::endl;
+=======
+        if(totalMin<bestMinRandom){
+            bestRandomPath = bestPath;
+            bestMinRandom = totalMin;
+        }
+    
+    
+    }
+    
+     auto startTime = std::chrono::high_resolution_clock::now();
+
+>>>>>>> two opt now generates 48 permutations
     
 <<<<<<< HEAD
 =======
     /*std::vector<IntersectionIdx> order = generate_intersection_order(bestRandomPath);
     std::vector<CourierSubPath> two_opt;
     two_opt.resize(bestRandomPath.size());
-    two_opt = two_opt_algorithm_order(bestRandomPath, order, deliveries, all_paths, intersections_dest);
+    std::vector<PD> pd = {PD(100), PD(200), PD(300)};
+    //two_opt = two_opt_algorithm_order(pd, bestRandomPath, deliveries, all_paths, intersections_dest);
     
     //auto startTime = std::chrono::high_resolution_clock::now();
      auto endTime = std::chrono::high_resolution_clock::now();
@@ -281,6 +296,9 @@ std::vector<CourierSubPath> travelingCourier(
 
 }
 
+
+
+
 //generates the three subpaths that result from deleting two connections
 //make sure index1 is smaller than index2
 std::vector<std::vector<PD>> swap_subpaths (std::vector<PD> order, int index1, int index2) {
@@ -293,6 +311,20 @@ std::vector<std::vector<PD>> swap_subpaths (std::vector<PD> order, int index1, i
     
     return result;
 }
+
+
+
+
+//generates two opt swap of a given intersection order
+//make sure index1 is less than index 2
+//std::vector<std::vector<IntersectionIdx>> two_opt_swap_order (std::vector<IntersectionIdx>& order,
+//                                                 int index1, int index2) {
+//    std::vector<IntersectionIdx> new_order(order);
+//    std::reverse(new_order.begin() + index1, new_order.begin() + index2);
+//    
+//    return new_order;
+//}
+
 
 
 std::vector<CourierSubPath> generate_new_courier (std::vector<IntersectionIdx>& order,
@@ -337,8 +369,6 @@ std::vector<PD> generate_intersection_order (std::vector<CourierSubPath>& path, 
     }   
     
     //result.push_back(path.back().end_intersection);
-    
-    //std::cout << result.back() << " " << path[path.size()].end_intersection << std::endl;
     
     return result;
 }

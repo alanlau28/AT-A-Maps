@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+
 struct PD{
     int index;
    
@@ -26,6 +27,8 @@ struct PD{
        
     }
 };
+
+
 
 std::vector<PD> generate_intersection_order (std::vector<CourierSubPath>& path, std::vector<IntersectionIdx> destination);
 
