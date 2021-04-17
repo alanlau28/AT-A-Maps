@@ -261,7 +261,7 @@ std::vector<CourierSubPath> travelingCourier(
     }
 
 
-    std::vector<CourierSubPath> newCourier =  generate_new_courier(bestRandomOrder, all_paths, intersections_dest, deliveries, depots, turn_penalty);
+    std::vector<CourierSubPath> newCourier;// =  generate_new_courier(bestRandomOrder, all_paths, intersections_dest, deliveries, depots, turn_penalty);
     
     //std::cout<<test<<std::endl;
 
@@ -287,12 +287,7 @@ std::vector<CourierSubPath> travelingCourier(
 //        std::cout << two_opt_order[i].index << " ";
 //    }
 //    
-     for (int i = 0; i < bestRandomOrder.size(); i++) {
-         if (bestRandomOrder[i].index != two_opt_order[i].index) {
-         std::cout << bestRandomOrder[i].index << " -> " <<
-         two_opt_order[i].index << std::endl;
-        }
-    }
+     newCourier = simulatedAnnealing(bestRandomPath,bestRandomOrder, intersections_dest, all_paths,deliveries,depots,turn_penalty);
 
      return newCourier;
 
@@ -400,22 +395,6 @@ void firstAndLastDepot (std::vector<PD>& order, std::vector<CourierSubPath>& new
     
 }
 
-//generates a vector of intersection ids from a legal path, 
-std::vector<PD> generate_intersection_order (std::vector<CourierSubPath>& path, std::vector<IntersectionIdx> destination) {
-    
-    std::vector<PD> result;
-    
-    for (int i = 1; i < path.size(); i++) {
-        auto it = std::find(destination.begin(), destination.end(), path[i].start_intersection);
-        *it = INT_MAX;
-        PD temp(it-destination.begin());
-        result.push_back(temp);
-    }   
-    
-    //result.push_back(path.back().end_intersection);
-    
-    return result;
-}
 
 //check that a given intersection order is legal
 bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& intersections_dest) {
@@ -443,125 +422,6 @@ bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& inter
 
 }
 
-std::vector<PD> two_opt_algorithm_order (std::vector<PD> delivery_order,
-                                         std::vector<DeliveryInf> deliveries,
-                                         std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
-                                         std::vector<IntersectionIdx>& intersections_dest) {
-    
-    
-    for (int i = 1; i < delivery_order.size() -1; i++) {
-        for (int j = i + 1; j < delivery_order.size(); j++) {
-            if (j > i && j - i > 1) {
-
-                //get the three subpaths
-                std::vector<std::vector<PD>> subpaths = swap_subpaths(delivery_order, i, j);
-                
-                int list[] = {2,0,1};
-                
-                
-                std::sort(list, list+3);
-                
-                //get all permutations of list
-                //build new vector according to permutation
-                do {
-                    std::vector<PD> new_order;
-            
-                    //get the list that's arranged in the new permutation
-                    for (int i = 0; i < 3; i++) {
-                        for (int j = 0; j < subpaths[list[i]].size(); j++) {
-                            new_order.push_back(subpaths[list[i]][j]);
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    //if original order is legal, return
-                    
-                    //std::cout << list[0] << " " << list[1] << " " << list[2] << std::endl;
-                    //std::cout << i << " " << j << std::endl;
-                    
-                    //check that path is legal
-                    //if legal break
-                    std::vector<PD> new_order1 (new_order);
-                    std::vector<PD> new_order2 (new_order);
-                    std::vector<PD> new_order3 (new_order);
-                    std::vector<PD> new_order4 (new_order);
-                    std::vector<PD> new_order5 (new_order);
-                    std::vector<PD> new_order6 (new_order);
-                    std::vector<PD> new_order7 (new_order);
-                    
-                    
-                    
-                    //reverse first subpath
-                    std::reverse(new_order1.begin(), new_order1.begin() + i);
-                    if (order_is_legal(new_order1, intersections_dest)
-                            && list[0] != 0 && list[1] != 1 && list[2] != 2) {
-                        return new_order1;
-                    }
-                    
-
-                    
-                    //reverse middle subpath
-                    std::reverse(new_order2.begin() + i, new_order2.begin() + j);
-                    if (order_is_legal(new_order2, intersections_dest)
-                            && list[0] != 0 && list[1] != 1 && list[2] != 2) {
-                        return new_order2;
-                    }
-                    
-                    
-                    
-                    //reverse last subpath
-                    std::reverse(new_order3.begin() + j, new_order3.end());
-                    if (order_is_legal(new_order3, intersections_dest)
-                            && list[0] != 0 && list[1] != 1 && list[2] != 2) {
-                        return new_order3;
-                    }
-                    
-                    
-                    //reverse second and third 
-                    std::reverse(new_order4.begin() + i, new_order4.end());
-                    if (order_is_legal(new_order4, intersections_dest)
-                           && list[0] != 0 && list[1] != 1 && list[2] != 2) {
-                        return new_order4;
-                    }
-                   
-                    
-                    
-                    //reverse first and second
-                    std::reverse(new_order5.begin(), new_order5.begin() + j);
-                    if (order_is_legal(new_order5, intersections_dest)
-                            && list[0] != 0 && list[1] != 1 && list[2] != 2) return new_order5;
-                    
-                    
-                    
-                    //reverse first and third
-                    std::reverse(new_order6.begin(), new_order6.begin() + i);
-                    std::reverse(new_order6.begin() + j, new_order6.end());
-                    if (order_is_legal(new_order6, intersections_dest)
-                            && list[0] != 0 && list[1] != 1 && list[2] != 2)return new_order6;
-  
-                    
-                    
-                    //reverse all
-                    std::reverse(new_order7.begin(), new_order7.end());
-                    if (order_is_legal(new_order7, intersections_dest)
-                            && list[0] != 0 && list[1] != 1 && list[2] != 2)return new_order7;
-
-                    
-                    if (order_is_legal(new_order, intersections_dest)
-                        && list[0] != 0 && list[1] != 1 && list[2] != 2) return new_order;
-                   
-                    
-                } while (std::next_permutation(list, list+3));
-                
-            }
-        }
-    }
-
-    return delivery_order;
-}
-
 
 std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>&  intersections_dest) {
     
@@ -580,7 +440,6 @@ std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>
       auto rand1 = uni(rng);
       auto rand2 = uni(rng);
       
-      std::cout << rand1 << " " << rand2 << std::endl;
       
       std::swap(new_order[rand1], new_order[rand2]);
       
@@ -598,7 +457,8 @@ std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>
 
 
 std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &initial, std::vector<PD> &current, 
-        std::vector<IntersectionIdx> &intersections_dest, std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths){
+        std::vector<IntersectionIdx> &intersections_dest, std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
+        const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, double turn_penalty){
     std::random_device rd;
     std::default_random_engine eng(rd());
     std::uniform_real_distribution<float> distr(0.0, 1.0);
@@ -613,16 +473,16 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     while(bestCost != newCost){
         newCost = 0.0;
         current = swap_nodes(current,intersections_dest);
-        newPath = generate_new_courier(current,all_paths,intersections_dest);
+        newPath = generate_new_courier(current,all_paths,intersections_dest, deliveries, depots, turn_penalty);
         for(int i = 0;i < initial.size();i++){
-            newCost += computePathTravelTime(newPath[i].subpath,15.00000);
+            newCost += computePathTravelTime(newPath[i].subpath,turn_penalty);
         }
         double deltaCost = newCost - bestCost;
         if(newCost < bestCost || distr(eng) < exp(deltaCost/temperature)){
             bestPath = newPath;
             bestCost = newCost;
         }
-        temperature -= 2.0;
+        temperature -= 0.01;
     }
     return bestPath;
 }
