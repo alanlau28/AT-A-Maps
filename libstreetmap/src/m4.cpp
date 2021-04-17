@@ -563,7 +563,7 @@ std::vector<PD> two_opt_algorithm_order (std::vector<PD> delivery_order,
 }
 
 
-std::vector<PD> swap_nodes (std::vector<PD> order, std::vector<IntersectionIdx>&  intersections_dest) {
+std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>&  intersections_dest) {
     
     if (order.size() < 4) return order;
     int k = 0;
@@ -597,10 +597,14 @@ std::vector<PD> swap_nodes (std::vector<PD> order, std::vector<IntersectionIdx>&
 } 
 
 
-std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initial){
+std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &initial, std::vector<PD> &current, 
+        std::vector<IntersectionIdx> &intersections_dest, std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths){
+    std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_real_distribution<float> distr(0.0, 1.0);
     double bestCost = 0.0;
     double newCost = 0.0;
-    int temperature = 50;
+    double temperature = 50.0;
     std::vector<CourierSubPath> bestPath;
     std::vector<CourierSubPath> newPath = initial;
     for(int i = 0;i < initial.size();i++){
@@ -608,18 +612,18 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initi
     }
     while(bestCost != newCost){
         newCost = 0.0;
-        //newPath = perturb(newPath)
-        
+        current = swap_nodes(current,intersections_dest);
+        newPath = generate_new_courier(current,all_paths,intersections_dest);
         for(int i = 0;i < initial.size();i++){
             newCost += computePathTravelTime(newPath[i].subpath,15.00000);
         }
         double deltaCost = newCost - bestCost;
-        if(newCost < bestCost){
+        if(newCost < bestCost || distr(eng) < exp(deltaCost/temperature)){
             bestPath = newPath;
             bestCost = newCost;
         }
-        temperature -= 2;
+        temperature -= 2.0;
     }
-    
+    return bestPath;
 }
 
