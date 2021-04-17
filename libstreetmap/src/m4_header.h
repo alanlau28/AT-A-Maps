@@ -34,9 +34,12 @@ std::vector<PD> generate_intersection_order (std::vector<CourierSubPath>& path, 
 
 std::vector<std::vector<PD>> swap_subpaths (std::vector<PD> order, int index1, int index2);
 
-std::vector<CourierSubPath> generate_new_courier (std::vector<IntersectionIdx>& order,
+std::vector<CourierSubPath> generate_new_courier (std::vector<PD>& order,
                                                   std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
-                                                  std::vector<IntersectionIdx>& intersections_dest);
+                                                  std::vector<IntersectionIdx>& intersections_dest,
+                                                  const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, double turn_penalty);
+void firstAndLastDepot (std::vector<PD>& order, std::vector<CourierSubPath>& new_path, const std::vector<DeliveryInf>& deliveries,
+                            const std::vector<int>& depots, std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths, double turn_penalty );
 
 bool order_is_legal (std::vector<PD>& path, std::vector<IntersectionIdx>&  intersections_dest);
 

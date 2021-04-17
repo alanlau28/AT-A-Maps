@@ -260,6 +260,12 @@ std::vector<CourierSubPath> travelingCourier(
 
     }
 
+
+    std::vector<CourierSubPath> newCourier =  generate_new_courier(bestRandomOrder, all_paths, intersections_dest, deliveries, depots, turn_penalty);
+    
+    //std::cout<<test<<std::endl;
+
+
     
     auto startTime = std::chrono::high_resolution_clock::now();
     
@@ -288,7 +294,7 @@ std::vector<CourierSubPath> travelingCourier(
         }
     }
 
-     return bestRandomPath;
+     return newCourier;
 
 
 }
@@ -326,7 +332,8 @@ std::vector<std::vector<PD>> swap_subpaths (std::vector<PD> order, int index1, i
 
 std::vector<CourierSubPath> generate_new_courier (std::vector<PD>& order,
                                                   std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
-                                                  std::vector<IntersectionIdx>& intersections_dest) {
+                                                  std::vector<IntersectionIdx>& intersections_dest,
+                                                  const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, double turn_penalty) {
     std::vector<CourierSubPath> new_path;
     
     for (int i = 0; i < order.size() - 1; i++) {
@@ -343,7 +350,54 @@ std::vector<CourierSubPath> generate_new_courier (std::vector<PD>& order,
         
     }
     
+    firstAndLastDepot(order, new_path, deliveries, depots, all_paths, turn_penalty);
+    
     return new_path;
+}
+
+void firstAndLastDepot (std::vector<PD>& order, std::vector<CourierSubPath>& new_path, const std::vector<DeliveryInf>& deliveries,
+                            const std::vector<int>& depots, std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths, double turn_penalty ){
+    double pathTime;
+    double currMin = INT_MAX;
+    const int curr = order[order.size()-1].index;
+    const int first = order[0].index;
+    int depot_end, depot_start;
+    
+    CourierSubPath lastPath, firstPath;
+    
+    lastPath.start_intersection = new_path.back().end_intersection;
+    
+    for(int i = 2*deliveries.size(); i < all_paths.size(); i++){
+               pathTime = computePathTravelTime(all_paths[curr][i],turn_penalty);
+               //pathTime = findEuclidianDistance(intersectionPosition[deliveries[next/2].dropOff], intersectionPosition[depots[i-(2*numDeliveries)]]);
+               if(pathTime< currMin && pathTime!=0){
+                   currMin = pathTime;
+                   depot_end = i;
+               }
+           }
+    
+    lastPath.end_intersection = depots[depot_end-2*(deliveries.size())];
+    
+    lastPath.subpath = all_paths[curr][depot_end];
+    new_path.push_back(lastPath);
+    
+    firstPath.end_intersection=new_path[0].start_intersection;
+    currMin = INT_MAX;
+    for (int i = 2*deliveries.size(); i < all_paths.size(); i++){
+        pathTime = computePathTravelTime(all_paths[i][first],turn_penalty);
+        if(pathTime<currMin&& pathTime!=0){                   
+                   currMin = pathTime;
+                   depot_start = i;
+
+                   
+               }
+    }
+    firstPath.start_intersection = depots[depot_start-(2*deliveries.size())];
+    firstPath.subpath = all_paths[depot_start][first];
+    
+    new_path.insert(new_path.begin(), firstPath);
+    
+    
 }
 
 //generates a vector of intersection ids from a legal path, 
