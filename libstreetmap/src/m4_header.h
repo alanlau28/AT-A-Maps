@@ -49,7 +49,9 @@ std::vector<PD> two_opt_algorithm_order (std::vector<PD> delivery_order,
                                          std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
                                          std::vector<IntersectionIdx>& intersections_dest);
 
-std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>&  intersections_dest);
+std::vector<PD> swap_nodes (std::vector<PD> order, std::vector<IntersectionIdx>&  intersections_dest,
+        std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
+                                                  const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, double turn_penalty,double bestCost);
 
 std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &initial, std::vector<PD> &current, 
         std::vector<IntersectionIdx> &intersections_dest, std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,

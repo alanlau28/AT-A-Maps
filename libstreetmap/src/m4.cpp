@@ -269,7 +269,6 @@ std::vector<CourierSubPath> travelingCourier(
     
     auto startTime = std::chrono::high_resolution_clock::now();
     
-    std::vector<PD> two_opt_order = swap_nodes (bestRandomOrder, intersections_dest);
     
     
     auto endTime = std::chrono::high_resolution_clock::now();
@@ -423,7 +422,10 @@ bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& inter
 }
 
 
-std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>&  intersections_dest) {
+std::vector<PD> swap_nodes (std::vector<PD> order, std::vector<IntersectionIdx>&  intersections_dest,
+                                                  std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
+                                                  const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, double turn_penalty,
+                                                  double bestCost) {
     
     if (order.size() < 4) return order;
     int k = 0;
@@ -462,28 +464,40 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     std::random_device rd;
     std::default_random_engine eng(rd());
     std::uniform_real_distribution<float> distr(0.0, 1.0);
+    
     double bestCost = 0.0;
+    double prevCost = 0.0;
     double newCost = 0.0;
     double temperature = 50.0;
+    
     std::vector<CourierSubPath> bestPath;
     std::vector<CourierSubPath> newPath = initial;
+    std::vector <PD> order = current;
     for(int i = 0;i < initial.size();i++){
         bestCost += computePathTravelTime(initial[i].subpath,15.00000);
     }
-    while(bestCost != newCost){
-        newCost = 0.0;
-        current = swap_nodes(current,intersections_dest);
-        newPath = generate_new_courier(current,all_paths,intersections_dest, deliveries, depots, turn_penalty);
-        for(int i = 0;i < initial.size();i++){
-            newCost += computePathTravelTime(newPath[i].subpath,turn_penalty);
-        }
-        double deltaCost = newCost - bestCost;
-        if(newCost < bestCost || distr(eng) < exp(deltaCost/temperature)){
-            bestPath = newPath;
-            bestCost = newCost;
+    
+    while(prevCost != bestCost){
+        for(int i = 0;i < 9000;i++){
+            newCost = 0.0;
+            current = swap_nodes(order,intersections_dest,all_paths,deliveries,depots,turn_penalty,bestCost);
+            newPath = generate_new_courier(current,all_paths,intersections_dest, deliveries, depots, turn_penalty);
+
+            for(int i = 0;i < initial.size();i++){
+                newCost += computePathTravelTime(newPath[i].subpath,turn_penalty);
+            }
+            std::cout << newCost << std::endl;
+            double deltaCost = newCost - bestCost;
+            if(newCost < bestCost || distr(eng) < exp(-1.0*deltaCost/temperature)){
+                order = current; 
+                prevCost = newCost;
+                bestPath = newPath;
+                bestCost = newCost;
+            }
         }
         temperature -= 0.01;
     }
+    std::cout << bestCost;
     return bestPath;
 }
 
