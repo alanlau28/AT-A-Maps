@@ -280,7 +280,7 @@ std::vector<CourierSubPath> travelingCourier(
 //    for (int i = 0; i < bestRandomOrder.size(); i++) {
 //        std::cout << two_opt_order[i].index << " ";
 //    }
-    
+//    
      for (int i = 0; i < bestRandomOrder.size(); i++) {
          if (bestRandomOrder[i].index != two_opt_order[i].index) {
          std::cout << bestRandomOrder[i].index << " -> " <<
@@ -514,23 +514,32 @@ std::vector<PD> swap_nodes (std::vector<PD> order, std::vector<IntersectionIdx>&
     if (order.size() < 4) return order;
     int k = 0;
     
-    for (int i = 1; i < order.size() - 2; i++) {
-        for (int j = i + 2; j < order.size(); j++) {
-            if (j > i && j - i > 1) {
-                std::vector<PD> new_order(order);
-                
-                std::swap(new_order[i], new_order[j]);
-                k++;
-                
-                if (order_is_legal(new_order, intersections_dest)) {
-                    std::cout << i << " " << j << std::endl;
-                    return new_order;
-                }
-            }
-        }
-    }
+    std::random_device rd;     // only used once to initialise (seed) engine
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni(0,order.size() - 1); // guaranteed unbiased
     
-    return order;
+    
+    std::vector<PD> new_order(order);
+
+    
+    do {
+      auto rand1 = uni(rng);
+      auto rand2 = uni(rng);
+      
+      std::cout << rand1 << " " << rand2 << std::endl;
+      
+      std::swap(new_order[rand1], new_order[rand2]);
+      
+      if (order_is_legal(new_order, intersections_dest)) {
+          return new_order;
+      }
+      
+      std::swap(new_order[rand1], new_order[rand2]);
+      
+    } while (1) ;
+    
+    
+    return new_order;
 } 
 
 
