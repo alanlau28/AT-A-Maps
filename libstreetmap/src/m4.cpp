@@ -260,12 +260,33 @@ std::vector<CourierSubPath> travelingCourier(
 
     }
 
-    bool test = order_is_legal(bestRandomOrder, intersections_dest);
-    std::cout<<test<<std::endl;
-
     
-     //auto startTime = std::chrono::high_resolution_clock::now();
-
+    auto startTime = std::chrono::high_resolution_clock::now();
+    
+    std::vector<PD> two_opt_order = swap_nodes (bestRandomOrder, intersections_dest);
+    
+    
+    auto endTime = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::duration<double>> (endTime - startTime);
+    //std::cout << duration.count() << std::endl;
+    
+//    bool test = order_is_legal(two_opt_order, intersections_dest);
+//    std::cout<<test<<std::endl;
+    
+//    for (int i = 0; i < bestRandomOrder.size(); i++) {
+//        std::cout << bestRandomOrder[i].index << " " << two_opt_order[i].index << std::endl;
+//    }
+//    std::cout << std::endl;
+//    for (int i = 0; i < bestRandomOrder.size(); i++) {
+//        std::cout << two_opt_order[i].index << " ";
+//    }
+    
+     for (int i = 0; i < bestRandomOrder.size(); i++) {
+         if (bestRandomOrder[i].index != two_opt_order[i].index) {
+         std::cout << bestRandomOrder[i].index << " -> " <<
+         two_opt_order[i].index << std::endl;
+        }
+    }
 
      return bestRandomPath;
 
@@ -368,38 +389,21 @@ bool order_is_legal (std::vector<PD>& order, std::vector<IntersectionIdx>& inter
 
 }
 
-std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<PD> delivery_order,
-                                                    std::vector<CourierSubPath>& path,
-                                                    std::vector<DeliveryInf> deliveries,
-                                                    std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
-                                                    std::vector<IntersectionIdx>& intersections_dest) {
+std::vector<PD> two_opt_algorithm_order (std::vector<PD> delivery_order,
+                                         std::vector<DeliveryInf> deliveries,
+                                         std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
+                                         std::vector<IntersectionIdx>& intersections_dest) {
     
-    //no two opt swap can be done if path size is less than 4
-    if (path.size() < 4) return path;
     
-    double initial_time = 0;
-    
-    double old_time = 0;
-    
-
-    for (int l = 0; l < path.size(); l++) {
-        initial_time += computePathTravelTime(path[l].subpath, 15.00);
-    }
-    
-    old_time = initial_time;
-    
-    std::vector<CourierSubPath> final_path;
-    final_path.resize(path.size());
-    
-    for (int i = 1; i < delivery_order.size() - 1; i++) {
-        for (int j = i + 1; j < delivery_order.size() - 1; j++) {
+    for (int i = 1; i < delivery_order.size() -1; i++) {
+        for (int j = i + 1; j < delivery_order.size(); j++) {
             if (j > i && j - i > 1) {
-                
-                
+
                 //get the three subpaths
                 std::vector<std::vector<PD>> subpaths = swap_subpaths(delivery_order, i, j);
                 
-                int list[] = {0,1,2};
+                int list[] = {2,0,1};
+                
                 
                 std::sort(list, list+3);
                 
@@ -417,9 +421,11 @@ std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<PD> delivery_or
                     
                     
                     
-                    if (order_is_legal(new_order, intersections_dest)){std::cout << "none"  << " "; }
                     
+                    //if original order is legal, return
                     
+                    //std::cout << list[0] << " " << list[1] << " " << list[2] << std::endl;
+                    //std::cout << i << " " << j << std::endl;
                     
                     //check that path is legal
                     //if legal break
@@ -431,105 +437,101 @@ std::vector<CourierSubPath> two_opt_algorithm_order (std::vector<PD> delivery_or
                     std::vector<PD> new_order6 (new_order);
                     std::vector<PD> new_order7 (new_order);
                     
+                    
+                    
                     //reverse first subpath
                     std::reverse(new_order1.begin(), new_order1.begin() + i);
-                    if (order_is_legal(new_order1, intersections_dest)) std::cout << "first" << " ";
+                    if (order_is_legal(new_order1, intersections_dest)
+                            && list[0] != 0 && list[1] != 1 && list[2] != 2) {
+                        return new_order1;
+                    }
                     
-                    //std::cout << "hello";
+
                     
                     //reverse middle subpath
                     std::reverse(new_order2.begin() + i, new_order2.begin() + j);
-                    if (order_is_legal(new_order2, intersections_dest))std::cout << "middle" << " ";
+                    if (order_is_legal(new_order2, intersections_dest)
+                            && list[0] != 0 && list[1] != 1 && list[2] != 2) {
+                        return new_order2;
+                    }
                     
                     
                     
                     //reverse last subpath
                     std::reverse(new_order3.begin() + j, new_order3.end());
-                    if (order_is_legal(new_order3, intersections_dest))std::cout << "last" << " ";
+                    if (order_is_legal(new_order3, intersections_dest)
+                            && list[0] != 0 && list[1] != 1 && list[2] != 2) {
+                        return new_order3;
+                    }
                     
                     
                     //reverse second and third 
-                    std::reverse(new_order4.begin() + i, new_order4.begin());
-                    if (order_is_legal(new_order4, intersections_dest))std::cout << "2nd3rd" << " ";
+                    std::reverse(new_order4.begin() + i, new_order4.end());
+                    if (order_is_legal(new_order4, intersections_dest)
+                           && list[0] != 0 && list[1] != 1 && list[2] != 2) {
+                        return new_order4;
+                    }
                    
                     
                     
                     //reverse first and second
                     std::reverse(new_order5.begin(), new_order5.begin() + j);
-                    if (order_is_legal(new_order5, intersections_dest))std::cout << "1st2nd" << " ";
+                    if (order_is_legal(new_order5, intersections_dest)
+                            && list[0] != 0 && list[1] != 1 && list[2] != 2) return new_order5;
                     
                     
                     
                     //reverse first and third
                     std::reverse(new_order6.begin(), new_order6.begin() + i);
                     std::reverse(new_order6.begin() + j, new_order6.end());
-                    if (order_is_legal(new_order6, intersections_dest))std::cout << "1st3rd" << " ";
+                    if (order_is_legal(new_order6, intersections_dest)
+                            && list[0] != 0 && list[1] != 1 && list[2] != 2)return new_order6;
   
                     
                     
                     //reverse all
                     std::reverse(new_order7.begin(), new_order7.end());
-                    if (order_is_legal(new_order7, intersections_dest))std::cout << "all" << " ";
+                    if (order_is_legal(new_order7, intersections_dest)
+                            && list[0] != 0 && list[1] != 1 && list[2] != 2)return new_order7;
 
                     
-                    
-                    for(int i = 0; i < new_order.size(); i++) {
-                        std::cout << new_order[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
-                    for(int i = 0; i < new_order1.size(); i++) {
-                        std::cout << new_order1[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
-                    for(int i = 0; i < new_order2.size(); i++) {
-                        std::cout << new_order2[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
-                    for(int i = 0; i < new_order3.size(); i++) {
-                        std::cout << new_order3[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
-                    for(int i = 0; i < new_order4.size(); i++) {
-                        std::cout << new_order4[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
-                    for(int i = 0; i < new_order5.size(); i++) {
-                        std::cout << new_order5[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
-                    for(int i = 0; i < new_order6.size(); i++) {
-                        std::cout << new_order6[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
-                    for(int i = 0; i < new_order7.size(); i++) {
-                        std::cout << new_order7[i].index << ",";
-                    }
-                    std::cout << std::endl;
-                    
+                    if (order_is_legal(new_order, intersections_dest)
+                        && list[0] != 0 && list[1] != 1 && list[2] != 2) return new_order;
                    
-                    new_order.clear();
-                    new_order1.clear();
-                    new_order2.clear();
-                    new_order3.clear();
-                    new_order4.clear();
-                    new_order5.clear();
-                    new_order6.clear();
-                    new_order7.clear();
+                    
                 } while (std::next_permutation(list, list+3));
-                std::cout << std::endl;
+                
             }
         }
     }
 
-    return path;
+    return delivery_order;
 }
+
+
+std::vector<PD> swap_nodes (std::vector<PD> order, std::vector<IntersectionIdx>&  intersections_dest) {
+    
+    if (order.size() < 4) return order;
+    int k = 0;
+    
+    for (int i = 1; i < order.size() - 2; i++) {
+        for (int j = i + 2; j < order.size(); j++) {
+            if (j > i && j - i > 1) {
+                std::vector<PD> new_order(order);
+                
+                std::swap(new_order[i], new_order[j]);
+                k++;
+                
+                if (order_is_legal(new_order, intersections_dest)) {
+                    std::cout << i << " " << j << std::endl;
+                    return new_order;
+                }
+            }
+        }
+    }
+    
+    return order;
+} 
 
 
 std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> initial){
