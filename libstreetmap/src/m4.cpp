@@ -303,27 +303,20 @@ std::vector<std::vector<PD>> swap_subpaths (std::vector<PD> order, int index1, i
 
 
 
-std::vector<CourierSubPath> generate_new_courier (std::vector<IntersectionIdx>& order,
+std::vector<CourierSubPath> generate_new_courier (std::vector<PD>& order,
                                                   std::vector<std::vector<std::vector<StreetSegmentIdx>>>& all_paths,
                                                   std::vector<IntersectionIdx>& intersections_dest) {
     std::vector<CourierSubPath> new_path;
     
     for (int i = 0; i < order.size() - 1; i++) {
         CourierSubPath new_node;
-        new_node.start_intersection = order[i];
-        new_node.end_intersection = order[i+1];
+        new_node.start_intersection = intersections_dest[order[i].index];
+        new_node.end_intersection = intersections_dest[order[i+1].index];
         
         int start = 0;
         int end = 0;
-        
-        for (int j = 0; j < intersections_dest.size(); j++) {
-            if (intersections_dest[j] == order[i]) start = j;
-        }
-        for (int j = 0; j < intersections_dest.size(); j++) {
-            if (intersections_dest[j] == order[i+1]) end = j;
-        }
-        
-        new_node.subpath = all_paths[start][end];
+       
+        new_node.subpath = all_paths[order[i].index][order[i+1].index];
         
         new_path.push_back(new_node);
         
