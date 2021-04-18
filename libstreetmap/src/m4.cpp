@@ -478,7 +478,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     }
     double greedyCost = bestCost;
     while(temperature > 0){
-        for(int i = 0;i < 1000;i++){
+        for(int i = 0;i < 3000;i++){
             newCost = 0.0;
             current = swap_nodes(order,intersections_dest,all_paths,deliveries,depots,turn_penalty,bestCost);
             newPath = generate_new_courier(current,all_paths,intersections_dest, deliveries, depots, turn_penalty);
@@ -500,6 +500,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     if(greedyCost < bestCost){
         bestPath = initial;
     }
+    //std::cout << bestCost;
     return bestPath;
 }
 
