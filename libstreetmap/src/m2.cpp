@@ -140,7 +140,10 @@ ezgl::application* global_app;
 intersection_data path_from; //starting intersection of path
 intersection_data path_to; //end intersection of path
 
-
+std::vector<int> h = {
+728, 729, 730, 731, 732, 733, 734, 158792, 149811, 206168, 158790,158791, 206169,206170, 206171, 206172, 24284, 24285, 144200,
+183222, 146882, 146883, 146884, 146885, 146886, 146887, 11226, 31054, 10720, 10721, 11007, 11008 ,11009, 143037, 143038,
+283, 3623,3624, 26577, 26578 ,26579 ,143296};
 
 bool operator< (feature_data& first, feature_data& second){
     auto begin = feature_priority.begin();
@@ -1211,7 +1214,7 @@ void drawHighlights(ezgl::renderer *g){
     ezgl::surface *png_surface1;  
     png_surface = ezgl::renderer::load_png("libstreetmap/resources/pin.png");
     png_surface1 = ezgl::renderer::load_png("libstreetmap/resources/from_pin.png");
-        
+    
     //loops through all street segments and draws the ones that are highlighted
     for (int i = 0; i < street_segments.size(); i++) {
         

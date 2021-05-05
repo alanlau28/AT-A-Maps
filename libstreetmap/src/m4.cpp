@@ -430,9 +430,9 @@ std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>
     if (order.size() < 4) return order;
     int k = 0;
     
-    std::random_device rd;     // only used once to initialise (seed) engine
-    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
-    std::uniform_int_distribution<int> uni(0,order.size() - 1); // guaranteed unbiased
+    std::random_device rd;
+    std::default_random_engine rng(rd());
+    std::uniform_int_distribution<int> uni(0,order.size()-1);
     
     
     std::vector<PD> new_order(order);
@@ -441,7 +441,12 @@ std::vector<PD> swap_nodes (std::vector<PD> &order, std::vector<IntersectionIdx>
     do {
       auto rand1 = uni(rng);
       auto rand2 = uni(rng);
-      
+      while(rand1 == rand2){
+          std::cout << rand1 <<std::endl;
+          std::cout <<rand2 <<std::endl;
+          rand1 = uni(rng);
+          rand2 = uni(rng);
+      }
       
       std::swap(new_order[rand1], new_order[rand2]);
       
@@ -468,7 +473,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     double bestCost = 0.0;
     double prevCost = 0.0;
     double newCost = 0.0;
-    double temperature = 50;
+    double temperature = 1000;
     
     std::vector<CourierSubPath> bestPath;
     std::vector<CourierSubPath> newPath = initial;
@@ -477,7 +482,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
         bestCost += computePathTravelTime(initial[i].subpath,15.00000);
     }
     double greedyCost = bestCost;
-    while(temperature > 0){
+    while(prevCost != bestCost){
         for(int i = 0;i < 4000;i++){
             newCost = 0.0;
             current = swap_nodes(order,intersections_dest,all_paths,deliveries,depots,turn_penalty,bestCost);
@@ -487,6 +492,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
                 newCost += computePathTravelTime(newPath[i].subpath,turn_penalty);
             }
             double deltaCost = newCost - bestCost;
+            //std::cout <<deltaCost <<std::endl;
             if(newCost < bestCost || distr(eng) < exp(-1.0*deltaCost/temperature)){
                 prevCost = bestCost;
                 order = current; 
@@ -500,7 +506,7 @@ std::vector<CourierSubPath> simulatedAnnealing(std::vector<CourierSubPath> &init
     if(greedyCost < bestCost){
         bestPath = initial;
     }
-    //std::cout << bestCost;
+    std::cout << bestCost;
     return bestPath;
 }
 
